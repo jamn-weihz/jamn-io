@@ -10,7 +10,7 @@ export default function UserPosts(props: UserPostsProps) {
   if (!props.user.focus) return null;
   return (
     <Box>
-      <PostContainer post={props.user.focus} instanceId={props.user.id} />
+      <PostContainer post={props.user.focus} postKey={props.user.id} />
     </Box>
   )
 }

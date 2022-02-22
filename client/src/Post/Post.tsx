@@ -12,7 +12,7 @@ import React from 'react';
 
 interface PostComponentProps {
   post: Post;
-  instanceId: string;
+  postKey: string;
 }
 export default function PostComponent(props: PostComponentProps) {
   const navigate = useNavigate();
@@ -52,6 +52,8 @@ export default function PostComponent(props: PostComponentProps) {
     count = contentState.getPlainText('\n').length;
   }
   const limit = 1000;
+
+  console.log(props.post, post);
 
   return (
     <Card variant='outlined' sx={{
@@ -96,7 +98,7 @@ export default function PostComponent(props: PostComponentProps) {
         <Editor post={post} isReadonly={false} />
       </Box>
       <Box sx={{
-        display: post.userId === userDetail.user?.id && !post.commitDate
+        display: post.userId === userDetail?.id && !post.commitDate
           ? 'flex' 
           : 'none',
         justifyContent: 'center',

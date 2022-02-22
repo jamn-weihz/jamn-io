@@ -1,6 +1,6 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client'
-import { tokenVar, userVar } from '../cache';
-
+import { colVar, tokenVar, userVar } from '../cache';
+import { v4 as uuidv4 } from 'uuid';
 
 const LOGOUT_USER = gql`
   mutation LogoutUser {
@@ -24,15 +24,36 @@ export default function useLogout() {
 
   const logoutUser = () => {
     logout();
+    colVar({
+      isAdding: false,
+      cols: [
+        { 
+          id: uuidv4(),
+          pathname: '/register',
+          i: 0,
+          __typename: 'Col',
+        },
+        { 
+          id: uuidv4(),
+          pathname: '/map',
+          i: 1,
+          __typename: 'Col',
+        },
+        {
+          id: uuidv4(),
+          pathname: '/search',
+          i: 2,
+          __typename: 'Col',
+       }
+      ]
+    })
     if (tokenDetail.interval) {
       clearInterval(tokenDetail.interval);
       tokenVar({
         isValid: false,
         interval: null,
       });
-      userVar({
-        user: null,
-      });
+      userVar(null);
     }
   }
 

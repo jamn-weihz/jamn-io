@@ -4,26 +4,28 @@ import GoogleButton from './GoogleButton';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { USER_FIELDS } from '../fragments';
+import { FULL_USER_FIELDS } from '../fragments';
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { tokenVar, userVar } from '../cache';
-import { useNavigate } from 'react-router-dom';
+import { colVar, tokenVar, userVar } from '../cache';
 import useToken from './useToken';
+import { Col } from '../types/Col';
 
 
 const LOGIN_USER = gql`
   mutation LoginUser($email: String!, $pass: String!) {
     loginUser(email: $email, pass: $pass) {
-      ...UserFields
+      ...FullUserFields
     }
   }
-  ${USER_FIELDS}
+  ${FULL_USER_FIELDS}
 `;
 
-export default function Login() {
-  const navigate = useNavigate();
-
+interface LoginProps {
+  i: number;
+}
+export default function Login(props: LoginProps) {
   const tokenDetail = useReactiveVar(tokenVar);
+  const colDetail = useReactiveVar(colVar);
 
   const { refreshTokenInterval } = useToken();
 
@@ -38,10 +40,11 @@ export default function Login() {
         clearInterval(tokenDetail.interval);
       }
       refreshTokenInterval();
-      userVar({
-        user: data.loginUser,
+      userVar(data.loginUser);
+      colVar({
+        ...colDetail,
+        cols: data.loginUser.cols,
       });
-      navigate(`/u/${encodeURIComponent(data.loginUser.name)}`)
     }
   });
 
@@ -81,17 +84,32 @@ export default function Login() {
   };
 
   const handleRegisterClick = (event: React.MouseEvent) => {
-    navigate('/register');
-  }
+    const cols = colDetail.cols.map((col, i) => {
+      if (i === props.i) {
+        return {
+          pathname: '/register',
+        } as Col;
+      }
+      return col;
+    });
+    colVar({
+      ...colDetail,
+      cols
+    });
+  };
 
   const isFormValid = email.length && pass.length;
 
   return (
     <Box sx={{
-      padding: 1,
-      textAlign: 'center',
+      border: '1px solid lavender',
+      width: 320,
     }}>
-      Login
+      <Card elevation={5} sx={{
+        padding:1,
+      }}>
+        /login
+      </Card>
       <Box>
         {message}
       </Box>
@@ -137,14 +155,19 @@ export default function Login() {
         </Button>
       </Card>
       <Card elevation={5} sx={{margin:1, padding:1}} onClick={handleGoogleClick}>
-        <GoogleButton isRegistration={false} setMessage={setMessage}/>
+        <GoogleButton isRegistration={false} setMessage={setMessage} i={props.i}/>
       </Card>
-      New user?&nbsp;
-      <Link onClick={handleRegisterClick} sx={{
-        cursor: 'pointer',
+      <Box sx={{
+        textAlign: 'center',
       }}>
-        Register
-      </Link>
+        New user?&nbsp;
+        <Link onClick={handleRegisterClick} sx={{
+          cursor: 'pointer',
+        }}>
+          Register
+        </Link>
+      </Box>
+
     </Box>
   );
 }

@@ -19,12 +19,12 @@ import { SurveyorItem } from '../types/Surveyor';
 import PostComponent from '../Post/Post';
 import useReplyPost from '../Post/useReplyPost';
 import { Jam } from '../types/Jam';
+import { FULL_POST_FIELDS } from '../fragments';
+import useGetPrev from '../Post/useGetPrev';
+import useGetNext from '../Post/useGetNext';
 
 interface SurveyorEntryProps {
   context: User | Jam;
-  post: Post;
-  showPrev: boolean;
-  showNext: boolean;
   item: SurveyorItem;
   updateItem(item: SurveyorItem): void;
   depth: number;
@@ -39,16 +39,74 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
 
   const surveyorState = surveyorDetail[props.context.id]
 
+  const handleGetPrevCompleted = (inLinks: Link[]) => {
+    const items = inLinks.map(link => {
+      let existingItem = null as SurveyorItem | null;
+      props.item.prev.some(item => {
+        if (item.linkId === link.id) {
+          existingItem = item;
+          return true;
+        }
+        return false;
+      });
+      return {
+        linkId: link.id,
+        postId: link.sourcePostId,
+        postKey: uuidv4(),
+        showPrev: !!existingItem?.showPrev,
+        showNext: !!existingItem?.showNext,
+        prev: existingItem?.prev || [],
+        next: existingItem?.next || [],
+      } as SurveyorItem;
+    });
+    props.updateItem({
+      ...props.item,
+      showPrev: true,
+      showNext: false,
+      prev: [...props.item.prev, ...items],
+    });
+  }
+  const { getPrev } = useGetPrev(props.item.postId, handleGetPrevCompleted);
+
+  const handleGetNextCompleted = (outLinks: Link[]) => {
+    const items = outLinks.map(link => {
+      let existingItem = null as SurveyorItem | null;
+      props.item.prev.some(item => {
+        if (item.linkId === link.id) {
+          existingItem = item;
+          return true;
+        }
+        return false;
+      });
+      return {
+        linkId: link.id,
+        postId: link.targetPostId,
+        postKey: uuidv4(),
+        showPrev: !!existingItem?.showPrev,
+        showNext: !!existingItem?.showNext,
+        prev: existingItem?.prev || [],
+        next: existingItem?.next || [],
+      } as SurveyorItem;
+    });
+    props.updateItem({
+      ...props.item,
+      showPrev: false,
+      showNext: true,
+      next: [...props.item.next, ...items],
+    });
+  }
+  const { getNext } = useGetNext(props.item.postId, handleGetNextCompleted);
+
   const handleReplyCompleted = (link: Link) => {
     const newItem = {
-      link,
-      post: link.targetPost,
+      linkId: link.id,
+      postId: link.targetPostId,
+      postKey: uuidv4(),
       showPrev: false,
       showNext: true,
       prev: [],
       next: [],
       refresh: false,
-      instanceId: uuidv4(),
     };
     props.updateItem({
       ...props.item,
@@ -58,7 +116,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
     })
   }
 
-  const { replyPost } = useReplyPost(props.post.id, props.context, handleReplyCompleted);
+  const { replyPost } = useReplyPost(props.item.postId, props.context, handleReplyCompleted);
 
   const handlePrevClick = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -70,12 +128,12 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
       })
     }
     else {
+      getPrev(props.item.prev.length);
       props.updateItem({
         ...props.item,
         showPrev: true,
         showNext: false,
-        refresh: true,
-      })
+      });
     }
   }
 
@@ -89,11 +147,11 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
       })
     }
     else {
+      getNext(props.item.next.length);
       props.updateItem({
         ...props.item,
         showPrev: false,
         showNext: true,
-        refresh: true,
       })
     }
   }
@@ -107,7 +165,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
       query:'',
       items: [{
         ...props.item,
-        link: undefined,
+        linkId: undefined,
       }]
     });
     surveyorVar({
@@ -124,6 +182,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
   const handleReplyClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     event.preventDefault();
+    replyPost();
   }
 
   const handleLinkClick = (event: React.MouseEvent) => {
@@ -149,6 +208,16 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
     event.preventDefault();
   }
 
+  const post = client.cache.readFragment({
+    id: client.cache.identify({
+      id: props.item.postId,
+      __typename: 'Post',
+    }),
+    fragment: FULL_POST_FIELDS,
+    fragmentName: 'FullPostFields',
+  }) as Post;
+
+  if (!post) return null;
   return (
     <MUICard elevation={7} 
       onMouseEnter={handleMouseEnter} 
@@ -160,8 +229,8 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
       }}
     >
       <PostComponent
-        post={props.item.post}
-        instanceId={props.item.instanceId}
+        post={post}
+        postKey={props.item.postKey}
       />
       <Box sx={{
         display: 'flex',
@@ -189,7 +258,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
             &nbsp;
             <Box component='span' sx={{whiteSpace: 'nowrap'}}>
               <IconButton
-                disabled={!userDetail.user?.verifyEmailDate}
+                disabled={!userDetail?.verifyEmailDate}
                 size='small'
                 color='inherit'
                 onClick={handleReplyClick}
@@ -203,7 +272,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
               &nbsp;
               &nbsp;
               <IconButton
-                disabled={!userDetail.user?.verifyEmailDate}
+                disabled={!userDetail?.verifyEmailDate}
                 size='small'
                 color='inherit'
                 onClick={handleLinkClick}
@@ -227,24 +296,24 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
             onClick={handlePrevClick}
             color='inherit'
             size='small'
-            variant={props.showPrev ? 'outlined' : 'text'}
+            variant={props.item.showPrev ? 'outlined' : 'text'}
             sx={{
               fontSize: 12,
             }}
           >
-            {props.item.post.prevCount} prev
+            {post.prevCount} prev
           </Button>
           &nbsp;
           <Button 
             onClick={handleNextClick}
             color='inherit'
             size='small'
-            variant={props.showNext ? 'outlined' : 'text'}
+            variant={props.item.showNext ? 'outlined' : 'text'}
             sx={{
               fontSize: 12,
             }}
           >
-            {props.item.post.nextCount} next
+            {post.nextCount} next
           </Button>
         </Box>
       </Box>

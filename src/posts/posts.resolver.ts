@@ -1,6 +1,7 @@
 import { forwardRef, Inject, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import { CurrentUser, GqlAuthGuard } from 'src/auth/gql-auth.guard';
+import { Jam } from 'src/jams/jam.model';
 import { JamsService } from 'src/jams/jams.service';
 import { User } from 'src/users/user.model';
 import { UsersService } from 'src/users/users.service';
@@ -24,7 +25,7 @@ export class PostsResolver {
     return this.usersService.getUserById(post.userId);
   }
 
-  @ResolveField(() => User, {name: 'jam'})
+  @ResolveField(() => Jam, {name: 'jam', nullable: true})
   async getPostJam(
     @Parent() post: Post,
   ) {

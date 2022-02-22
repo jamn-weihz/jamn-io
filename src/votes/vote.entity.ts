@@ -18,6 +18,23 @@ export class Vote {
   id: string;
 
   @Column()
+  userId: string;
+  
+  @ManyToOne(() => User)
+  @JoinColumn({ referencedColumnName: 'id' })
+  user: User;
+
+  @Column()
+  userI: number;
+
+  @Column()
+  linkId: string;
+
+  @ManyToOne(() => Link)
+  @JoinColumn({ referencedColumnName: 'id' })
+  link: Link;
+  
+  @Column()
   sourcePostId: string;
 
   @ManyToOne(() => Post)
@@ -30,20 +47,6 @@ export class Vote {
   @ManyToOne(() => Post)
   @JoinColumn({ name: 'targetPostId', referencedColumnName: 'id' })
   targetPost: Post;
-
-  @Column()
-  linkId: string;
-
-  @ManyToOne(() => Link)
-  @JoinColumn({ referencedColumnName: 'id' })
-  link: Link;
-  
-  @Column()
-  userId: string;
-  
-  @ManyToOne(() => User)
-  @JoinColumn({ referencedColumnName: 'id' })
-  user: User;
   
   @Column({ default: 0 })
   clicks: number;

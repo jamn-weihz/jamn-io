@@ -31,8 +31,11 @@ export class User {
   @OneToMany(() => Role, role => role.user)
   roles: Role[];
 
-  @Column()
+  @Column({default: 0})
   postI: number;
+
+  @Column({default: 0})
+  voteI: number;
 
   @Column()
   name: string;

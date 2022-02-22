@@ -1,18 +1,14 @@
 import { gql, useLazyQuery, useMutation, useReactiveVar } from '@apollo/client';
 import { 
   Box,
-  Card,
   FormControl,
   InputLabel,
-  Modal,
   OutlinedInput,
   FormHelperText,
   Button,
 } from '@mui/material';
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { userVar } from '../cache';
-import { JAM_FIELDS } from '../fragments';
+import { colVar } from '../cache';
 
 const GET_JAM_BY_NAME = gql`
   query GetJamByName($name: String!) {
@@ -36,11 +32,10 @@ interface StartJamModalProps {
   lat: number;
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  i: number;
 }
-export default function StartJamModal(props: StartJamModalProps) {
-  const navigate = useNavigate();
-
-  const userDetail = useReactiveVar(userVar);
+export default function StartJamForm(props: StartJamModalProps) {
+  const colDetail = useReactiveVar(colVar);
 
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState('');
@@ -68,7 +63,18 @@ export default function StartJamModal(props: StartJamModalProps) {
     onCompleted: data => {
       console.log(data);
       props.setIsOpen(false);
-      navigate(`/j/${encodeURIComponent(data.startJam.name)}`);
+      colVar({
+        ...colDetail,
+        cols: colDetail.cols.map((col, i) => {
+          if (i === props.i) {
+            return {
+              ...col,
+              pathname: `/j/${data.startJam.name}`,
+            };
+          }
+          return col;
+        })
+      })
     }
   });
 
@@ -118,55 +124,44 @@ export default function StartJamModal(props: StartJamModalProps) {
 
   const isFormValid = !!name.length
   return (
-    <Modal open={props.isOpen} onClose={handleClose}>
-      <Card sx={{
-        position: 'absolute',
-        left: '50%',
-        top: '50%',
-        marginLeft: '-160px',
-        marginTop: '-110px',
-        width: '320px',
-        height: '220px',
-        textAlign: 'center',
+    <Box sx={{
+      display: props.isOpen ? 'block' : 'none',
+      padding: 1,
+    }}>
+      <FormControl margin='dense' sx={{width: '100%'}}>
+        <InputLabel htmlFor='jamn-name' variant='outlined'>Name</InputLabel>
+        <OutlinedInput
+          id='jamn-name'
+          type='text'
+          value={name}
+          onChange={handleNameChange}
+          error={!!nameError}
+          label='Name'
+        />
+        <FormHelperText>{nameError}</FormHelperText>
+      </FormControl>
+      <FormControl margin='dense' sx={{width: '100%'}}>
+        <InputLabel htmlFor='jamn-desc' variant='outlined'>Description (optional)</InputLabel>
+        <OutlinedInput
+          id='jamn-desc'
+          type='text'
+          value={desc}
+          onChange={handleDescChange}
+          label='Description (optional)'
+        />
+      </FormControl>
+      <Box sx={{
+        paddingTop: 1,
       }}>
-        <Box sx={{
-          padding: 1,
-        }}>
-          Start a jam
-          <FormControl margin='dense' sx={{width: '100%'}}>
-            <InputLabel htmlFor='jamn-name' variant='outlined'>Name</InputLabel>
-            <OutlinedInput
-              id='jamn-name'
-              type='text'
-              value={name}
-              onChange={handleNameChange}
-              error={!!nameError}
-              label='Name'
-            />
-            <FormHelperText>{nameError}</FormHelperText>
-          </FormControl>
-          <FormControl margin='dense' sx={{width: '100%'}}>
-            <InputLabel htmlFor='jamn-desc' variant='outlined'>Description (optional)</InputLabel>
-            <OutlinedInput
-              id='jamn-desc'
-              type='text'
-              value={desc}
-              onChange={handleDescChange}
-              label='Description (optional)'
-            />
-          </FormControl>
-          <Box sx={{
-            padding:1,
-          }}>
-            <Button color='secondary' onClick={handleCancelClick}>
-              Cancel
-            </Button>
-            <Button disabled={!isFormValid} onClick={handleSubmitClick}>
-              Start
-            </Button>
-          </Box>
-        </Box>
-      </Card>
-    </Modal>
+        <Button variant='contained' disabled={!isFormValid} onClick={handleSubmitClick}>
+          Start
+        </Button>
+        &nbsp;
+        <Button color='secondary' onClick={handleCancelClick}>
+          Cancel
+        </Button>
+
+      </Box>
+    </Box>
   )
 }

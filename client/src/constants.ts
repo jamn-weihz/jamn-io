@@ -16,5 +16,3 @@ export const ALGOLIA_APP_KEY = '5b9983f85822a5b64d79be432ba9d901';
 export const ALGOLIA_INDEX_NAME = process.env.NODE_ENV === 'production'
   ? 'prod_jamn'
   : 'dev_jamn'
-
-export const APPBAR_HEIGHT = 48;

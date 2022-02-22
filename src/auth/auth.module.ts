@@ -7,12 +7,14 @@ import { JwtAuthStrategy } from './jwt-auth.strategy';
 import { JwtRefreshStrategy } from './jwt-refresh.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { EmailModule } from 'src/email/email.module';
+import { ColsModule } from 'src/cols/cols.module';
 @Module({
   imports: [
     ConfigModule,
     JwtModule.register({}),
     UsersModule,
     EmailModule,
+    ColsModule,
   ],
   providers: [
     AuthResolver,

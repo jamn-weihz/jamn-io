@@ -14,6 +14,9 @@ export class Vote {
   @Field(() => User)
   user: User;
 
+  @Field(() => Int)
+  userI: number;
+  
   @Field()
   linkId: string;
 

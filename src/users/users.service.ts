@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { adjectives, animals, NumberDictionary, uniqueNamesGenerator } from 'unique-names-generator';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
+import { ColsService } from 'src/cols/cols.service';
 
 const numbers = NumberDictionary.generate({ min: 100, max: 999 });
 
@@ -72,8 +73,8 @@ export class UsersService {
     user0.isRegisteredWithGoogle = isGoogle;
     user0.verifyEmailDate = isGoogle ? new Date() : null;
     user0.postI = 0;
-    const user1 = this.usersRepository.save(user0);
-
+    user0.voteI = 0;
+    const user1 = await this.usersRepository.save(user0);
     return user1;
   }
 
@@ -119,6 +120,10 @@ export class UsersService {
 
   incrementUserPostI(userId: string) {
     this.usersRepository.increment({id: userId}, 'postI', 1);
+  }
+
+  incrementUserVoteI(userId: string) {
+    this.usersRepository.increment({id: userId}, 'voteI', 1);
   }
 
   async setUserColor(userId: string, color: string): Promise<User> {

@@ -19,6 +19,27 @@ export const USER_FIELDS = gql`
   }
 `;
 
+export const COL_FIELDS = gql`
+  fragment ColFields on Col {
+    id
+    userId
+    pathname
+    i
+    deleteDate
+  }
+`
+
+export const FULL_USER_FIELDS = gql`
+  fragment FullUserFields on User {
+    ...UserFields
+    cols {
+      ...ColFields
+    }
+  }
+  ${USER_FIELDS}
+  ${COL_FIELDS}
+`;
+
 export const JAM_FIELDS = gql`
   fragment JamFields on Jam {
     id
@@ -80,6 +101,8 @@ export const FULL_POST_FIELDS = gql`
 export const LINK_FIELDS = gql`
   fragment LinkFields on Link {
     id
+    sourcePostId
+    targetPostId
     weight
     deleteDate
   }
@@ -90,6 +113,8 @@ export const VOTE_FIELDS = gql`
     id
     userId
     linkId
+    sourcePostId
+    targetPostId
     weight
     deleteDate
   }

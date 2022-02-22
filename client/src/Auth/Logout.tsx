@@ -12,7 +12,6 @@ export default function Logout() {
   return (
     <Box>
       <Link onClick={handleLogoutClick} sx={{
-        padding: 1,
         cursor: 'pointer',
       }}>
         Logout

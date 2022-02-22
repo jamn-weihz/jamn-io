@@ -25,7 +25,7 @@ export default function useUpdateUser() {
   });
 
   const updateUserMap = (lng: number, lat: number, zoom: number) => {
-    if (!userDetail.user?.id) return;
+    if (!userDetail?.id) return;
     updateMap({
       variables: {
         lng,

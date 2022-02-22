@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { START_POST_DESC, START_POST_DRAFT, START_POST_I, START_POST_NAME } from 'src/constants';
 import { Repository } from 'typeorm';
@@ -7,6 +7,8 @@ import * as Enums from 'src/enums';
 import { v4 as uuidv4 } from 'uuid';
 import { UsersService } from 'src/users/users.service';
 import { convertFromRaw } from 'draft-js';
+import { JamsService } from 'src/jams/jams.service';
+import { SearchService } from 'src/search/search.service';
 
 @Injectable()
 export class PostsService {
@@ -14,6 +16,9 @@ export class PostsService {
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
     private readonly usersService: UsersService,
+    @Inject(forwardRef(() => JamsService))
+    private readonly jamsService: JamsService,
+    private readonly searchService: SearchService,
   ) {}
 
   async getPostById(id: string) {
@@ -88,6 +93,34 @@ export class PostsService {
     return this.postsRepository.save(post0);
   }
 
+  async createPost(userId: string, jamId?: string): Promise<Post> {
+    const user = await this.usersService.getUserById(userId);
+    this.usersService.incrementUserPostI(userId);
+
+    let jamI = null;
+    if (jamId) {
+      const jam = await this.jamsService.getJamById(jamId);
+      this.jamsService.incrementJamPostI(jamId);
+      jamI = jam.postI;
+    }
+
+    const post0 = new Post();
+    post0.userId = userId;
+    post0.userI = user.postI + 1;
+    post0.jamId = jamId;
+    post0.jamI = jamI;
+    post0.draft = '';
+    post0.name = '';
+    post0.description = '';
+    post0.prevCount = 1;
+    post0.nextCount = 0;
+    post0.saveDate = new Date();
+    post0.commitDate = null;
+    const post1 = await this.postsRepository.save(post0);
+    this.searchService.savePosts([post1]);
+    return post1;
+  }
+
   async savePost(userId: string, postId: string, draft: string): Promise<Post> {
     const post = await this.postsRepository.findOne({id: postId});
 
@@ -111,5 +144,13 @@ export class PostsService {
     post0.saveDate = new Date();
 
     return this.postsRepository.save(post0);
+  }
+
+  incrementPostPrevCount(postId: string) {
+    this.postsRepository.increment({id: postId}, 'prevCount', 1);
+  }
+
+  incrementPostNextCount(postId: string) {
+    this.postsRepository.increment({id: postId}, 'nextCount', 1);
   }
 }

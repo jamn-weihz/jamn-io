@@ -16,6 +16,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { EmailModule } from './email/email.module';
 import { RolesModule } from './roles/roles.module';
 import { SearchModule } from './search/search.module';
+import { ColsModule } from './cols/cols.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -32,6 +33,9 @@ import * as Joi from 'joi';
         GOOGLE_CLIENT_SECRET: Joi.string().required(),
         MAILGUN_API_KEY: Joi.string().required(),
         MAILGUN_DOMAIN: Joi.string().required(),
+        ALGOLIA_APP_ID: Joi.string().required(),
+        ALGOLIA_API_KEY: Joi.string().required(),
+        ALGOLIA_INDEX_NAME: Joi.string().required(),
         DEV_CLIENT_URI: Joi.string(),
       })
     }),
@@ -79,6 +83,7 @@ import * as Joi from 'joi';
     EmailModule,
     RolesModule,
     SearchModule,
+    ColsModule,
   ],
   controllers: [],
   providers: [],

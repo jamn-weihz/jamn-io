@@ -3,15 +3,15 @@ import { Link } from '../types/Link';
 import SurveyorEntry from './SurveyorEntry';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { Vote } from '../types/Vote';
-import React, { Dispatch, useEffect } from 'react';
+import React from 'react';
 
-import { v4 as uuidv4 } from 'uuid';
-import { gql, useApolloClient } from '@apollo/client';
+import { useApolloClient } from '@apollo/client';
 
 import { SurveyorItem } from '../types/Surveyor';
 import { User } from '../types/User';
 import { Jam } from '../types/Jam';
+import { FULL_POST_FIELDS, LINK_FIELDS } from '../fragments';
+import { Post } from '../types/Post';
 
 interface SurveyorTreeProps {
   context: User | Jam;
@@ -49,20 +49,37 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
     })
   }
 
-  const weight = 0;
+  const post = client.cache.readFragment({
+    id: client.cache.identify({
+      id: props.item.postId,
+      __typename: 'Post',
+    }),
+    fragment: FULL_POST_FIELDS,
+    fragmentName: 'FullPostFields',
+  }) as Post;
+
+  const link = props.item.linkId
+    ? client.cache.readFragment({
+        id: client.cache.identify({
+          id: props.item.linkId,
+          __typename: 'Link',
+        }),
+        fragment: LINK_FIELDS,
+      }) as Link
+    : null;
 
   let remaining = 0;
   let items = [] as SurveyorItem[];
   if (props.item.showPrev) {
     items = props.item.prev;
     remaining = items.length > 0
-      ? Math.min(20, props.item.post.prevCount - items.length)
+      ? Math.min(20, post.prevCount - items.length)
       : 0;
   }
   else if (props.item.showNext) {
     items = props.item.next;
     remaining = items.length > 0 
-      ? Math.min(20, props.item.post.nextCount - items.length)
+      ? Math.min(20, post.nextCount - items.length)
       : 0;
   }
 
@@ -79,7 +96,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
         justifyContent: 'space-between',
       }}>
         {
-          props.item.link
+          link
             ? <Box sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -88,27 +105,28 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
                 marginRight: '-4px',
               }}>
                 <IconButton
-                  onClick={voteOnLink(weight > 0 ? 0 : 1)} 
-                  color={weight > 0 ? 'primary' : 'secondary'} 
+                  onClick={voteOnLink(link.weight > 0 ? 0 : 1)} 
+                  color={link.weight > 0 ? 'primary' : 'secondary'} 
                   size='small' 
                   sx={{
-                    opacity: weight > 0 ? 1 : .4,
+                    opacity: link.weight > 0 ? 1 : .4,
                     fontSize: 20,
                   }}
                 >
                   <ArrowDropUpIcon fontSize='inherit' />
                 </IconButton>
                 <Box sx={{
-                  color: 'dimgrey'
+                  color: 'dimgrey',
+                  textAlign: 'center',
                 }}>
-                { props.item.link.weight }
+                { link.weight }
                 </Box>
                 <IconButton
-                  onClick={voteOnLink(weight < 0 ? 0 : -1)} 
-                  color={weight < 0 ? 'primary' : 'secondary'} 
+                  onClick={voteOnLink(link.weight < 0 ? 0 : -1)} 
+                  color={link.weight < 0 ? 'primary' : 'secondary'} 
                   size='small' 
                   sx={{
-                    opacity: weight < 0 ? 1 : .4,
+                    opacity: link.weight < 0 ? 1 : .4,
                     fontSize: 20,
                   }}
                 >
@@ -119,9 +137,6 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
         }
         <SurveyorEntry
           context={props.context}
-          post={props.item.post}
-          showPrev={props.item.showPrev}
-          showNext={props.item.showNext}
           item={props.item}
           updateItem={props.updateItem}
           depth={props.depth}
@@ -139,7 +154,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
           items.map((item, i) => {
             return (
               <SurveyorTree
-                key={`surveyor-tree-${item.instanceId}`}
+                key={`surveyor-tree-${item.postKey}`}
                 item={item}
                 updateItem={updateChildItem(props.item.showNext, i)}
                 depth={props.depth + 1}

@@ -1,14 +1,13 @@
-
-import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { ObjectType, Field, Int } from "@nestjs/graphql";
 import { User } from 'src/users/user.model';
-import { Link } from 'src/links/link.model';
 import { Jam } from 'src/jams/jam.model';
+import { Link } from 'src/links/link.model';
 
 @ObjectType()
 export class Post {
   @Field()
   id: string;
-
+  
   @Field()
   userId: string;
 
@@ -21,7 +20,7 @@ export class Post {
   @Field({ nullable: true })
   jamId: string;
   
-  @Field(() => Jam, {nullable: true})
+  @Field(() => Jam)
   jam: Jam;
 
   @Field(() => Int, {nullable: true}) 
@@ -56,12 +55,6 @@ export class Post {
 
   @Field(() => Int)
   nextCount: number;
-
-  @Field(() => Int)
-  featCount: number;
-
-  @Field()
-  hasOrig: boolean;
 
   @Field(() => Int)
   clicks: number;

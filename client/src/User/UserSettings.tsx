@@ -1,7 +1,9 @@
-import { gql, useMutation } from '@apollo/client';
+import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { Box } from '@mui/material';
 import { useState } from 'react';
 import { ChromePicker } from 'react-color';
+import { userVar } from '../cache';
+import { USER_FIELDS } from '../fragments';
 import { User } from '../types/User';
 
 const SET_USER_COLOR = gql`
@@ -19,6 +21,8 @@ interface UserSettingsProps {
 }
 
 export default function UserSettings(props: UserSettingsProps) {
+  const client = useApolloClient();
+
   const [color, setColor] = useState(props.user.color);
 
   const [colorTimeout, setColorTimeout] = useState(null as ReturnType<typeof setTimeout> | null);
@@ -29,6 +33,11 @@ export default function UserSettings(props: UserSettingsProps) {
     },
     onCompleted: data => {
       console.log(data);
+      const user = client.cache.readFragment({
+        id: client.cache.identify(data.setUserColor),
+        fragment: USER_FIELDS,
+      }) as User;
+      userVar(user);
     },
   });
 

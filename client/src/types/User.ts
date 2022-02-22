@@ -1,14 +1,16 @@
+import { Col } from './Col';
 import { Post } from './Post';
 import { Role } from './Role';
 
 export type User = {
   id: string;
+  cols: Col[];
   focusId: string;
   focus: Post | null;
   roles: Role[];
   email: string | null;
   name: string;
-  lowercarseName: string;
+  lowercaseName: string;
   description: string;
   color: string;
   lng: number | null;

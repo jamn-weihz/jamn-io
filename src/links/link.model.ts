@@ -23,6 +23,9 @@ export class Link {
   votes: Vote[];
 
   @Field(() => Int)
+  voteI: number;
+
+  @Field(() => Int)
   clicks: number;
 
   @Field(() => Int)

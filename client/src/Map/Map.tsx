@@ -1,15 +1,14 @@
 import { gql, useLazyQuery, useReactiveVar } from '@apollo/client';
-import { Box, Card } from '@mui/material';
+import { Box, Button, Card } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { userVar } from '../cache';
-import MapControls from './MapControls';
 //@ts-ignore
 import mapboxgl from '!mapbox-gl'; //eslint-disable-line import/no-webpack-loader-syntax
 import { Map as MapBoxMap } from 'mapbox-gl';
 import useUpdateUser from '../User/useUpdateUser';
 import { DEFAULT_COLOR, DEV_SERVER_URI, MAPBOX_ACCESS_TOKEN } from '../constants';
 import { Jam } from '../types/Jam';
-import StartJamModal from './StartJamModal';
+import StartJamForm from './StartJamForm';
 import { useNavigate } from 'react-router-dom';
 
 mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
@@ -25,21 +24,25 @@ const GET_JAMS_BY_LOCATION = gql`
   }
 `;
 
-export default function Map() {
+interface MapProps {
+  i: number;
+}
+export default function Map(props: MapProps) {
   const navigate = useNavigate();
 
   const userDetail = useReactiveVar(userVar);
 
   const mapContainer = useRef(null);
   const map = useRef(null as unknown as MapBoxMap);
+  let onMapClick = null as any;
 
   const [marker, setMarker] = useState(null as any | null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSourceAdded, setIsSourceAdded] = useState(false);
 
-  const [lng, setLng] = useState(userDetail.user?.mapLng || -118.5301);
-  const [lat, setLat] = useState(userDetail.user?.mapLat || 34.2381);
-  const [zoom, setZoom] = useState(userDetail.user?.mapZoom || 4);
+  const [lng, setLng] = useState(userDetail?.mapLng || -118.5301);
+  const [lat, setLat] = useState(userDetail?.mapLat || 34.2381);
+  const [zoom, setZoom] = useState(userDetail?.mapZoom || 4);
 
   const [pinLng, setPinLng] = useState(lng);
   const [pinLat, setPinLat] = useState(lat);
@@ -67,6 +70,7 @@ export default function Map() {
     event.stopPropagation();
     m.remove();
     setHasPin(false);
+    setIsStartingJam(false);
   };
 
   const handleMapClick = (m:any) => (event: mapboxgl.MapMouseEvent) => {
@@ -104,10 +108,10 @@ export default function Map() {
     }) as MapBoxMap;
 
     const m = new mapboxgl.Marker({
-      color: userDetail.user?.color || DEFAULT_COLOR,
-      draggable: true,
+      color: userDetail?.color || DEFAULT_COLOR,
+      draggable: false,
     });
-
+    setMarker(m)
     m.getElement().addEventListener('click', handlePinClick(m))
     
     map.current.addControl(
@@ -142,7 +146,9 @@ export default function Map() {
       setZoom(zoom);
     });
 
-    map.current.on('click', handleMapClick(m));
+    const handleClick = handleMapClick(m);
+    onMapClick = handleClick;
+    map.current.on('click', handleClick);
   }, []);
 
   useEffect(() => {
@@ -264,64 +270,109 @@ export default function Map() {
   }, [lng, lat, zoom]);
 
   useEffect(() => {
-    if (userDetail.user?.mapLng && userDetail.user?.mapLat && userDetail.user?.mapZoom) {
+    if (userDetail?.mapLng && userDetail?.mapLat && userDetail?.mapZoom) {
       map.current?.setCenter({
-        lng: userDetail.user.mapLng,
-        lat: userDetail.user.mapLat,
+        lng: userDetail.mapLng,
+        lat: userDetail.mapLat,
       });
-      map.current?.setZoom(userDetail.user.mapZoom);
+      map.current?.setZoom(userDetail.mapZoom);
     }
-  }, [userDetail.user?.id]);
+  }, [userDetail?.id]);
 
   useEffect(() => {
     if (marker) {
-      marker.remove();
+      marker.remove()
     }
     const m = new mapboxgl.Marker({
-      color: userDetail.user?.color || DEFAULT_COLOR,
-      draggable: true,
+      color: userDetail?.color || DEFAULT_COLOR,
+      draggable: false,
     });
 
     m.setLngLat([pinLng, pinLat]);
     m.getElement().addEventListener('click', handlePinClick(m));
-    map.current.on('click', handleMapClick(m));
+    map.current.off('click', onMapClick);
+    const handleClick = handleMapClick(m);
+    onMapClick = handleClick;
+    map.current.on('click', handleClick);
     setMarker(m);
-  }, [userDetail.user?.color]);
+  }, [userDetail?.color]);
   
+  useEffect(() => {
+    map.current.resize();
+  }, [isStartingJam])
+  const handleStartJamClick = (event: React.MouseEvent) => {
+    if (userDetail?.id) {
+      if (userDetail?.verifyEmailDate) {
+        setIsStartingJam(true);
+      }
+      else {
+        // go to register
+      }
+    }
+    else{
+      // go to register
+    }
+  };
+
   return (
     <Box sx={{
-      width: '100%',
+      border: '1px solid lavender',
+      width: 320,
       height: '100%',
     }}>
-      <Box sx={{
-        position: 'absolute', top: 0, zIndex: 10,
-        textAlign: 'left',
-        margin: 1,
+      <Card elevation={5} sx={{
+        padding:1,
       }}>
-        <Card sx={{backgroundColor: 'black', color: 'white', opacity: 0.5, padding: 1}}>
-          Lng: {hasPin ? pinLng.toFixed(4) : lng.toFixed(4)}
-          <br/>
-          Lat: {hasPin ? pinLat.toFixed(4) : lat.toFixed(4)}
-          <br/>
-          Zoom: {zoom.toFixed(2)}
-        </Card>
-      </Box>
-      
-      <Box ref={mapContainer} sx={{
-        width: '100%', 
-        height: '100%',
-      }}/>
-      {
-        hasPin
-          ? <MapControls setIsStartingJam={setIsStartingJam}/>
-          : null
-      }
-      <StartJamModal 
-        lng={pinLng}
-        lat={pinLat}
-        isOpen={isStartingJam} 
-        setIsOpen={setIsStartingJam}
-      />
+        /map
+      </Card>
+      <Card elevation={5} sx={{
+        position: 'relative',
+        height: isStartingJam
+          ? 'calc(100% - 400px)'
+          : 'calc(100% - 230px)',
+        margin: 1,
+        padding: 1,
+      }}>
+        <Box ref={mapContainer} sx={{
+          width: '100%', 
+          height: '100%',
+        }}/>
+
+      </Card>
+      <Card elevation={5} sx={{
+        margin: 1,
+        padding: 1,
+      }}>
+        {hasPin ? pinLng.toFixed(4) : lng.toFixed(4)},&nbsp;
+        {hasPin ? pinLat.toFixed(4) : lat.toFixed(4)}
+      </Card>
+      <Card elevation={5} sx={{
+        margin: 1,
+        padding: 1,
+      }}>
+        {
+          isStartingJam
+            ? <StartJamForm
+                i={props.i}
+                lng={pinLng}
+                lat={pinLat}
+                isOpen={isStartingJam} 
+                setIsOpen={setIsStartingJam}
+              />
+            : <Button disabled={!hasPin || !userDetail?.verifyEmailDate} variant='contained' onClick={handleStartJamClick}>
+                Start a jam
+              </Button>
+        }
+
+      </Card>
+      <Card elevation={5} sx={{
+        margin: 1,
+        padding: 1,
+      }}>
+        <Button disabled={true}>
+          Set your location
+        </Button>
+      </Card>
     </Box>
   )
 }

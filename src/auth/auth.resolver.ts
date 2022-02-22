@@ -18,12 +18,13 @@ export class AuthResolver {
     @Context() context: any,
     @Args('email') email: string,
     @Args('pass') pass: string,
+    @Args('pathnames', {type: () => [String]}) pathnames: string[],
   ) {
     const {
       user,
       accessTokenCookie,
       refreshTokenCookie,
-    } = await this.authService.registerUser(email, pass);
+    } = await this.authService.registerUser(email, pass, pathnames);
 
     context.res.cookie(accessTokenCookie.name, accessTokenCookie.value, accessTokenCookie.options);
     context.res.cookie(refreshTokenCookie.name, refreshTokenCookie.value, refreshTokenCookie.options);
@@ -54,12 +55,13 @@ export class AuthResolver {
   async loginGoogleUser(
     @Context() context: any,
     @Args('token') token: string,
+    @Args('pathnames', {type: () => [String]}) pathnames: string[],
   ) {
     const {
       user,
       accessTokenCookie,
       refreshTokenCookie,
-    } = await this.authService.loginGoogleUser(token);
+    } = await this.authService.loginGoogleUser(token, pathnames);
 
     context.res.cookie(accessTokenCookie.name, accessTokenCookie.value, accessTokenCookie.options);
     context.res.cookie(refreshTokenCookie.name, refreshTokenCookie.value, refreshTokenCookie.options);

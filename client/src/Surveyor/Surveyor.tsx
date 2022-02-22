@@ -7,12 +7,11 @@ import { sizeVar, surveyorVar } from '../cache';
 import SearchBox from './SearchBox';
 import { SurveyorItem } from '../types/Surveyor';
 import SurveyorTree from './SurveyorTree';
-import { APPBAR_HEIGHT } from '../constants';
 import { User } from '../types/User';
 import { Jam } from '../types/Jam';
 
 interface SurveyorProps {
-  context: User | Jam;
+  context: User | Jam | any;
 }
 export default function Surveyor(props: SurveyorProps) {
   const surveyorDetail = useReactiveVar(surveyorVar);
@@ -20,7 +19,7 @@ export default function Surveyor(props: SurveyorProps) {
   const contentEl = useRef<HTMLElement>();
 
   const surveyorState = surveyorDetail[props.context.id];
-  console.log(surveyorDetail);
+
   if (!surveyorState) return null;
 
   const handleBackClick = (event: React.MouseEvent) => {
@@ -48,7 +47,6 @@ export default function Surveyor(props: SurveyorProps) {
       }
     });
   }
-
 
   return (
     <Box>
@@ -79,14 +77,14 @@ export default function Surveyor(props: SurveyorProps) {
         </Box>
       </Card>
       <Box ref={contentEl} sx={{
-        height: sizeDetail.height - (3 * APPBAR_HEIGHT),
+        height: '100%',
         overflow: 'scroll', 
       }}>
         { 
           (surveyorState.stack[surveyorState.index]?.items || []).map((item, i) => {
             return (
               <SurveyorTree
-                key={`surveyor-tree-${item.instanceId}`}
+                key={`surveyor-tree-${item.postKey}`}
                 item={item}
                 updateItem={updateItem(i)}
                 depth={0}

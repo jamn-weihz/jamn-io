@@ -17,8 +17,8 @@ export default function JamPosts(props: JamPostsProps) {
   useEffect(() => {
     if (!surveyorDetail[props.jam.id]) {
       const surveyorItem: SurveyorItem = {
-        post: props.jam.focus,
-        instanceId: uuidv4(),
+        postId: props.jam.focusId,
+        postKey: uuidv4(),
         showPrev: false,
         showNext: false,
         prev: [],

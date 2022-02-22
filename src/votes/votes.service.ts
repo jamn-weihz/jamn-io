@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { LinksService } from 'src/links/links.service';
+import { UsersService } from 'src/users/users.service';
 import { findDefaultWeight } from 'src/utils';
 import { Repository } from 'typeorm';
 import { Vote } from './vote.entity';
@@ -8,12 +10,30 @@ import { Vote } from './vote.entity';
 export class VotesService {
   constructor(
     @InjectRepository(Vote)
-    private readonly votesRepository: Repository<Vote>
+    private readonly votesRepository: Repository<Vote>,
+    private readonly usersService: UsersService,
+    @Inject(forwardRef(() => LinksService))
+    private readonly linksService: LinksService,
   ) {}
 
+  async getVotesByLinkId(linkId: string) {
+    return this.votesRepository.find({
+      where: {
+        linkId,
+      },
+    });
+  }
+  
   async createVote(userId: string, linkId: string, sourcePostId: string, targetPostId: string, clicks: number, tokens: number): Promise<Vote> {
+    const user = await this.usersService.getUserById(userId);
+    this.usersService.incrementUserVoteI(userId);
+
+    const link = await this.linksService.getLinkById(linkId);
+    this.linksService.incrementLinkVoteI(linkId);
+
     const vote0 = new Vote();
     vote0.userId = userId;
+    vote0.userI = user.voteI + 1;
     vote0.linkId = linkId;
     vote0.sourcePostId = sourcePostId;
     vote0.targetPostId = targetPostId;

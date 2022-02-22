@@ -15,6 +15,9 @@ export class User {
   @Field(() => Int)
   postI: number;
   
+  @Field(() => Int)
+  voteI: number;
+  
   @Field()
   name: string;
 

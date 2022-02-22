@@ -35,6 +35,9 @@ export class Link {
   votes: Vote[];
 
   @Column({ default: 0 })
+  voteI: number
+
+  @Column({ default: 0 })
   clicks: number;
 
   @Column({ default: 0 })

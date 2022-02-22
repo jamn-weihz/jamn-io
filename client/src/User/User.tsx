@@ -29,8 +29,12 @@ const GET_USER_BY_NAME = gql`
   ${USER_FIELDS}
   ${ROLE_FIELDS}
   ${JAM_FIELDS}
-`
-export default function UserComponent() {
+`;
+interface UserProps {
+  i: number;
+  name: string;
+}
+export default function UserComponent(props: UserProps) {
   const location = useLocation();
   const params = useParams();
   const navigate = useNavigate();
@@ -57,10 +61,10 @@ export default function UserComponent() {
     setIsLoading(true);
     getUserByName({
       variables: {
-        name: params.userName,
+        name: props.name,
       }
     });
-  }, [params.userName, userDetail.user?.name]);
+  }, [props.name]);
 
 
   useEffect(() => {
@@ -72,7 +76,7 @@ export default function UserComponent() {
       path[3] !== 's'
     ) {
       const branch = pathDetail.pathToBranch[path.slice(0,3).join('/')] || 'p';
-      navigate(`/u/${path[2]}/${branch}`);
+      //navigate(`/u/${path[2]}/${branch}`);
     }
   }, [location.pathname]);
 
@@ -125,28 +129,29 @@ export default function UserComponent() {
   const path = location.pathname.split('/');
 
   return (
-    <Box>
+    <Box sx={{
+      width: 320,
+      border: '1px solid lavender',
+    }}>
       <Card sx={{
         padding: 1,
-        paddingLeft: 2,
-        paddingRight: 2,
-        fontSize: 20,
         color: user.color,
       }}>
         u/{ user.name }
       </Card>
       {
-        user.id === userDetail.user?.id
-          ? <Box sx={{
-              padding: 2,
+        user.id === userDetail?.id
+          ? <Card elevation={5} sx={{
+              margin: 1,
+              padding: 1,
             }}>
               <Logout />
               {
-                userDetail.user.verifyEmailDate
+                userDetail.verifyEmailDate
                   ? null
                   : <Verify />
               }
-            </Box>
+            </Card>
           : null
       }
       {
@@ -160,60 +165,38 @@ export default function UserComponent() {
                   ? <UserSettings user={user} />
                   : null
       }
-      <Box sx={{
-        position: 'absolute',
-        bottom: 0,
-        width: {
-          xs: '100%',
-          sm: '400px',
-        },
-        left: {
-          xs: 'initial',
-          sm: '50%'
-        },
-        marginLeft: {
-          xs: 0,
-          sm: '-200px',
-        },
-        zIndex: 100,
-        textAlign: 'center'
+      <Card elevation={5} sx={{
+        margin: 1,
+        padding: 1,
       }}>
-        <Card elevation={5} sx={{
-          margin: 1,
-          padding: 1,
+        <Box sx={{
+          float: 'left',
         }}>
-          <Box sx={{
-            float: 'left',
+          <Button onClick={handleShowJamsClick} sx={{
+            color: path[3] === 'j' ? user.color : 'dimgrey',
           }}>
-            <Button onClick={handleShowJamsClick} sx={{
-              color: path[3] === 'j' ? user.color : 'dimgrey',
-            }}>
-              Jams
-            </Button>
-          </Box>
-          <Button onClick={handleShowPostsClick} sx={{
-            color: path[3] === 'p' ? user.color : 'dimgrey',
-          }}>
-            Posts
+            Jams
           </Button>
-          &nbsp;
-          &nbsp;
-          &nbsp;
-          &nbsp;
-          <Button onClick={handleShowVotesClick} sx={{
-            color: path[3] === 'v' ? user.color : 'dimgrey',
+        </Box>
+        <Button onClick={handleShowPostsClick} sx={{
+          color: path[3] === 'p' ? user.color : 'dimgrey',
+        }}>
+          Posts
+        </Button>
+        &nbsp;
+        <Button onClick={handleShowVotesClick} sx={{
+          color: path[3] === 'v' ? user.color : 'dimgrey',
+        }}>
+          Votes
+        </Button>
+        <Box sx={{float: 'right'}}>
+          <Button onClick={handleShowSettingsClick} sx={{
+            color: path[3] === 's' ? user.color : 'dimgrey',
           }}>
-            Votes
+            Settings
           </Button>
-          <Box sx={{float: 'right'}}>
-            <Button onClick={handleShowSettingsClick} sx={{
-              color: path[3] === 's' ? user.color : 'dimgrey',
-            }}>
-              Settings
-            </Button>
-          </Box>
-        </Card>
-      </Box>
+        </Box>
+      </Card>
     </Box>
   )
 }

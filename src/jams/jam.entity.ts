@@ -2,7 +2,6 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn, 
-  OneToOne,
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
@@ -30,7 +29,7 @@ export class Jam {
   @OneToMany(() => Role, role => role.jam)
   roles: Role[];
 
-  @Column()
+  @Column({ default: 0})
   postI: number;
   
   @Column()

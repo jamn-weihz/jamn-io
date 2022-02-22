@@ -70,6 +70,8 @@ export class JamsService {
     if (!startPost) {
       startPost = await this.postsService.createStartPost(user.id);
     }
+    this.postsService.incrementPostNextCount(startPost.id);
+    
     const jamPost = await this.postsService.createJamPost(user.id, jam1.id, jam1.name, jam1.description);
 
     const link = await this.linksService.createLink(startPost.id, jamPost.id, 1, 0);

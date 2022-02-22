@@ -2,6 +2,8 @@ import { UseGuards } from '@nestjs/common';
 import { Float, Parent, Query, ResolveField } from '@nestjs/graphql';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { CurrentUser, GqlAuthGuard } from 'src/auth/gql-auth.guard';
+import { Col } from 'src/cols/col.model';
+import { ColsService } from 'src/cols/cols.service';
 import { Role } from 'src/roles/role.model';
 import { RolesService } from 'src/roles/roles.service';
 import { User } from './user.model';
@@ -12,6 +14,7 @@ export class UsersResolver {
   constructor(
     private readonly usersService: UsersService,
     private readonly rolesService: RolesService,
+    private readonly colsService: ColsService,
   ) {}
 
   @ResolveField(() => [Role], {name: 'roles'})
@@ -19,6 +22,13 @@ export class UsersResolver {
     @Parent() user: User,
   ) {
     return this.rolesService.getRolesByUserId(user.id);
+  }
+
+  @ResolveField(() => [Col], {name: 'cols'})
+  async getUserCols(
+    @Parent() user: User,
+  ) {
+    return this.colsService.getColsByUserId(user.id);
   }
 
   @UseGuards(GqlAuthGuard)

@@ -33,17 +33,15 @@ const GET_JAM_BY_NAME = gql`
   ${FULL_POST_FIELDS}
 `;
 
-export default function JamComponent() {
-  const params = useParams();
-  const location = useLocation();
-  const navigate = useNavigate();
-
+interface JamComponentProps {
+  i: number;
+  name: string;
+}
+export default function JamComponent(props: JamComponentProps) {
   const pathDetail = useReactiveVar(pathVar);
-  const sizeDetail = useReactiveVar(sizeVar);
 
   const [jam, setJam] = useState(null as Jam | null);
   const [isLoading, setIsLoading] = useState(false);
-  const [show, setShow] = useState('p');
 
   const [getJamByName] = useLazyQuery(GET_JAM_BY_NAME, {
     onError: error => {
@@ -61,83 +59,38 @@ export default function JamComponent() {
     setIsLoading(true);
     getJamByName({
       variables: {
-        name: params.jamName,
+        name: props.name,
       },
     });
-  }, [params.jamName]);
+  }, [props.name]);
 
-  useEffect(() => {
-    const path = location.pathname.split('/');
-    if (
-      path[1] === 'j' &&
-      path[3] !== 'u' && 
-      path[3] !== 'p' &&
-      path[3] !== 's'
-    ) {
-      const branch = pathDetail.pathToBranch[path.slice(0,3).join('/')] || 'p';
-      navigate(`/j/${path[2]}/${branch}`);
-    }
-  }, [location.pathname]);
 
   if (isLoading) return <Loading />
 
   if (!jam) return <NotFound />
 
   const handleShowUsersClick = (event:React.MouseEvent) => {
-    const path = location.pathname.split('/');
-    pathVar({
-      pathToBranch: {
-        ...pathDetail.pathToBranch,
-        [path.slice(0, 3).join('/')]: 'u',
-      },
-    });
-    navigate(`/j/${encodeURIComponent(jam.name)}/u`)
+
   }
   const handleShowPostsClick = (event:React.MouseEvent) => {
-    const path = location.pathname.split('/');
-    pathVar({
-      pathToBranch: {
-        ...pathDetail.pathToBranch,
-        [path.slice(0, 3).join('/')]: 'p',
-      },
-    });
-    navigate(`/j/${encodeURIComponent(jam.name)}/p`)
+
   }
   const handleShowSettingsClick = (event:React.MouseEvent) => {
-    const path = location.pathname.split('/');
-    pathVar({
-      pathToBranch: {
-        ...pathDetail.pathToBranch,
-        [path.slice(0, 3).join('/')]: 's',
-      },
-    });
-    navigate(`/j/${encodeURIComponent(jam.name)}/s`)
+
   }
 
-  const path = location.pathname.split('/');
-  
   return (
     <Box className='jam' sx={{
-      //height: props.height,
+      width: 320,
+      border: '1px solid lavender',
     }}>
-      <Card elevation={10} sx={{
+      <Card elevation={5} sx={{
         padding: 1,
-        paddingLeft: 2,
-        paddingRight: 2,
-        fontSize: 20,
         color: jam.color,
       }}>
         j/{ jam.name }
       </Card>
-      {
-        path[3] === 'u'
-          ? <JamUsers jam={jam} />
-          : path[3] === 'p'
-            ? <JamPosts jam={jam} />
-            : path[3] === 's'
-              ? <JamSettings jam={jam} />
-              : null
-      }
+
       <Box sx={{
         position: 'absolute',
         bottom: 0,
@@ -164,19 +117,19 @@ export default function JamComponent() {
             float: 'left',
           }}>
             <Button onClick={handleShowUsersClick} sx={{
-              color: path[3] === 'u' ? jam.color : 'dimgrey',
+              //color: path[3] === 'u' ? jam.color : 'dimgrey',
             }}>
               Users
             </Button>
           </Box>
           <Button onClick={handleShowPostsClick} sx={{
-            color: path[3] === 'p' ? jam.color : 'dimgrey',
+            //color: path[3] === 'p' ? jam.color : 'dimgrey',
           }}>
             Posts
           </Button>
           <Box sx={{float: 'right'}}>
             <Button onClick={handleShowSettingsClick} sx={{
-              color: path[3] === 's' ? jam.color : 'dimgrey',
+              //color: path[3] === 's' ? jam.color : 'dimgrey',
             }}>
               Settings
             </Button>

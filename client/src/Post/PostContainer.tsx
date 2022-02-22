@@ -9,7 +9,7 @@ import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 
 interface PostContainerProps {
   post: Post;
-  instanceId: string;
+  postKey: string;
 }
 
 export default function PostContainer(props: PostContainerProps) {
@@ -21,7 +21,7 @@ export default function PostContainer(props: PostContainerProps) {
       padding: 1,
       textAlign: 'center',
     }}>
-      <PostComponent post={props.post} instanceId={props.instanceId} />
+      <PostComponent post={props.post} postKey={props.postKey} />
       <Box sx={{
         paddingTop: 1,
       }}>

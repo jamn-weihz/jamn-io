@@ -2,9 +2,9 @@ import { Link } from './Link'
 import { Post } from './Post'
 
 export type SurveyorItem = {
-  link?: Link;
-  post: Post;
-  instanceId: string;
+  linkId?: string;
+  postId: string;
+  postKey: string;
   showPrev: boolean;
   showNext: boolean;
   prev: SurveyorItem[];

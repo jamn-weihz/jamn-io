@@ -53,7 +53,7 @@ export default function EditorComponent(props: EditorComponentProps) {
   });
 
   const handleChange = (newState: EditorState) => {
-    if (props.post.userId !== userDetail.user?.id || props.post.commitDate) {
+    if (props.post.userId !== userDetail?.id || props.post.commitDate) {
       return;
     }
     setEditorState(newState);
@@ -91,7 +91,7 @@ export default function EditorComponent(props: EditorComponentProps) {
     setFocused(false);
   };
 
-  const isReadonly = props.isReadonly || !!props.post.commitDate || props.post.userId !== userDetail.user?.id;
+  const isReadonly = props.isReadonly || !!props.post.commitDate || props.post.userId !== userDetail?.id;
   return (
     <Box sx={{
       fontSize: 14,

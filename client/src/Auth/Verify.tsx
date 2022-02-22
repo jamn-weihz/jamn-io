@@ -39,9 +39,7 @@ export default function Verify() {
         id: client.cache.identify(data.verifyUser),
         fragment: USER_FIELDS,
       }) as User;
-      userVar({
-        user,
-      });
+      userVar(user);
     }
   });
 
@@ -71,7 +69,7 @@ export default function Verify() {
   }
 
   return (
-    <Card variant='outlined' sx={{padding: 1, margin: 1}}>
+    <Card variant='outlined' sx={{padding: 1, marginTop: 1,}}>
       <Box sx={{padding:1}}>
         Verify your email to complete registration.
       </Box>

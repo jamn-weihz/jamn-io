@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 import { EMAIL_REGEX } from '../constants';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { useNavigate } from 'react-router-dom';
 import GoogleButton from './GoogleButton';
-import { USER_FIELDS } from '../fragments';
-import { tokenVar, userVar } from '../cache';
+import { FULL_USER_FIELDS } from '../fragments';
+import { colVar, tokenVar, userVar } from '../cache';
 import useToken from './useToken';
+import { Col } from '../types/Col';
 
 const GET_USER_BY_EMAIL = gql`
   query GetUserByEmail($email: String!) {
@@ -19,18 +19,20 @@ const GET_USER_BY_EMAIL = gql`
 `;
 
 const REGISTER_USER = gql`
-  mutation RegisterUser($email: String!, $pass: String!) {
-    registerUser(email: $email, pass: $pass) {
-      ...UserFields
+  mutation RegisterUser($email: String!, $pass: String!, $pathnames: [String!]!) {
+    registerUser(email: $email, pass: $pass, pathnames: $pathnames) {
+      ...FullUserFields
     }
   }
-  ${USER_FIELDS}
+  ${FULL_USER_FIELDS}
 `;
 
-export default function Register() {
-  const navigate = useNavigate();
-
+interface RegisterProps {
+  i: number;
+}
+export default function Register(props: RegisterProps) {
   const tokenDetail = useReactiveVar(tokenVar);
+  const colDetail = useReactiveVar(colVar);
 
   const { refreshTokenInterval } = useToken();
 
@@ -57,10 +59,20 @@ export default function Register() {
           clearInterval(tokenDetail.interval);
         }
         refreshTokenInterval();
-        userVar({
-          user: data.registerUser,
+        userVar(data.registerUser);
+        const cols = colDetail.cols.map((col, i) => {
+          if (i === props.i) {
+            return {
+              ...col,
+              pathname: `/u/${encodeURIComponent(data.registerUser.name)}`
+            };
+          }
+          return col;
         });
-        navigate(`/u/${encodeURIComponent(data.registerUser.name)}`)
+        colVar({
+          ...colDetail,
+          cols,
+        });
       }
     }
   })
@@ -111,12 +123,24 @@ export default function Register() {
         email,
         pass,
         isGoogle: false,
+        pathnames: colDetail.cols.map(col => col.pathname)
       }
     });
   };
 
   const handleLoginClick = (event: React.MouseEvent) => {
-    navigate('/login');
+    const cols = colDetail.cols.map((col, i) => {
+      if (i === props.i) {
+        return {
+          pathname: '/login',
+        } as Col;
+      }
+      return col;
+    });
+    colVar({
+      ...colDetail,
+      cols,
+    });
   };
 
   const handleGoogleClick = (event: React.MouseEvent) => {
@@ -127,10 +151,14 @@ export default function Register() {
 
   return (
     <Box sx={{
-      padding: 1,
-      textAlign: 'center',
+      border: '1px solid lavender',
+      width: 320,
     }}>
-      Register
+      <Card elevation={5} sx={{
+        padding:1,
+      }}>
+        /register
+      </Card>
       <Box>
         {message}
       </Box>
@@ -178,9 +206,11 @@ export default function Register() {
           </Button>
         </Card>
         <Card elevation={5} sx={{padding:1, margin:1}} onClick={handleGoogleClick}>
-          <GoogleButton isRegistration={true} setMessage={setMessage}/>
+          <GoogleButton isRegistration={true} setMessage={setMessage} i={props.i}/>
         </Card>
-      <Box>
+      <Box sx={{
+        textAlign: 'center'
+      }}>
         Already registered?&nbsp;
         <Link onClick={handleLoginClick} sx={{cursor: 'pointer'}}>
           Log in

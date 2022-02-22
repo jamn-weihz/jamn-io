@@ -2,6 +2,17 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Col {
+  createDate: DateTime!
+  deleteDate: DateTime
+  i: Int!
+  id: String!
+  pathname: String!
+  updateDate: DateTime!
+  user: User!
+  userId: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -35,16 +46,21 @@ type Link {
   targetPostId: String!
   tokens: Int!
   updateDate: DateTime!
+  voteI: Int!
   votes: [Vote!]!
   weight: Int!
 }
 
 type Mutation {
-  loginGoogleUser(token: String!): User!
+  addCol(pathname: String!): Col!
+  getNext(offset: Int!, postId: String!): [Link!]!
+  getPrev(offset: Int!, postId: String!): [Link!]!
+  loginGoogleUser(pathnames: [String!]!, token: String!): User!
   loginUser(email: String!, pass: String!): User!
   logoutUser: User!
   refreshToken: User!
-  registerUser(email: String!, pass: String!): User!
+  registerUser(email: String!, pass: String!, pathnames: [String!]!): User!
+  replyPost(jamId: String, sourcePostId: String!): Link!
   resendUserVerification: User!
   savePost(draft: String!, postId: String!): Post!
   setJamColor(color: String!, jamId: String!): Jam!
@@ -61,11 +77,9 @@ type Post {
   deleteDate: DateTime
   description: String!
   draft: String!
-  featCount: Int!
-  hasOrig: Boolean!
   id: String!
   inLinks: [Link!]!
-  jam: User!
+  jam: Jam
   jamI: Int
   jamId: String
   name: String!
@@ -104,6 +118,7 @@ type Role {
 
 type User {
   color: String!
+  cols: [Col!]!
   createDate: DateTime!
   deleteDate: DateTime
   description: String!
@@ -124,6 +139,7 @@ type User {
   roles: [Role!]!
   updateDate: DateTime!
   verifyEmailDate: DateTime
+  voteI: Int!
   zoom: Float
 }
 
@@ -140,6 +156,7 @@ type Vote {
   targetPostId: String!
   tokens: Int!
   user: User!
+  userI: Int!
   userId: String!
   weight: Int!
 }

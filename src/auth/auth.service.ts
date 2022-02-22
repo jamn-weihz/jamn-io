@@ -6,6 +6,7 @@ import { UsersService } from 'src/users/users.service';
 import TokenPayload from './tokenPayload.interface';
 import { google, Auth } from 'googleapis';
 import * as bcrypt from 'bcrypt';
+import { ColsService } from 'src/cols/cols.service';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
 		private readonly usersService: UsersService,
     private readonly emailService: EmailService,
+    private readonly colsService: ColsService,
   ) {
     const clientId = this.configService.get('GOOGLE_CLIENT_ID');
     const clientSecret = this.configService.get('GOOGLE_CLIENT_SECRET');
@@ -23,8 +25,9 @@ export class AuthService {
   
   oauthClient: Auth.OAuth2Client;
 
-  async registerUser(email: string, pass: string) {
+  async registerUser(email: string, pass: string, pathnames: string[]) {
     const user = await this.usersService.registerUser(email, pass, false);
+    await this.colsService.registerCols(user.id, user.name, pathnames);
     await this.sendVerificationEmail(user.id, user.email);
     const accessTokenCookie = this.getAccessTokenCookie(user.id);
     const refreshTokenCookie = await this.getRefreshTokenCookie(user.id);
@@ -53,11 +56,12 @@ export class AuthService {
     };
   }
 
-  async loginGoogleUser(token: string) {
+  async loginGoogleUser(token: string, pathnames: string[]) {
     const email = await this.googleAuthenticate(token);
     let user = await this.usersService.getUserByEmail(email);
     if (!user) {
       user = await this.usersService.registerUser(email, null, true);
+      await this.colsService.registerCols(user.id, user.name, pathnames);
     }
     const accessTokenCookie = this.getAccessTokenCookie(user.id);
     const refreshTokenCookie = await this.getRefreshTokenCookie(user.id);

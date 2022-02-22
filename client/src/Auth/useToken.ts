@@ -21,7 +21,7 @@ export default function useToken() {
     onError: error => {
       console.error(error);
       if (error.message === 'Unauthorized') {
-        if (userDetail.user?.id) {
+        if (userDetail?.id) {
           logoutUser();
         }
       }
