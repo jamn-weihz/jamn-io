@@ -1,0 +1,21 @@
+.App {
+  text-align: center;
+}
+
+.mapboxgl-ctrl-attrib {
+  display: none;
+}
+
+.mapboxgl-ctrl-logo {
+  display: none;
+}
+
+html,body {
+  width: 100%;
+  height: 100%;
+}
+
+.unstyled-content-block {
+  margin-top: 7px;
+  margin-bottom: 7px;
+}

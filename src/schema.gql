@@ -1,0 +1,145 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Jam {
+  color: String!
+  createDate: DateTime!
+  deleteDate: DateTime
+  description: String!
+  focus: Post!
+  focusId: String
+  id: String!
+  lat: Float!
+  lng: Float!
+  lowercaseName: String!
+  name: String!
+  postI: Int!
+  roles: [Role!]!
+  updateDate: DateTime!
+}
+
+type Link {
+  clicks: Int!
+  createDate: DateTime!
+  deleteDate: DateTime
+  id: String!
+  sourcePost: Post!
+  sourcePostId: String!
+  targetPost: Post!
+  targetPostId: String!
+  tokens: Int!
+  updateDate: DateTime!
+  votes: [Vote!]!
+  weight: Int!
+}
+
+type Mutation {
+  loginGoogleUser(token: String!): User!
+  loginUser(email: String!, pass: String!): User!
+  logoutUser: User!
+  refreshToken: User!
+  registerUser(email: String!, pass: String!): User!
+  resendUserVerification: User!
+  savePost(draft: String!, postId: String!): Post!
+  setJamColor(color: String!, jamId: String!): Jam!
+  setUserColor(color: String!): User!
+  startJam(desc: String!, lat: Float!, lng: Float!, name: String!): Jam!
+  updateUserMap(lat: Float!, lng: Float!, zoom: Float!): User!
+  verifyUser(code: String!): User!
+}
+
+type Post {
+  clicks: Int!
+  commitDate: DateTime
+  createDate: DateTime!
+  deleteDate: DateTime
+  description: String!
+  draft: String!
+  featCount: Int!
+  hasOrig: Boolean!
+  id: String!
+  inLinks: [Link!]!
+  jam: User!
+  jamI: Int
+  jamId: String
+  name: String!
+  nextCount: Int!
+  outLinks: [Link!]!
+  prevCount: Int!
+  privacy: String!
+  saveDate: DateTime!
+  tokens: Int!
+  updateDate: DateTime!
+  user: User!
+  userI: Int!
+  userId: String!
+  weight: Int!
+}
+
+type Query {
+  getJamByName(name: String!): Jam
+  getJamsByLocation(lat: Float!, lng: Float!, zoom: Float!): [Jam!]!
+  getUser: User!
+  getUserByEmail(email: String!): User
+  getUserByName(name: String!): User
+}
+
+type Role {
+  createDate: DateTime!
+  deleteDate: DateTime
+  id: String!
+  jam: Jam!
+  jamId: String!
+  type: String!
+  updateDate: DateTime!
+  user: User!
+  userId: String!
+}
+
+type User {
+  color: String!
+  createDate: DateTime!
+  deleteDate: DateTime
+  description: String!
+  email: String
+  focus: Post
+  focusId: String
+  id: String!
+  isAdmin: Boolean!
+  isRegisteredWithGoogle: Boolean!
+  lat: Float
+  lng: Float
+  lowercaseName: String!
+  mapLat: Float
+  mapLng: Float
+  mapZoom: Float
+  name: String!
+  postI: Int!
+  roles: [Role!]!
+  updateDate: DateTime!
+  verifyEmailDate: DateTime
+  zoom: Float
+}
+
+type Vote {
+  clicks: Int!
+  createDate: DateTime!
+  deleteDate: DateTime
+  id: String!
+  link: Link!
+  linkId: String!
+  sourcePost: Post!
+  sourcePostId: String!
+  targetPost: Post!
+  targetPostId: String!
+  tokens: Int!
+  user: User!
+  userId: String!
+  weight: Int!
+}
