@@ -54,14 +54,18 @@ type Link {
 type Mutation {
   addCol(pathname: String!): Col!
   getNext(offset: Int!, postId: String!): [Link!]!
+  getPosts(postIds: [String!]!): [Post!]!
   getPrev(offset: Int!, postId: String!): [Link!]!
+  linkPosts(sourcePostId: String!, targetPostId: String!): Link!
   loginGoogleUser(pathnames: [String!]!, token: String!): User!
   loginUser(email: String!, pass: String!): User!
   logoutUser: User!
   refreshToken: User!
   registerUser(email: String!, pass: String!, pathnames: [String!]!): User!
+  removeCol(colId: String!): [Col!]!
   replyPost(jamId: String, sourcePostId: String!): Link!
   resendUserVerification: User!
+  saveCol(colId: String!, pathname: String!): Col!
   savePost(draft: String!, postId: String!): Post!
   setJamColor(color: String!, jamId: String!): Jam!
   setUserColor(color: String!): User!
@@ -114,6 +118,11 @@ type Role {
   updateDate: DateTime!
   user: User!
   userId: String!
+}
+
+type Subscription {
+  linkPosts(postIds: [String!]!): Link!
+  savePost(cardIds: [String!]!): Post!
 }
 
 type User {

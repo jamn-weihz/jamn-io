@@ -1,4 +1,15 @@
-import { Box, Button, Card, FormControl, IconButton, InputAdornment, InputLabel, Link, OutlinedInput, TextField } from '@mui/material';
+import { 
+  Box, 
+  Button,
+  Card,
+  FormControl,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  Link,
+  OutlinedInput,
+  TextField
+} from '@mui/material';
 import React, { useState } from 'react';
 import GoogleButton from './GoogleButton';
 
@@ -9,7 +20,8 @@ import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { colVar, tokenVar, userVar } from '../cache';
 import useToken from './useToken';
 import { Col } from '../types/Col';
-
+import useChangeCol from '../Col/useChangeCol';
+import ColRemovalButton from '../Col/ColRemovalButton';
 
 const LOGIN_USER = gql`
   mutation LoginUser($email: String!, $pass: String!) {
@@ -21,12 +33,13 @@ const LOGIN_USER = gql`
 `;
 
 interface LoginProps {
-  i: number;
+  col: Col;
 }
 export default function Login(props: LoginProps) {
   const tokenDetail = useReactiveVar(tokenVar);
   const colDetail = useReactiveVar(colVar);
 
+  const { changeCol } = useChangeCol();
   const { refreshTokenInterval } = useToken();
 
   const [loginUser] = useMutation(LOGIN_USER, {
@@ -41,10 +54,6 @@ export default function Login(props: LoginProps) {
       }
       refreshTokenInterval();
       userVar(data.loginUser);
-      colVar({
-        ...colDetail,
-        cols: data.loginUser.cols,
-      });
     }
   });
 
@@ -54,6 +63,7 @@ export default function Login(props: LoginProps) {
   const [showPass, setShowPass] = useState(false);
 
   const [message, setMessage] = useState('');
+
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
   };
@@ -84,31 +94,22 @@ export default function Login(props: LoginProps) {
   };
 
   const handleRegisterClick = (event: React.MouseEvent) => {
-    const cols = colDetail.cols.map((col, i) => {
-      if (i === props.i) {
-        return {
-          pathname: '/register',
-        } as Col;
-      }
-      return col;
-    });
-    colVar({
-      ...colDetail,
-      cols
-    });
+    changeCol(props.col, '/register');
   };
 
   const isFormValid = email.length && pass.length;
 
   return (
-    <Box sx={{
-      border: '1px solid lavender',
-      width: 320,
-    }}>
+    <Box>
       <Card elevation={5} sx={{
-        padding:1,
+        padding: 1,
+        display: 'flex',
+        justifyContent: 'space-between'
       }}>
-        /login
+        <Box>
+          /login
+        </Box>
+        <ColRemovalButton col={props.col}/>
       </Card>
       <Box>
         {message}
@@ -155,7 +156,7 @@ export default function Login(props: LoginProps) {
         </Button>
       </Card>
       <Card elevation={5} sx={{margin:1, padding:1}} onClick={handleGoogleClick}>
-        <GoogleButton isRegistration={false} setMessage={setMessage} i={props.i}/>
+        <GoogleButton isRegistration={false} setMessage={setMessage} col={props.col}/>
       </Card>
       <Box sx={{
         textAlign: 'center',

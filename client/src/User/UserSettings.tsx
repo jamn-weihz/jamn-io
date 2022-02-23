@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import { useState } from 'react';
 import { ChromePicker } from 'react-color';
 import { userVar } from '../cache';
-import { USER_FIELDS } from '../fragments';
+import { FULL_USER_FIELDS, USER_FIELDS } from '../fragments';
 import { User } from '../types/User';
 
 const SET_USER_COLOR = gql`
@@ -35,7 +35,8 @@ export default function UserSettings(props: UserSettingsProps) {
       console.log(data);
       const user = client.cache.readFragment({
         id: client.cache.identify(data.setUserColor),
-        fragment: USER_FIELDS,
+        fragment: FULL_USER_FIELDS,
+        fragmentName: 'FullUserFields',
       }) as User;
       userVar(user);
     },

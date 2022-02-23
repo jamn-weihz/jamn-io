@@ -9,6 +9,8 @@ import { FULL_USER_FIELDS } from '../fragments';
 import { colVar, tokenVar, userVar } from '../cache';
 import useToken from './useToken';
 import { Col } from '../types/Col';
+import useChangeCol from '../Col/useChangeCol';
+import ColRemovalButton from '../Col/ColRemovalButton';
 
 const GET_USER_BY_EMAIL = gql`
   query GetUserByEmail($email: String!) {
@@ -28,7 +30,7 @@ const REGISTER_USER = gql`
 `;
 
 interface RegisterProps {
-  i: number;
+  col: Col;
 }
 export default function Register(props: RegisterProps) {
   const tokenDetail = useReactiveVar(tokenVar);
@@ -45,6 +47,8 @@ export default function Register(props: RegisterProps) {
 
   const [message, setMessage] = useState('');
 
+  const { changeCol } = useChangeCol(); 
+
   const [getUserByEmail] = useLazyQuery(GET_USER_BY_EMAIL, {
     onCompleted: data => {
       console.log(data);
@@ -60,19 +64,6 @@ export default function Register(props: RegisterProps) {
         }
         refreshTokenInterval();
         userVar(data.registerUser);
-        const cols = colDetail.cols.map((col, i) => {
-          if (i === props.i) {
-            return {
-              ...col,
-              pathname: `/u/${encodeURIComponent(data.registerUser.name)}`
-            };
-          }
-          return col;
-        });
-        colVar({
-          ...colDetail,
-          cols,
-        });
       }
     }
   })
@@ -129,18 +120,7 @@ export default function Register(props: RegisterProps) {
   };
 
   const handleLoginClick = (event: React.MouseEvent) => {
-    const cols = colDetail.cols.map((col, i) => {
-      if (i === props.i) {
-        return {
-          pathname: '/login',
-        } as Col;
-      }
-      return col;
-    });
-    colVar({
-      ...colDetail,
-      cols,
-    });
+    changeCol(props.col, '/login')
   };
 
   const handleGoogleClick = (event: React.MouseEvent) => {
@@ -150,14 +130,16 @@ export default function Register(props: RegisterProps) {
   const isFormValid = email.length && !emailError && pass.length;
 
   return (
-    <Box sx={{
-      border: '1px solid lavender',
-      width: 320,
-    }}>
+    <Box>
       <Card elevation={5} sx={{
-        padding:1,
+        padding: 1,
+        display: 'flex',
+        justifyContent: 'space-between',
       }}>
-        /register
+        <Box>
+          /register
+        </Box>
+        <ColRemovalButton col={props.col}/>
       </Card>
       <Box>
         {message}
@@ -206,7 +188,7 @@ export default function Register(props: RegisterProps) {
           </Button>
         </Card>
         <Card elevation={5} sx={{padding:1, margin:1}} onClick={handleGoogleClick}>
-          <GoogleButton isRegistration={true} setMessage={setMessage} i={props.i}/>
+          <GoogleButton isRegistration={true} setMessage={setMessage} col={props.col}/>
         </Card>
       <Box sx={{
         textAlign: 'center'

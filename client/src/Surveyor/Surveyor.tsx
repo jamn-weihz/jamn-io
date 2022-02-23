@@ -1,24 +1,22 @@
-import { Box, Card, IconButton } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import React, { useRef } from 'react';
+import { Box } from '@mui/material';
+import React, { useRef, Dispatch } from 'react';
 import { useReactiveVar } from '@apollo/client';
 import { sizeVar, surveyorVar } from '../cache';
-import SearchBox from './SearchBox';
 import { SurveyorItem } from '../types/Surveyor';
 import SurveyorTree from './SurveyorTree';
-import { User } from '../types/User';
-import { Jam } from '../types/Jam';
+import { Col } from '../types/Col';
+import { PostAction } from '../types/Post';
 
 interface SurveyorProps {
-  context: User | Jam | any;
+  col: Col;
+  postDispatch: Dispatch<PostAction>;
 }
 export default function Surveyor(props: SurveyorProps) {
   const surveyorDetail = useReactiveVar(surveyorVar);
   const sizeDetail = useReactiveVar(sizeVar);
   const contentEl = useRef<HTMLElement>();
 
-  const surveyorState = surveyorDetail[props.context.id];
+  const surveyorState = surveyorDetail[props.col.id];
 
   if (!surveyorState) return null;
 
@@ -41,7 +39,7 @@ export default function Surveyor(props: SurveyorProps) {
     });
     surveyorVar({
       ...surveyorDetail,
-      [props.context.id]: {
+      [props.col.id]: {
         ...surveyorState,
         stack,
       }
@@ -49,51 +47,24 @@ export default function Surveyor(props: SurveyorProps) {
   }
 
   return (
-    <Box>
-      <Card elevation={5} sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        padding: 1,
-        borderBottom: '1px solid grey',
-      }}>
-        <Box sx={{ whiteSpace: 'nowrap', paddingRight: 1,}}>
-          <IconButton
-            disabled={surveyorState.index <= 0} 
-            size='small'
-            onClick={handleBackClick}
-          >
-            <ArrowBackIcon fontSize='inherit' />
-          </IconButton>
-          <IconButton
-            disabled={surveyorState.index >= surveyorState.stack.length - 1} 
-            size='small'
-            onClick={handleForwardClick}
-          >
-            <ArrowForwardIcon fontSize='inherit' />
-          </IconButton> 
-        </Box>
-        <Box> 
-          <SearchBox contextId={props.context.id} defaultRefinement='JAMN.IO' />
-        </Box>
-      </Card>
-      <Box ref={contentEl} sx={{
-        height: '100%',
-        overflow: 'scroll', 
-      }}>
-        { 
-          (surveyorState.stack[surveyorState.index]?.items || []).map((item, i) => {
-            return (
-              <SurveyorTree
-                key={`surveyor-tree-${item.postKey}`}
-                item={item}
-                updateItem={updateItem(i)}
-                depth={0}
-                context={props.context}
-              />
-            );
-          })
-        }
-      </Box>
+    <Box ref={contentEl} sx={{
+      overflow: 'scroll', 
+      width: '100%',
+    }}>
+      { 
+        (surveyorState.stack[surveyorState.index]?.items || []).map((item, i) => {
+          return (
+            <SurveyorTree
+              key={`surveyor-tree-${item.postKey}`}
+              item={item}
+              updateItem={updateItem(i)}
+              depth={0}
+              col={props.col}
+              postDispatch={props.postDispatch}
+            />
+          );
+        })
+      }
     </Box>
   );
 }

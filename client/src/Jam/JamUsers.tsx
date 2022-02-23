@@ -1,17 +1,14 @@
 import { Box, Card, Link } from '@mui/material'
 import { Jam } from '../types/Jam'
 import { useNavigate } from 'react-router-dom';
+import ColLink from '../Col/ColLink';
+import { Col } from '../types/Col';
 
 interface JamUsersProps {
   jam: Jam;
+  col: Col;
 }
 export default function JamUsers(props: JamUsersProps) {
-  const navigate = useNavigate();
-
-  const handleUserClick = (userName: string) => (event: React.MouseEvent) => {
-    navigate(`/u/${encodeURIComponent(userName)}`);
-  }
-
   return (
     <Box>
       {
@@ -22,12 +19,12 @@ export default function JamUsers(props: JamUsersProps) {
               padding:1,
               fontSize: 16,
             }}>
-              <Link onClick={handleUserClick(role.user.name)} sx={{
+              <ColLink col={props.col} pathname={`/u/${encodeURIComponent(role.user.name)}`} sx={{
                 cursor: 'pointer',
                 color: role.user.color,
               }}>
-                u/{ role.user.name }
-              </Link>
+                { `u/${role.user.name}` }
+              </ColLink>
               <Box sx={{
                 marginTop:1,
                 fontSize: 12,

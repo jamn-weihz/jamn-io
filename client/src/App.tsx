@@ -1,26 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import './App.css';
 import Appbar from './Appbar';
-import { gql, useApolloClient, useLazyQuery, useReactiveVar } from '@apollo/client';
+import { gql, useLazyQuery, useReactiveVar } from '@apollo/client';
 import { FULL_USER_FIELDS } from './fragments';
 import { colVar, sizeVar, tokenVar, userVar } from './cache';
-import { Box, Card, Drawer, IconButton, Theme } from '@mui/material'; 
-import { Route, Routes } from 'react-router-dom';
-import Login from './Auth/Login';
-import Register from './Auth/Register';
-import NotFound from './NotFound';
-import User from './User/User';
-import Jam from './Jam/Jam';
+import { Box, Theme } from '@mui/material';
 import useToken from './Auth/useToken';
-import Map from './Map/Map';
 import { ThemeProvider, createTheme } from '@mui/material';
 import { grey } from '@mui/material/colors';
-import { ALGOLIA_APP_ID, ALGOLIA_APP_KEY, ALGOLIA_INDEX_NAME, DEFAULT_COLOR } from './constants';
-import { InstantSearch } from 'react-instantsearch-dom';
-import algoliasearch, { SearchClient } from 'algoliasearch/lite';
-import { Col } from './types/Col';
-import Search from './Search';
+import {DEFAULT_COLOR } from './constants';
 import ColAdder from './Col/ColAdder';
+import ColComponent from './Col/Col';
+import resetCols from './Col/resetCols';
+import { getAppbarWidth } from './utils';
+import { PostAction, PostState } from './types/Post';
+import useSavePostSubcription from './Post/useSavePostSubcription';
+import useLinkPostsSubcription from './Post/useLinkPostsSubscription';
 
 const GET_USER = gql`
   query GetUser {
@@ -31,20 +26,17 @@ const GET_USER = gql`
   ${FULL_USER_FIELDS}
 `;
 
+
 function App() {
-  const client = useApolloClient();
   const tokenDetail = useReactiveVar(tokenVar);
   const userDetail = useReactiveVar(userVar);
   const colDetail = useReactiveVar(colVar);
+  const sizeDetail = useReactiveVar(sizeVar);
 
+  const containerEl = useRef<HTMLElement>();
   const { refreshToken, refreshTokenInterval } = useToken();
 
-  const [searchClient, setSearchClient] = useState(null as SearchClient | null);
   const [theme, setTheme] = useState(null as Theme | null);
-  
-  useEffect(() => {
-    setSearchClient(algoliasearch(ALGOLIA_APP_ID, ALGOLIA_APP_KEY));
-  }, []);
 
   useEffect(() => {
     setTheme(createTheme({
@@ -55,13 +47,13 @@ function App() {
         secondary: {
           main: grey[600],
         }
-      }
+      },
     }));
   }, [userDetail?.color])
 
   const [getUser] = useLazyQuery(GET_USER, {
     onError: error => {
-      console.error(error)
+      console.error(error);
     },
     onCompleted: data => {
       console.log(data);
@@ -81,10 +73,15 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (tokenDetail.isValid) {
-      getUser();
+    if (tokenDetail.isInit) {
+      if (tokenDetail.isValid) {
+        getUser();
+      }
+      else {
+        resetCols();
+      }
     }
-  }, [tokenDetail.isValid])
+  }, [tokenDetail.isInit, tokenDetail.isValid])
 
   useEffect(() => {
     const handleResize = () => {
@@ -101,62 +98,87 @@ function App() {
     }
   }, [])
 
-  if (!theme) return null;
-
-  const mapColToComponent = (col: Col, i: number) => {
-    const path = col.pathname.split('/');
-    if (path[1] === 'register') {
-      return <Register key={'col-'+i} i={i}/>
-    }
-    else if (path[1] === 'login') {
-      return <Login key={'col-'+i} i={i}/>
-    }
-    else if (path[1] === 'map') {
-      return <Map key={'col'+i} i={1}/>
-    }
-    else if (path[1] === 'search') {
-      return <Search key={'col-'+i} i={i} />
-    }
-    else if (path[1] === 'u') {
-      return <User key={'col-'+i} i={i} name={path[2]}/>
-    }
-    else if (path[1] === 'j') {
-      return <Jam key={'col-'+i} i={i} name={path[2]}/>
+  const postReducer = (state: PostState, action: PostAction) => {
+    switch (action.type) {
+      case 'ADD':
+        return {
+          ...state,
+          [action.postId]: [
+            ...(state[action.postId] || []),
+            action.postKey,
+          ],
+        }
+      case 'REMOVE':
+        return {
+          ...state,
+          [action.postId]: (state[action.postId] || [])
+            .filter(postKey => postKey !== action.postKey),
+        }
+      default:
+        throw new Error('Invalid action type')
     }
   }
+  const [postState, postDispatch] = useReducer(postReducer, {});
 
-  const app = (
+  const postIds = useMemo(() => Object.keys(postState), [postState]);
+
+  useSavePostSubcription(postIds);
+  useLinkPostsSubcription(postIds);
+
+  if (!theme) return null;
+
+  return (
+    <ThemeProvider theme={theme}>
     <Box sx={{
-      position: 'fixed',
-      left: 0,
-      top: 0,
       width: '100%',
       height: '100%',
-      display: 'flex',
-      flexDirection: 'row',
-      overflow: 'scroll',
     }}>
-      <ThemeProvider theme={theme}>
-        <Appbar />
+        <Appbar  containerEl={containerEl} />
         <Box sx={{
-          display: 'flex',
-          flexDirection: 'row',
+          position: 'fixed',
+          left: getAppbarWidth(sizeDetail.width),
+          top: 0,
+          bottom: 0,
+          rigth: 0,
         }}>
-          <Box sx={{width: 52,}}/>
-          {
-            colDetail.cols.map(mapColToComponent)
-          }
+          <Box ref={containerEl}  sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            overflowY: 'hidden',
+            overflowX: 'scroll',
+            height: '100%',
+            width: sizeDetail.width - getAppbarWidth(sizeDetail.width),
+          }}>
+            {
+              userDetail?.id
+                ? userDetail.cols
+                    .filter(col => !col.deleteDate)
+                    .sort((a, b) => a.i < b.i ? -1 : 1)
+                    .map(col => {
+                      return (
+                        <ColComponent 
+                          key={`col-${col.i}`}
+                          col={col} 
+                          postDispatch={postDispatch}
+                        />
+                      );
+                    })
+                : colDetail.cols.map(col => {
+                    return (
+                      <ColComponent 
+                        key={`col-${col.i}`}
+                        col={col} 
+                        postDispatch={postDispatch}
+                      />
+                    );
+                  })
+            }
+          </Box>
         </Box>
-        <ColAdder />
-      </ThemeProvider>
-    </Box>
-  );
-  if (!searchClient) return app;
-  return (
-    <InstantSearch searchClient={searchClient} indexName={ALGOLIA_INDEX_NAME}>
-      { app }
-    </InstantSearch>
-  );
+        <ColAdder containerEl={containerEl}/>
+      </Box>
+    </ThemeProvider>
+  )
 }
 
 export default App;

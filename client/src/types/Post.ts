@@ -26,3 +26,13 @@ export type Post = {
   deleteDate: Date | null;
   __typename: string;
 }
+
+export type PostState = {
+  [postId: string]: string[];
+}
+
+export type PostAction = {
+  type: string;
+  postId: string;
+  postKey: string;
+}

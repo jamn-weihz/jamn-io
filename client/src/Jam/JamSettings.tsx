@@ -2,6 +2,7 @@ import { gql, useMutation } from '@apollo/client';
 import { Box } from '@mui/material';
 import { useState } from 'react';
 import { ChromePicker } from 'react-color';
+import { Col } from '../types/Col';
 import { Jam } from '../types/Jam';
 
 const SET_JAM_COLOR = gql`
@@ -16,6 +17,7 @@ const SET_JAM_COLOR = gql`
 
 interface JamSettingsProps {
   jam: Jam;
+  col: Col;
 }
 
 export default function JamSettings(props: JamSettingsProps) {

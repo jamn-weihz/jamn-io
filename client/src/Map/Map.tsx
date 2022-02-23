@@ -1,7 +1,7 @@
 import { gql, useLazyQuery, useReactiveVar } from '@apollo/client';
-import { Box, Button, Card } from '@mui/material';
+import { Box, Button, Card, IconButton } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
-import { userVar } from '../cache';
+import { colVar, userVar } from '../cache';
 //@ts-ignore
 import mapboxgl from '!mapbox-gl'; //eslint-disable-line import/no-webpack-loader-syntax
 import { Map as MapBoxMap } from 'mapbox-gl';
@@ -10,6 +10,11 @@ import { DEFAULT_COLOR, DEV_SERVER_URI, MAPBOX_ACCESS_TOKEN } from '../constants
 import { Jam } from '../types/Jam';
 import StartJamForm from './StartJamForm';
 import { useNavigate } from 'react-router-dom';
+import useChangeCol from '../Col/useChangeCol';
+import { Col } from '../types/Col';
+import CloseIcon from '@mui/icons-material/Close';
+import ColRemovalButton from '../Col/ColRemovalButton';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
 
@@ -25,12 +30,14 @@ const GET_JAMS_BY_LOCATION = gql`
 `;
 
 interface MapProps {
-  i: number;
+  col: Col;
 }
 export default function Map(props: MapProps) {
   const navigate = useNavigate();
+  const { changeCol } = useChangeCol();
 
   const userDetail = useReactiveVar(userVar);
+  const colDetail = useReactiveVar(colVar);
 
   const mapContainer = useRef(null);
   const map = useRef(null as unknown as MapBoxMap);
@@ -241,7 +248,9 @@ export default function Map(props: MapProps) {
     map.current.on('click', 'points', (event) => {
       const features = event.features as any[];
       const jam = JSON.parse(features[0].properties?.jam) as Jam;
-      navigate(`/j/${encodeURIComponent(jam.name)}`);
+      const pathname = `/j/${encodeURIComponent(jam.name)}`
+      changeCol(props.col, pathname);
+      navigate(pathname)
     });
     map.current.on('mouseenter', 'clusters', () => {
       map.current.getCanvas().style.cursor = 'pointer';
@@ -314,22 +323,35 @@ export default function Map(props: MapProps) {
     }
   };
 
+  const handleOptionsClick = () => {
+    
+  }
+
   return (
     <Box sx={{
-      border: '1px solid lavender',
-      width: 320,
-      height: '100%',
+      height: '100%'
     }}>
       <Card elevation={5} sx={{
         padding:1,
+        display: 'flex',
+        justifyContent: 'space-between',
+        color: 'dimgrey',
       }}>
-        /map
+        <Box>
+          /map
+        </Box>
+        <IconButton size='small' onClick={handleOptionsClick} sx={{
+            fontSize: 20,
+            padding: 0,
+          }}>
+            <MoreVertIcon fontSize='inherit'/> 
+          </IconButton>
       </Card>
       <Card elevation={5} sx={{
         position: 'relative',
         height: isStartingJam
           ? 'calc(100% - 400px)'
-          : 'calc(100% - 230px)',
+          : 'calc(100% - 240px)',
         margin: 1,
         padding: 1,
       }}>
@@ -337,7 +359,6 @@ export default function Map(props: MapProps) {
           width: '100%', 
           height: '100%',
         }}/>
-
       </Card>
       <Card elevation={5} sx={{
         margin: 1,
@@ -353,13 +374,13 @@ export default function Map(props: MapProps) {
         {
           isStartingJam
             ? <StartJamForm
-                i={props.i}
+                col={props.col}
                 lng={pinLng}
                 lat={pinLat}
                 isOpen={isStartingJam} 
                 setIsOpen={setIsStartingJam}
               />
-            : <Button disabled={!hasPin || !userDetail?.verifyEmailDate} variant='contained' onClick={handleStartJamClick}>
+            : <Button disabled={!hasPin || !userDetail?.verifyEmailDate} onClick={handleStartJamClick}>
                 Start a jam
               </Button>
         }

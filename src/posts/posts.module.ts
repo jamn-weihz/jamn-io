@@ -6,6 +6,7 @@ import { PostsResolver } from './posts.resolver';
 import { UsersModule } from 'src/users/users.module';
 import { JamsModule } from 'src/jams/jams.module';
 import { SearchModule } from 'src/search/search.module';
+import { PubSubModule } from 'src/pub-sub/pub-sub.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { SearchModule } from 'src/search/search.module';
     forwardRef(() => UsersModule),
     forwardRef(() => JamsModule),
     SearchModule,
+    PubSubModule,
   ],
   providers: [PostsService, PostsResolver],
   exports: [PostsService],

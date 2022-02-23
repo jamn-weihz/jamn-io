@@ -2,7 +2,7 @@ import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { Box, Button, Card, FormControl, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { userVar } from '../cache';
-import { USER_FIELDS } from '../fragments';
+import { FULL_USER_FIELDS } from '../fragments';
 import { User } from '../types/User';
 
 
@@ -37,7 +37,8 @@ export default function Verify() {
       console.log(data);
       const user = client.cache.readFragment({
         id: client.cache.identify(data.verifyUser),
-        fragment: USER_FIELDS,
+        fragment: FULL_USER_FIELDS,
+        fragmentName: 'FullUserFields',
       }) as User;
       userVar(user);
     }
@@ -69,7 +70,7 @@ export default function Verify() {
   }
 
   return (
-    <Card variant='outlined' sx={{padding: 1, marginTop: 1,}}>
+    <Card elevation={5} sx={{padding: 1, margin: 1,}}>
       <Box sx={{padding:1}}>
         Verify your email to complete registration.
       </Box>

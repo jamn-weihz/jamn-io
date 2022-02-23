@@ -1,51 +1,91 @@
-import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { colVar, userVar } from '../cache';
+import { gql, useApolloClient, useMutation, useReactiveVar } from '@apollo/client';
+import { colVar, sizeVar, userVar } from '../cache';
 import { v4 as uuidv4 } from 'uuid';
-import { COL_FIELDS } from '../fragments';
+import { COL_FIELDS, FULL_USER_FIELDS } from '../fragments';
+import { User } from '../types/User';
+import React from 'react';
+import { getColWidth } from '../utils';
+import { useNavigate } from 'react-router-dom';
 
 const ADD_COL = gql`
-  mutation AddCol($id: String!, $pathname: String!) {
-    addCol(id: $id, pathname: $pathname) {
+  mutation AddCol($pathname: String!) {
+    addCol(pathname: $pathname) {
       ...ColFields
     }
   }
   ${COL_FIELDS}
 `;
 
-export default function useAddCol() {
+export default function useAddCol(containerEl: React.MutableRefObject<HTMLElement | undefined>) {
+  const navigate = useNavigate();
+
+  const client = useApolloClient();
+
   const userDetail = useReactiveVar(userVar);
   const colDetail = useReactiveVar(colVar);
+  const sizeDetail = useReactiveVar(sizeVar);
 
   const [add] = useMutation(ADD_COL, {
     onError: error => {
       console.error(error);
     },
+    update: (cache, {data: {addCol}}) => {
+      cache.modify({
+        id: cache.identify(userDetail || {}),
+        fields: {
+          cols: (cachedRefs = []) => {
+            const newRef = cache.writeFragment({
+              id: cache.identify(addCol),
+              fragment: COL_FIELDS,
+              data: addCol,
+            });
+            return [...cachedRefs, newRef];
+          }
+        }
+      });
+    },
     onCompleted: data => {
       console.log(data);
+      const user = client.cache.readFragment({
+        id: client.cache.identify(userDetail || {}),
+        fragment: FULL_USER_FIELDS,
+        fragmentName: 'FullUserFields',
+      }) as User;
+      userVar(user);
+      const i = user.cols.filter(col => !col.deleteDate).length - 1;
+      colVar({
+        ...colDetail,
+        i,
+        isAdding: false,
+      });
+      containerEl.current?.scrollTo({
+        left: i * getColWidth(sizeDetail.width),
+        behavior: 'smooth',
+      });
+      navigate(data.addCol.pathname);
     }
   });
 
   const addCol = (pathname: string) => {
-    const id = uuidv4();
-    console.log(id);
     if (userDetail?.id) {
       add({
         variables: {
           pathname,
-          id,
         }
       })
     }
-    colVar({
-      ...colDetail,
-      cols: [...colDetail.cols, { 
-        id,
-        i: colDetail.cols.length,
-        pathname,
-        __typename: 'Col',
-      }],
-    });
-
+    else {
+      colVar({
+        ...colDetail,
+        cols: [...colDetail.cols, { 
+          id: uuidv4(),
+          i: colDetail.cols.length,
+          pathname,
+          __typename: 'Col',
+        }],
+        isAdding: false,
+      });
+    }
   }
 
   return { addCol }

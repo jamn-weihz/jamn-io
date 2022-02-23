@@ -19,4 +19,25 @@ export class ColsResolver {
   ) {
     return this.colsService.addCol(user.id, pathname);
   }
+
+  @UseGuards(GqlAuthGuard)
+  @Mutation(() => Col, {name: 'saveCol'})
+  async saveCol(
+    @CurrentUser() user: User,
+    @Args('colId') colId: string,
+    @Args('pathname') pathname: string,
+  ) {
+    return this.colsService.saveCol(user.id, colId, pathname);
+  }
+
+  @UseGuards(GqlAuthGuard)
+  @Mutation(() => [Col], {name: 'removeCol'})
+  async removeCol(
+    @CurrentUser() user: User,
+    @Args('colId') colId: string,
+  ) {
+    return this.colsService.removeCol(user.id, colId);
+  }
+
+
 }

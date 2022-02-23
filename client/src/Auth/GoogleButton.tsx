@@ -3,22 +3,23 @@ import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from 're
 import { GOOGLE_CLIENT_ID } from '../constants';
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { Dispatch, SetStateAction } from 'react';
-import { USER_FIELDS } from '../fragments';
+import { FULL_USER_FIELDS } from '../fragments';
 import { colVar, userVar } from '../cache';
+import { Col } from '../types/Col';
  
 const REGISTER_USER = gql`
-  mutation LoginGoogleUser($token: String, $pathnames: [String!]!) {
+  mutation LoginGoogleUser($token: String!, $pathnames: [String!]!) {
     loginGoogleUser(token: $token, pathnames: $pathnames) {
-      ...UserFields
+      ...FullUserFields
     }
   }
-  ${USER_FIELDS}
+  ${FULL_USER_FIELDS}
 `;
 
 interface GoogleButtonProps {
   isRegistration: boolean;
   setMessage: Dispatch<SetStateAction<string>>;
-  i: number;
+  col: Col;
 }
 export default function GoogleButton(props: GoogleButtonProps) {
   const colDetail = useReactiveVar(colVar);
@@ -31,7 +32,7 @@ export default function GoogleButton(props: GoogleButtonProps) {
       console.log(data);
       userVar(data.loginGoogleUser);
       const cols = colDetail.cols.map((col, i) => {
-        if (i === props.i) {
+        if (i === props.col.i) {
           return {
             ...col,
             pathname: `/u/${encodeURIComponent(data.loginGoogleUser.name)}`

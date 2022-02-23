@@ -7,23 +7,30 @@ import MapIcon from '@mui/icons-material/Map';
 import SearchIcon from '@mui/icons-material/Search';
 import useAddCol from './useAddCol';
 
-export default function AddCol() {
+interface ColAdderProps {
+  containerEl: React.MutableRefObject<HTMLElement | undefined>;
+}
+export default function ColAdder(props: ColAdderProps) {
   const userDetail = useReactiveVar(userVar);
   const colDetail = useReactiveVar(colVar);
 
-  const { addCol } = useAddCol();
+  const { addCol } = useAddCol(props.containerEl);
 
   const handleAddClick = (pathname: string) => (event: React.MouseEvent) => {
     event.stopPropagation();
     event.preventDefault();
     addCol(pathname);
+    colVar({
+      ...colDetail,
+      isAdding: false,
+    });
   }
   return (
     <Card elevation={10} sx={{
-      position: 'absolute',
+      position: 'fixed',
       display: colDetail.isAdding ? 'flex' : 'none',
-      left: 52,
-      top: 52 * (colDetail.cols.length + 1) + 7,
+      left: 56,
+      top: 52 * (colDetail.cols.filter(col => !col.deleteDate).length + 1) + 7,
       padding: 1,
       flexDirection: 'row'
     }}>

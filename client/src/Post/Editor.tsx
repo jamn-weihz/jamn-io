@@ -10,7 +10,7 @@ import {
 import 'draft-js/dist/Draft.css';
 import Editor from '@draft-js-plugins/editor';
 import { useApolloClient, useReactiveVar } from '@apollo/client';
-import { userVar } from '../cache';
+import { replyVar, userVar } from '../cache';
 import { Box } from '@mui/material';
 import useSavePost from './useSavePost';
 
@@ -29,6 +29,7 @@ interface EditorComponentProps {
 export default function EditorComponent(props: EditorComponentProps) {
   const client = useApolloClient();
   const userDetail = useReactiveVar(userVar);
+  const replyDetail = useReactiveVar(replyVar);
 
   const { savePost } = useSavePost(props.post.id);
 
@@ -50,7 +51,25 @@ export default function EditorComponent(props: EditorComponentProps) {
     if (focused && editorRef.current) {
       editorRef.current.focus();
     }
+    if (replyDetail.postId === props.post.id && editorRef.current)  {
+      editorRef.current.focus();
+      replyVar({
+        postId: '',
+      });
+    }
   });
+
+  useEffect(() => {
+    if (
+      props.post.draft && 
+      (props.post.userId !== userDetail?.id || !focused)
+    ) {
+      const contentState = convertFromRaw(JSON.parse(props.post.draft));
+      setEditorState(
+        EditorState.createWithContent(contentState)
+      );
+    }
+  }, [props.post.draft])
 
   const handleChange = (newState: EditorState) => {
     if (props.post.userId !== userDetail?.id || props.post.commitDate) {

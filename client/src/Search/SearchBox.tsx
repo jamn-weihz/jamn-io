@@ -9,13 +9,15 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect } from 'react';
-import { surveyorVar } from '../cache';
+import { sizeVar, surveyorVar } from '../cache';
 import { connectSearchBox } from 'react-instantsearch-dom';
 
 import { useSearchParams } from 'react-router-dom';
+import { Col } from '../types/Col';
+import { getColWidth } from '../utils';
 
 interface SearchBoxProps {
-  contextId: string;
+  col: Col;
   currentRefinement: string;
   isSearchStalled: boolean;
   refine: any;
@@ -24,16 +26,17 @@ interface SearchBoxProps {
 function SearchBox(props: SearchBoxProps) {
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const sizeDetail = useReactiveVar(sizeVar);
   const surveyorDetail = useReactiveVar(surveyorVar);
 
-  const surveyorState = surveyorDetail[props.contextId];
+  const surveyorState = surveyorDetail[props.col.id];
 
   useEffect(() => {
     if (surveyorState.triggerRefinement) {
       refineQuery();
       surveyorVar({
         ...surveyorDetail,
-        [props.contextId]:  {
+        [props.col.id]:  {
           ...surveyorState,
           triggerRefinement: false,
         },
@@ -49,7 +52,7 @@ function SearchBox(props: SearchBoxProps) {
     });
     surveyorVar({
       ...surveyorDetail,
-      [props.contextId]:  {
+      [props.col.id]:  {
         ...surveyorState,
         stack,
       },
@@ -67,7 +70,7 @@ function SearchBox(props: SearchBoxProps) {
     });
     surveyorVar({
       ...surveyorDetail,
-      [props.contextId]:  {
+      [props.col.id]:  {
         ...surveyorState,
         stack,
         index: surveyorState.index + 1,
@@ -90,19 +93,22 @@ function SearchBox(props: SearchBoxProps) {
     }}>
       <FormControl variant={'outlined'}>
         <OutlinedInput
-          sx={{height: 30, width: '300px'}}
+          sx={{
+            height: 30, 
+            width: getColWidth(sizeDetail.width) - 100,
+          }}
           id='query'
           type={'text'}
           value={surveyorState.stack[surveyorState.index].query}
           onChange={handleChange}
           onKeyPress={handleKeyPress}
           endAdornment={
-            <InputAdornment position="end"> 
-              <Tooltip title='Search'>
-                <IconButton color={'inherit'} size={'small'} onClick={refineQuery}>
-                  <SearchIcon fontSize='inherit'/>
-                </IconButton>
-              </Tooltip>
+            <InputAdornment position='end' sx={{
+              marginRight: -1,
+            }}> 
+              <IconButton color={'inherit'} size={'small'} onClick={refineQuery}>
+                <SearchIcon fontSize='inherit'/>
+              </IconButton>
               
             </InputAdornment>
           }

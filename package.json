@@ -40,6 +40,8 @@
     "geojson": "^0.5.0",
     "googleapis": "^95.0.0",
     "graphql": "^16.3.0",
+    "graphql-redis-subscriptions": "^2.4.2",
+    "ioredis": "^4.28.5",
     "joi": "^17.6.0",
     "mailgun-js": "^0.22.0",
     "passport": "^0.5.2",

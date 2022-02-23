@@ -9,6 +9,8 @@ import {
 } from '@mui/material';
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import { colVar } from '../cache';
+import useChangeCol from '../Col/useChangeCol';
+import { Col } from '../types/Col';
 
 const GET_JAM_BY_NAME = gql`
   query GetJamByName($name: String!) {
@@ -32,10 +34,10 @@ interface StartJamModalProps {
   lat: number;
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  i: number;
+  col: Col;
 }
 export default function StartJamForm(props: StartJamModalProps) {
-  const colDetail = useReactiveVar(colVar);
+  const { changeCol } = useChangeCol()
 
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState('');
@@ -56,25 +58,15 @@ export default function StartJamForm(props: StartJamModalProps) {
     }
   });
 
-  const [startJam ] = useMutation(START_JAM, {
+  const [startJam] = useMutation(START_JAM, {
     onError: error => {
       console.error(error);
     },
     onCompleted: data => {
       console.log(data);
       props.setIsOpen(false);
-      colVar({
-        ...colDetail,
-        cols: colDetail.cols.map((col, i) => {
-          if (i === props.i) {
-            return {
-              ...col,
-              pathname: `/j/${data.startJam.name}`,
-            };
-          }
-          return col;
-        })
-      })
+      const pathname = `/j/${encodeURIComponent(data.startJam.name)}`;
+      changeCol(props.col, pathname);
     }
   });
 
@@ -153,7 +145,7 @@ export default function StartJamForm(props: StartJamModalProps) {
       <Box sx={{
         paddingTop: 1,
       }}>
-        <Button variant='contained' disabled={!isFormValid} onClick={handleSubmitClick}>
+        <Button disabled={!isFormValid} onClick={handleSubmitClick}>
           Start
         </Button>
         &nbsp;

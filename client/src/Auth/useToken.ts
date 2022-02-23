@@ -24,6 +24,11 @@ export default function useToken() {
         if (userDetail?.id) {
           logoutUser();
         }
+        tokenVar({
+          ...tokenDetail,
+          isInit: true,
+          isValid: false
+        })
       }
     },
     onCompleted: data => {
@@ -31,7 +36,15 @@ export default function useToken() {
       if (data.refreshToken.id) {
         tokenVar({
           ...tokenDetail,
+          isInit: true,
           isValid: true,
+        })
+      }
+      else {
+        tokenVar({
+          ...tokenDetail,
+          isInit: true,
+          isValid: false
         })
       }
     },

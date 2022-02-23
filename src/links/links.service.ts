@@ -19,6 +19,15 @@ export class LinksService {
     return this.linksRepository.findOne({ id });
   }
 
+  async getLinkBySourcePostIdAndTargetPostId(sourcePostId: string, targetPostId: string) {
+    return this.linksRepository.findOne({
+      where: {
+        sourcePostId,
+        targetPostId,
+      },
+    });
+  }
+
   async getLinksBySourcePostId(sourcePostId: string, offset: number): Promise<Link[]> {
     return this.linksRepository.createQueryBuilder('link')
       .select('link')
@@ -58,6 +67,36 @@ export class LinksService {
     return link;
   }
 
+  async linkPosts(userId: string, sourcePostId: string, targetPostId: string, clicks: number, tokens: number): Promise<Link> {
+    let link = await this.getLinkBySourcePostIdAndTargetPostId(sourcePostId, targetPostId);
+    if (!link) {
+      const posts = await this.postsService.getPostsByIds([sourcePostId, targetPostId]);
+      if (posts.length !== 2) return null;
+      this.postsService.incrementPostNextCount(sourcePostId);
+      this.postsService.incrementPostPrevCount(targetPostId);
+      link = await this.createLink(sourcePostId, targetPostId, clicks, tokens);
+    }
+    let dClicks = clicks;
+    let dTokens = tokens;
+    let dWeight = findDefaultWeight(clicks, tokens);
+    let vote = await this.votesService.getVoteByUserIdAndLinkId(userId, link.id);
+    if (vote) {
+      dClicks -= vote.clicks;
+      dTokens -= vote.tokens;
+      dWeight -= vote.weight;
+      if (dClicks === 0 && dTokens === 0) {
+        return link;
+      }
+      else {
+        this.linksRepository.increment({id: link.id}, 'clicks', dClicks);
+        this.linksRepository.increment({id: link.id}, 'tokens', dTokens);
+        this.linksRepository.increment({id: link.id}, 'weight', dWeight);
+        const oldVote = await this.votesService.deleteVote(vote.id);
+      }
+    }
+    const newVote = await this.votesService.createVote(userId, link.id, sourcePostId, targetPostId, clicks, tokens);
+    return this.getLinkById(link.id);
+  }
   incrementLinkVoteI(linkId: string) {
     this.linksRepository.increment({id: linkId}, 'voteI', 1);
   }

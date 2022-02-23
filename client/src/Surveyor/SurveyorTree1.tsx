@@ -1,7 +1,9 @@
 import { Box, IconButton, Link as MUILink } from '@mui/material';
 import { Link } from '../types/Link';
 import SurveyorEntry from './SurveyorEntry';
-import React, { Dispatch } from 'react';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import React from 'react';
 
 import { useApolloClient } from '@apollo/client';
 
@@ -9,17 +11,15 @@ import { SurveyorItem } from '../types/Surveyor';
 import { User } from '../types/User';
 import { Jam } from '../types/Jam';
 import { FULL_POST_FIELDS, LINK_FIELDS } from '../fragments';
-import { Post, PostAction } from '../types/Post';
-import { Col } from '../types/Col';
+import { Post } from '../types/Post';
 
-interface SurveyorTreeProps {
-  col: Col;
+interface SurveyorTree1Props {
+  context: User | Jam;
   item: SurveyorItem;
   updateItem(item: SurveyorItem): void;
   depth: number;
-  postDispatch: Dispatch<PostAction>;
 }
-export default function SurveyorTree(props: SurveyorTreeProps) {
+export default function SurveyorTree(props: SurveyorTree1Props) {
   const client = useApolloClient();
 
   const voteOnLink = (clicks: number) => (event: React.MouseEvent) => {
@@ -58,6 +58,16 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
     fragmentName: 'FullPostFields',
   }) as Post;
 
+  const link = props.item.linkId
+    ? client.cache.readFragment({
+        id: client.cache.identify({
+          id: props.item.linkId,
+          __typename: 'Link',
+        }),
+        fragment: LINK_FIELDS,
+      }) as Link
+    : null;
+
   let remaining = 0;
   let items = [] as SurveyorItem[];
   if (props.item.showPrev) {
@@ -78,8 +88,6 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
     event.stopPropagation();
   }
 
-  if (!post) return null;
-
   return (
     <Box>
       <Box sx={{
@@ -87,17 +95,54 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
         flexDirection: 'row',
         justifyContent: 'space-between',
       }}>
-        <SurveyorEntry
-          col={props.col}
-          item={props.item}
-          updateItem={props.updateItem}
-          depth={props.depth}
-          postDispatch={props.postDispatch}
-        />
+        {
+          link
+            ? <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                marginLeft: '0px',
+                marginRight: '-4px',
+              }}>
+                <IconButton
+                  onClick={voteOnLink(link.weight > 0 ? 0 : 1)} 
+                  color={link.weight > 0 ? 'primary' : 'secondary'} 
+                  size='small' 
+                  sx={{
+                    opacity: link.weight > 0 ? 1 : .4,
+                    fontSize: 20,
+                  }}
+                >
+                  <ArrowDropUpIcon fontSize='inherit' />
+                </IconButton>
+                <Box sx={{
+                  color: 'dimgrey',
+                  textAlign: 'center',
+                }}>
+                { link.weight }
+                </Box>
+                <IconButton
+                  onClick={voteOnLink(link.weight < 0 ? 0 : -1)} 
+                  color={link.weight < 0 ? 'primary' : 'secondary'} 
+                  size='small' 
+                  sx={{
+                    opacity: link.weight < 0 ? 1 : .4,
+                    fontSize: 20,
+                  }}
+                >
+                  <ArrowDropDownIcon fontSize='inherit' />
+                </IconButton>
+              </Box>
+            : null
+          }
       </Box>
       <Box sx={{
-        borderLeft: `1px solid ${post.user.color}`,
-        marginLeft: '7px',
+        borderLeft: props.depth > 0
+          ? '3px solid lavender'
+          : 'none',
+        marginLeft: props.depth > 0
+          ? '12px'
+          : '0px'
       }}>
         {
           items.map((item, i) => {
@@ -107,8 +152,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
                 item={item}
                 updateItem={updateChildItem(props.item.showNext, i)}
                 depth={props.depth + 1}
-                col={props.col}
-                postDispatch={props.postDispatch}
+                context={props.context}
               />
             )
           })
@@ -117,11 +161,9 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
           remaining > 0
             ? <Box onClick={handleLoadClick} sx={{
                 fontSize: 12,
-                marginTop: '5px',
-                marginLeft: '10px',
+                marginLeft: '35px',
                 textAlign: 'left',
-                cursor: 'pointer',
-                color: post.user.color,
+                cursor: 'pointer'
               }}>
                 <MUILink>load {remaining} more</MUILink>
               </Box>

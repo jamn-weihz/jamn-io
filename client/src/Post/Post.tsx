@@ -1,25 +1,42 @@
 import { useApolloClient, useReactiveVar } from '@apollo/client';
 import { Box, Button, Card, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { userVar } from '../cache';
+import { linkVar, userVar } from '../cache';
 import { FULL_POST_FIELDS } from '../fragments';
-import { Post } from '../types/Post';
+import { Post, PostAction } from '../types/Post';
 import { getTimeString } from '../utils';
 import CharCounter from './CharCounter';
 import Editor from './Editor';
 import { convertFromRaw } from 'draft-js';
-import React from 'react';
+import React, { Dispatch, useEffect } from 'react';
 
 interface PostComponentProps {
   post: Post;
   postKey: string;
+  postDispatch: Dispatch<PostAction>;
 }
 export default function PostComponent(props: PostComponentProps) {
   const navigate = useNavigate();
 
   const client = useApolloClient();
   const userDetail = useReactiveVar(userVar);
-  
+  const linkDetail = useReactiveVar(linkVar);
+
+  useEffect(() => {
+    props.postDispatch({
+      type: 'ADD',
+      postId: props.post.id,
+      postKey: props.postKey,
+    });
+    return () => {
+      props.postDispatch({
+        type: 'REMOVE',
+        postId: props.post.id,
+        postKey: props.postKey,
+      });
+    };
+  }, []);
+
   const post = client.cache.readFragment({
     id: client.cache.identify(props.post),
     fragment: FULL_POST_FIELDS,
@@ -53,24 +70,23 @@ export default function PostComponent(props: PostComponentProps) {
   }
   const limit = 1000;
 
-  console.log(props.post, post);
-
+  const isLinking = (
+    linkDetail.sourcePostId === props.post.id || 
+    linkDetail.targetPostId === props.post.id
+  );
   return (
     <Card variant='outlined' sx={{
       margin: 1,
       padding: 1,
+      backgroundColor: isLinking
+        ? 'lavender'
+        : 'white'
+
     }}>
       <Box sx={{
-        fontSize: 12,
+        fontSize: 14,
         color: 'dimgrey',
-        textAlign: 'center'
       }}>
-        {
-          post.commitDate
-            ? 'committed by'
-            : 'written by'
-        }
-        &nbsp;
         <Link onClick={handleUserClick} sx={{
           display: 'inline-block',
           cursor: 'pointer',
@@ -79,11 +95,11 @@ export default function PostComponent(props: PostComponentProps) {
           u/{post.user.name}
         </Link>
         &nbsp;
-        { timeString }&nbsp;ago
+        { timeString }
+        &nbsp;
         {
           post.jam
             ? <Box component='span'>
-                &nbsp;to&nbsp;
                 <Link onClick={handleJamClick} sx={{
                   cursor: 'pointer',
                   color: post.jam.color,
@@ -98,7 +114,7 @@ export default function PostComponent(props: PostComponentProps) {
         <Editor post={post} isReadonly={false} />
       </Box>
       <Box sx={{
-        display: post.userId === userDetail?.id && !post.commitDate
+        display: false && post.userId === userDetail?.id && !post.commitDate
           ? 'flex' 
           : 'none',
         justifyContent: 'center',

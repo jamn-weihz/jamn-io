@@ -1,3 +1,4 @@
+import { MOBILE_WIDTH } from "./constants";
 
 const second = 1000;
 const minute = 60 * second;
@@ -25,3 +26,15 @@ export const getTimeString = (time: number) => {
               : (dTime / second).toFixed(0) + 'sec'
   )
 };
+
+
+export const getAppbarWidth = (width: number) => {
+  return width < MOBILE_WIDTH
+    ? 38
+    : 55
+}
+export const getColWidth = (width: number) => {
+  return width < MOBILE_WIDTH 
+    ? width - 42
+    : Math.min(350, width - 60)
+}

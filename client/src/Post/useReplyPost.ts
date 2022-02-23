@@ -1,4 +1,5 @@
 import { gql, useMutation } from '@apollo/client';
+import { replyVar } from '../cache';
 import { FULL_POST_FIELDS, LINK_FIELDS, VOTE_FIELDS } from '../fragments';
 import { Jam } from '../types/Jam';
 import { Link } from '../types/Link';
@@ -28,7 +29,7 @@ const REPLY_POST = gql`
 
 type HandleCompleted = (link: Link) => void;
 
-export default function useReplyPost(sourcePostId: string, context: User | Jam, handleCompleted: HandleCompleted) {
+export default function useReplyPost(sourcePostId: string, jam: Jam | undefined, handleCompleted: HandleCompleted) {
   const [reply] = useMutation(REPLY_POST, {
     onError: error => {
       console.error(error);
@@ -36,13 +37,14 @@ export default function useReplyPost(sourcePostId: string, context: User | Jam, 
     onCompleted: data => {
       console.log(data);
       handleCompleted(data.replyPost);
+      replyVar({
+        postId: data.replyPost.targetPost.id,
+      })
     }
   });
 
   const replyPost = () => {
-    const jamId = context.__typename === 'Jam'
-      ? context.id
-      : null;
+    const jamId = jam?.id;
     reply({
       variables: {
         sourcePostId,

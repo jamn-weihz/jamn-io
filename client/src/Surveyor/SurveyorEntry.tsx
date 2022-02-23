@@ -1,17 +1,15 @@
-import { Box, Button, Card as MUICard, IconButton, Tooltip} from '@mui/material';
+import { Box, Button, Card as MUICard, IconButton } from '@mui/material';
 import NorthIcon from '@mui/icons-material/North';
 import ReplyIcon from '@mui/icons-material/Reply';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import FilterAltTwoToneIcon from '@mui/icons-material/FilterAltTwoTone';
 import NotificationsTwoToneIcon from '@mui/icons-material/NotificationsTwoTone';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import { surveyorVar, userVar } from '../cache';
-import { gql, useReactiveVar } from '@apollo/client';
-import { Post } from '../types/Post';
-import { User } from '../types/User';
+import { linkVar, surveyorVar, userVar } from '../cache';
+import { useReactiveVar } from '@apollo/client';
+import { Post, PostAction } from '../types/Post';
 import { useApolloClient } from '@apollo/client';
-import React, { Dispatch } from 'react';
-import { Role } from '../types/Role';
+import React, { Dispatch, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid'; 
 import { Link } from '../types/Link';
 import { useSearchParams } from 'react-router-dom';
@@ -19,15 +17,19 @@ import { SurveyorItem } from '../types/Surveyor';
 import PostComponent from '../Post/Post';
 import useReplyPost from '../Post/useReplyPost';
 import { Jam } from '../types/Jam';
-import { FULL_POST_FIELDS } from '../fragments';
+import { FULL_POST_FIELDS, LINK_FIELDS } from '../fragments';
 import useGetPrev from '../Post/useGetPrev';
 import useGetNext from '../Post/useGetNext';
+import { Col } from '../types/Col';
+import useLinkPosts from '../Post/useLinkPosts';
 
 interface SurveyorEntryProps {
-  context: User | Jam;
+  jam?: Jam;
+  col: Col;
   item: SurveyorItem;
   updateItem(item: SurveyorItem): void;
   depth: number;
+  postDispatch: Dispatch<PostAction>;
 }
 
 export default function SurveyorEntry(props: SurveyorEntryProps) {
@@ -36,8 +38,11 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
   const client = useApolloClient();
   const userDetail = useReactiveVar(userVar);
   const surveyorDetail = useReactiveVar(surveyorVar);
+  const linkDetail = useReactiveVar(linkVar);  
 
-  const surveyorState = surveyorDetail[props.context.id]
+  const { linkPosts } = useLinkPosts();
+
+  const surveyorState = surveyorDetail[props.col.id]
 
   const handleGetPrevCompleted = (inLinks: Link[]) => {
     const items = inLinks.map(link => {
@@ -57,6 +62,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
         showNext: !!existingItem?.showNext,
         prev: existingItem?.prev || [],
         next: existingItem?.next || [],
+        refresh: false,
       } as SurveyorItem;
     });
     props.updateItem({
@@ -86,6 +92,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
         showNext: !!existingItem?.showNext,
         prev: existingItem?.prev || [],
         next: existingItem?.next || [],
+        refresh: false,
       } as SurveyorItem;
     });
     props.updateItem({
@@ -93,6 +100,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
       showPrev: false,
       showNext: true,
       next: [...props.item.next, ...items],
+      refresh: false,
     });
   }
   const { getNext } = useGetNext(props.item.postId, handleGetNextCompleted);
@@ -112,15 +120,29 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
       ...props.item,
       showPrev: false,
       showNext: true,
-      next: [newItem, ...props.item.next]
+      next: [newItem, ...props.item.next],
+      refresh: false,
     })
   }
 
-  const { replyPost } = useReplyPost(props.item.postId, props.context, handleReplyCompleted);
+  const { replyPost } = useReplyPost(props.item.postId, props.jam, handleReplyCompleted);
+
+  useEffect(() => {
+    if (props.item.refresh) {
+      if (props.item.showNext) {
+        getNext(0);
+      }
+      else if (props.item.showPrev) {
+        getPrev(0);
+      }
+      props.updateItem({
+        ...props.item,
+        refresh: false,
+      });
+    }
+  }, [props.item.refresh]);
 
   const handlePrevClick = (event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
     if (props.item.showPrev) {
       props.updateItem({
         ...props.item,
@@ -138,8 +160,6 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
   }
 
   const handleNextClick = (event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
     if (props.item.showNext) {
       props.updateItem({
         ...props.item,
@@ -157,8 +177,6 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
   }
   
   const handlePromoteClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    event.preventDefault();
     const stack = surveyorState.stack.slice();
     stack.push({
       originalQuery: '',
@@ -170,7 +188,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
     });
     surveyorVar({
       ...surveyorDetail,
-      [props.context.id]: {
+      [props.col.id]: {
         ...surveyorState,
         index: surveyorState.index + 1,
         stack,
@@ -180,23 +198,46 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
   }
 
   const handleReplyClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    event.preventDefault();
     replyPost();
   }
 
   const handleLinkClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    event.preventDefault();
+    if (linkDetail.sourcePostId === props.item.postId) {
+      linkVar({
+        sourcePostId: '',
+        targetPostId: '',
+      });
+    }
+    else {
+      linkVar({
+        sourcePostId: props.item.postId,
+        targetPostId: '', 
+      })
+    }
   }
 
   const handleMouseEnter = (event: React.MouseEvent) => {
+    if (linkDetail.sourcePostId && linkDetail.sourcePostId !== props.item.postId) {
+      linkVar({
+        ...linkDetail,
+        targetPostId: props.item.postId,
+      });
+    }
   }
 
   const handleMouseLeave = (event: React.MouseEvent) => {
+    if (linkDetail.sourcePostId && linkDetail.sourcePostId !== props.item.postId) {
+      linkVar({
+        ...linkDetail,
+        targetPostId: '',
+      });
+    }
   }
 
   const handleClick = (event: React.MouseEvent) => {
+    if (linkDetail.sourcePostId && linkDetail.targetPostId === props.item.postId) {
+      linkPosts();
+    } 
   }
 
   const handleFilterClick = (event: React.MouseEvent) => {
@@ -217,80 +258,110 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
     fragmentName: 'FullPostFields',
   }) as Post;
 
+  const link = props.item.linkId
+    ? client.cache.readFragment({
+        id: client.cache.identify({
+          id: props.item.linkId,
+          __typename: 'Link',
+        }),
+        fragment: LINK_FIELDS,
+      }) as Link
+    : null;
+
+
   if (!post) return null;
   return (
-    <MUICard elevation={7} 
+    <MUICard elevation={5} 
       onMouseEnter={handleMouseEnter} 
       onMouseLeave={handleMouseLeave} 
       onClick={handleClick}
       sx={{
-        margin: '5px',
+        margin: 1,
+        marginBottom: 0,
         width: 'calc(100% - 10px)',
       }}
     >
       <PostComponent
         post={post}
         postKey={props.item.postKey}
+        postDispatch={props.postDispatch}
       />
       <Box sx={{
         display: 'flex',
         flexDirection: 'row',
+        flexWrap: 'wrap',
         justifyContent: 'center',
       }}>
-        <Box sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-        }}>
-          <Box sx={{margin: 'auto', padding: '5px', marginTop: '-4px'}}>
-            <IconButton
-              disabled={props.depth === 0 && surveyorState.stack[surveyorState.index].items.length === 1}
-              size='small'
-              onClick={handlePromoteClick}
-              sx={{
-                fontSize: 14,
+        {
+          link 
+            ? <Box sx={{
                 color: 'dimgrey',
+                paddingBottom: '5px'
+              }}>
+                <Button
+                  color='inherit'
+                  size='small'
+                  sx={{
+                    fontSize: 10,
+                    minWidth: 0,
+                  }}
+                >
+                  { link.weight > 0 ? '+' : ''}
+                  { link.weight }
+                </Button>
+              </Box>
+            : null
+        }
+        <Box sx={{ 
+          padding: '5px', 
+          marginTop: '-4px', 
+          whiteSpace: 'nowrap',
+        }}>
+          <IconButton
+            disabled={props.depth === 0 && surveyorState.stack[surveyorState.index].items.length === 1}
+            size='small'
+            onClick={handlePromoteClick}
+            sx={{
+              fontSize: 12,
+              color: 'dimgrey',
+            }}
+          >
+            <NorthIcon fontSize='inherit' />
+          </IconButton>
+          <Box component='span' sx={{whiteSpace: 'nowrap'}}>
+            <IconButton
+              disabled={!userDetail?.verifyEmailDate}
+              size='small'
+              color='inherit'
+              onClick={handleReplyClick}
+              sx={{
+                fontSize: 12,
+                color: 'dimgrey'
               }}
             >
-              <NorthIcon fontSize='inherit' />
+              <ReplyIcon fontSize='inherit'/>
             </IconButton>
-            &nbsp;
-            &nbsp;
-            <Box component='span' sx={{whiteSpace: 'nowrap'}}>
-              <IconButton
-                disabled={!userDetail?.verifyEmailDate}
-                size='small'
-                color='inherit'
-                onClick={handleReplyClick}
-                sx={{
-                  fontSize: 14,
-                  color: 'dimgrey'
-                }}
-              >
-                <ReplyIcon fontSize='inherit'/>
-              </IconButton>
-              &nbsp;
-              &nbsp;
-              <IconButton
-                disabled={!userDetail?.verifyEmailDate}
-                size='small'
-                color='inherit'
-                onClick={handleLinkClick}
-                sx={{
-                  fontSize: 14,
-                  color: 'dimgrey'
-                }}
-              >
-                <DoubleArrowIcon fontSize='inherit'/>
-              </IconButton>
-            </Box>
+            <IconButton
+              disabled={!userDetail?.verifyEmailDate}
+              size='small'
+              color='inherit'
+              onClick={handleLinkClick}
+              sx={{
+                fontSize: 12,
+                color: 'dimgrey'
+              }}
+            >
+              <DoubleArrowIcon fontSize='inherit'/>
+            </IconButton>
           </Box>
         </Box>
-        &nbsp;&nbsp;&nbsp;
+        <Box>
+          
+        </Box>
         <Box sx={{
           color: 'dimgrey',
-          fontSize: 12,
-          paddingBottom: '3px'
+          paddingBottom: '5px',
+          whiteSpace: 'nowrap',
         }}>
           <Button 
             onClick={handlePrevClick}
@@ -298,7 +369,8 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
             size='small'
             variant={props.item.showPrev ? 'outlined' : 'text'}
             sx={{
-              fontSize: 12,
+              fontSize: 10,
+              minWidth: 0,
             }}
           >
             {post.prevCount} prev
@@ -310,7 +382,9 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
             size='small'
             variant={props.item.showNext ? 'outlined' : 'text'}
             sx={{
-              fontSize: 12,
+              fontSize: 10,
+              maxWidth: '50px',
+              minWidth: 0,
             }}
           >
             {post.nextCount} next

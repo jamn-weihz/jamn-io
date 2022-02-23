@@ -23,6 +23,15 @@ export class VotesService {
       },
     });
   }
+
+  async getVoteByUserIdAndLinkId(userId:string, linkId: string) {
+    return this.votesRepository.findOne({
+      where: {
+        userId,
+        linkId,
+      }
+    })
+  }
   
   async createVote(userId: string, linkId: string, sourcePostId: string, targetPostId: string, clicks: number, tokens: number): Promise<Vote> {
     const user = await this.usersService.getUserById(userId);
@@ -40,6 +49,13 @@ export class VotesService {
     vote0.clicks = clicks;
     vote0.tokens = tokens;
     vote0.weight = findDefaultWeight(clicks, tokens);
+    return this.votesRepository.save(vote0);
+  }
+
+  async deleteVote(voteId: string) {
+    const vote0 = new Vote();
+    vote0.id = voteId;
+    vote0.deleteDate = new Date();
     return this.votesRepository.save(vote0);
   }
 

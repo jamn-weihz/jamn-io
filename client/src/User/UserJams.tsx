@@ -1,15 +1,21 @@
-import { Box, Card, Link } from "@mui/material"
-import { useNavigate } from "react-router-dom";
-import { User } from "../types/User"
+import { Box, Card, Link } from '@mui/material'
+import { useNavigate } from 'react-router-dom';
+import useChangeCol from '../Col/useChangeCol';
+import { Col } from '../types/Col';
+import { User } from '../types/User'
 
 interface UserJamsProps {
+  col: Col;
   user: User;
 }
 export default function UserJams(props: UserJamsProps) {
   const navigate = useNavigate();
+  const { changeCol } = useChangeCol();
 
   const handleJamClick = (jamName: string) => (event: React.MouseEvent) => {
-    navigate(`/j/${encodeURIComponent(jamName)}`)
+    const pathname = `/j/${encodeURIComponent(jamName)}`;
+    changeCol(props.col, pathname);
+    navigate(pathname);
   }
   
   return (

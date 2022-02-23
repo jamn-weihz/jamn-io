@@ -17,6 +17,7 @@ import { EmailModule } from './email/email.module';
 import { RolesModule } from './roles/roles.module';
 import { SearchModule } from './search/search.module';
 import { ColsModule } from './cols/cols.module';
+import { PubSubModule } from './pub-sub/pub-sub.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -25,6 +26,7 @@ import * as Joi from 'joi';
       validationSchema: Joi.object({
         PORT: Joi.number().required(),
         DATABASE_URL: Joi.string().required(),
+        REDIS_URL: Joi.string().required(),
         JWT_ACCESS_TOKEN_SECRET: Joi.string().required(),
         JWT_ACCESS_TOKEN_EXPIRATION_TIME: Joi.string().required(),
         JWT_REFRESH_TOKEN_SECRET: Joi.string().required(),
@@ -84,6 +86,7 @@ import * as Joi from 'joi';
     RolesModule,
     SearchModule,
     ColsModule,
+    PubSubModule,
   ],
   controllers: [],
   providers: [],

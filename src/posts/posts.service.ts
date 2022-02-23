@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { START_POST_DESC, START_POST_DRAFT, START_POST_I, START_POST_NAME } from 'src/constants';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Post } from './post.entity';
 import * as Enums from 'src/enums';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,6 +23,14 @@ export class PostsService {
 
   async getPostById(id: string) {
     return this.postsRepository.findOne({ id });
+  }
+
+  async getPostsByIds(ids: string[]) {
+    return this.postsRepository.find({
+      where: {
+        id: In(ids),
+      },
+    });
   }
 
   async getStartPost() {
@@ -47,7 +55,9 @@ export class PostsService {
     post0.startI = 1;
     post0.userI = user.postI + 1;
 
-    return this.postsRepository.save(post0);
+    const post1 = await this.postsRepository.save(post0);
+    this.searchService.savePosts([post1]);
+    return post1;
   }
 
   async createJamPost(userId: string, jamId: string, jamName: string, jamDesc: string) {
@@ -90,7 +100,9 @@ export class PostsService {
     post0.nextCount = 0;
     post0.saveDate = new Date();
 
-    return this.postsRepository.save(post0);
+    const post1 = await this.postsRepository.save(post0);
+    this.searchService.savePosts([post1]);
+    return post1;
   }
 
   async createPost(userId: string, jamId?: string): Promise<Post> {
