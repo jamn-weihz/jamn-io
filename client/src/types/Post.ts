@@ -34,5 +34,5 @@ export type PostState = {
 export type PostAction = {
   type: string;
   postId: string;
-  postKey: string;
+  itemId: string;
 }

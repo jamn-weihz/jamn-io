@@ -1,10 +1,10 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { linkVar } from '../cache';
+import { itemVar, linkVar, sessionVar } from '../cache';
 import { LINK_FIELDS, POST_FIELDS, VOTE_FIELDS } from '../fragments';
 
 const LINK_POSTS = gql`
-  mutation LinkPosts($sourcePostId: String!, $targetPostId: String!) {
-    linkPosts(sourcePostId: $sourcePostId, targetPostId: $targetPostId) {
+  mutation LinkPosts($sessionId: String!, $sourcePostId: String!, $targetPostId: String!) {
+    linkPosts(sessionId: $sessionId, sourcePostId: $sourcePostId, targetPostId: $targetPostId) {
       ...LinkFields 
       sourcePost {
         id
@@ -24,6 +24,8 @@ const LINK_POSTS = gql`
 `
 export default function useLinkPosts() {
   const linkDetail = useReactiveVar(linkVar);
+  const sessionDetail = useReactiveVar(sessionVar);
+  const { dispatch } = useReactiveVar(itemVar);
 
   const [link] = useMutation(LINK_POSTS, {
     onError: error => {
@@ -34,13 +36,26 @@ export default function useLinkPosts() {
       linkVar({
         sourcePostId: '',
         targetPostId: '',
-      })
+      });
+      if (data.linkPosts.deleteDate) {
+        dispatch({
+          type: 'REMOVE_LINK',
+          link: data.linkPosts,
+        });
+      }
+      else {
+        dispatch({
+          type:'ADD_LINK',
+          link: data.linkPosts,
+        });
+      }
     }
   });
 
   const linkPosts = () => {
     link({
       variables: {
+        sessionId: sessionDetail.id,
         sourcePostId: linkDetail.sourcePostId,
         targetPostId: linkDetail.targetPostId,
       },

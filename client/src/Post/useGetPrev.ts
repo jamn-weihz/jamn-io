@@ -1,6 +1,6 @@
-import { gql, useLazyQuery, useMutation } from '@apollo/client';
+import { gql, useMutation, useReactiveVar } from '@apollo/client';
+import { itemVar } from '../cache';
 import { LINK_FIELDS, VOTE_FIELDS, FULL_POST_FIELDS } from '../fragments';
-import { Link } from '../types/Link';
 
 const GET_PREV = gql`
   mutation GetPrev($postId: String!, $offset: Int!) {
@@ -23,16 +23,19 @@ const GET_PREV = gql`
   ${VOTE_FIELDS}
 `;
 
-type HandleCompleted = (links: Link[]) => void;
-
-export default function useGetPrev(postId: string, handleCompleted: HandleCompleted) {
+export default function useGetPrev(itemId: string, postId: string) {
+  const { dispatch } = useReactiveVar(itemVar);
   const [getPrevLinks] = useMutation(GET_PREV, {
     onError: error => {
       console.error(error);
     },
     onCompleted: data => {
       console.log(data);
-      handleCompleted(data.getPrev);
+      dispatch({
+        type: 'ADD_PREV',
+        itemId,
+        inLinks: data.getPrev,
+      })
     },
     fetchPolicy: 'network-only',
   });

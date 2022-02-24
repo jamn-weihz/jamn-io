@@ -19,21 +19,23 @@ export default function useLogout() {
     },
     onCompleted: data => {
       console.log(data);
+      userVar(null);
+      resetCols();
     }
   });
 
   const logoutUser = () => {
     logout();
+    userVar(null);
     resetCols();
     if (tokenDetail.interval) {
       clearInterval(tokenDetail.interval);
-      tokenVar({
-        ...tokenDetail,
-        isValid: false,
-        interval: null,
-      });
-      userVar(null);
     }
+    tokenVar({
+      ...tokenDetail,
+      isValid: false,
+      interval: null,
+    });
   }
 
   return { logoutUser };

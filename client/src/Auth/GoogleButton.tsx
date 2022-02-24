@@ -4,8 +4,9 @@ import { GOOGLE_CLIENT_ID } from '../constants';
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { Dispatch, SetStateAction } from 'react';
 import { FULL_USER_FIELDS } from '../fragments';
-import { colVar, userVar } from '../cache';
+import { colVar, focusVar, userVar } from '../cache';
 import { Col } from '../types/Col';
+import useChangeCol from '../Col/useChangeCol';
  
 const REGISTER_USER = gql`
   mutation LoginGoogleUser($token: String!, $pathnames: [String!]!) {
@@ -18,12 +19,12 @@ const REGISTER_USER = gql`
 
 interface GoogleButtonProps {
   isRegistration: boolean;
-  setMessage: Dispatch<SetStateAction<string>>;
   col: Col;
 }
 export default function GoogleButton(props: GoogleButtonProps) {
   const colDetail = useReactiveVar(colVar);
-
+  const { changeCol } = useChangeCol();
+  
   const [loginGoogleUser] = useMutation(REGISTER_USER, {
     onError: error => {
       console.error(error);
@@ -31,19 +32,9 @@ export default function GoogleButton(props: GoogleButtonProps) {
     onCompleted: data => {
       console.log(data);
       userVar(data.loginGoogleUser);
-      const cols = colDetail.cols.map((col, i) => {
-        if (i === props.col.i) {
-          return {
-            ...col,
-            pathname: `/u/${encodeURIComponent(data.loginGoogleUser.name)}`
-          };
-        }
-        return col;
-      });
-      colVar({
-        ...colDetail,
-        cols,
-      });    
+      focusVar({
+        postId: data.loginGoogleUser.focusId,
+      })
     },
   });
 

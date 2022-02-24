@@ -33,6 +33,9 @@ export class Vote {
   @ManyToOne(() => Link)
   @JoinColumn({ referencedColumnName: 'id' })
   link: Link;
+
+  @Column()
+  linkI: number
   
   @Column()
   sourcePostId: string;

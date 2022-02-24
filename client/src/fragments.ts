@@ -4,6 +4,8 @@ export const USER_FIELDS = gql`
   fragment UserFields on User {
     id
     focusId
+    postI
+    voteI
     name
     lowercaseName
     email
@@ -29,21 +31,11 @@ export const COL_FIELDS = gql`
   }
 `
 
-export const FULL_USER_FIELDS = gql`
-  fragment FullUserFields on User {
-    ...UserFields
-    cols {
-      ...ColFields
-    }
-  }
-  ${USER_FIELDS}
-  ${COL_FIELDS}
-`;
-
 export const JAM_FIELDS = gql`
   fragment JamFields on Jam {
     id
     focusId
+    postI
     name
     lowercaseName
     description
@@ -68,7 +60,9 @@ export const POST_FIELDS = gql`
   fragment PostFields on Post {
     id
     userId
+    userI
     jamId
+    jamI
     name
     description
     draft
@@ -112,10 +106,27 @@ export const VOTE_FIELDS = gql`
   fragment VoteFields on Vote {
     id
     userId
+    userI
     linkId
+    linkI
     sourcePostId
     targetPostId
     weight
     deleteDate
   }
-`
+`;
+
+export const FULL_USER_FIELDS = gql`
+  fragment FullUserFields on User {
+    ...UserFields
+    cols {
+      ...ColFields
+    }
+    focus {
+      ...FullPostFields
+    }
+  }
+  ${USER_FIELDS}
+  ${COL_FIELDS}
+  ${FULL_POST_FIELDS}
+`;

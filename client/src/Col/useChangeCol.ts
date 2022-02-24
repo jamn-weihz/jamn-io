@@ -1,8 +1,9 @@
 import { gql, useApolloClient, useMutation, useReactiveVar } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
 import { colVar, userVar } from '../cache';
-import { COL_FIELDS } from '../fragments';
+import { COL_FIELDS, FULL_USER_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
+import { User } from '../types/User';
 
 const SAVE_COL = gql`
   mutation SaveCol($colId: String!, $pathname: String!) {
@@ -45,6 +46,17 @@ export default function useChangeCol() {
           pathname: () => pathname,
         },
       });
+      const user = client.cache.readFragment({
+        id: client.cache.identify(userDetail),
+        fragment: FULL_USER_FIELDS,
+        fragmentName: 'FullUserFields',
+      }) as User;
+      console.log(user);
+      userVar(user);
+      colVar({
+        ...colDetail,
+        i: col.i,
+      })
     }
     else {
       colVar({
@@ -58,6 +70,7 @@ export default function useChangeCol() {
           }
           return col_i;
         }),
+        i: col.i
       });
     }
   }

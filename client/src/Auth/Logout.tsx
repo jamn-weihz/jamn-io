@@ -4,7 +4,7 @@ import useLogout from './useLogout';
 
 export default function Logout() {
   const { logoutUser } = useLogout();
-
+  
   const handleLogoutClick = (event: React.MouseEvent) => {
     logoutUser();
   }

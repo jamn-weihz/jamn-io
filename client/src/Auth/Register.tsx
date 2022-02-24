@@ -6,11 +6,12 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import GoogleButton from './GoogleButton';
 import { FULL_USER_FIELDS } from '../fragments';
-import { colVar, tokenVar, userVar } from '../cache';
+import { colVar, focusVar, paletteVar, tokenVar, userVar } from '../cache';
 import useToken from './useToken';
 import { Col } from '../types/Col';
 import useChangeCol from '../Col/useChangeCol';
-import ColRemovalButton from '../Col/ColRemovalButton';
+import RemoveColButton from '../Col/RemoveColButton';
+import { getColor } from '../utils';
 
 const GET_USER_BY_EMAIL = gql`
   query GetUserByEmail($email: String!) {
@@ -35,6 +36,7 @@ interface RegisterProps {
 export default function Register(props: RegisterProps) {
   const tokenDetail = useReactiveVar(tokenVar);
   const colDetail = useReactiveVar(colVar);
+  const paletteDetail = useReactiveVar(paletteVar);
 
   const { refreshTokenInterval } = useToken();
 
@@ -64,6 +66,10 @@ export default function Register(props: RegisterProps) {
         }
         refreshTokenInterval();
         userVar(data.registerUser);
+        changeCol(props.col, `/u/${encodeURIComponent(data.loginUser.name)}`);
+        focusVar({
+          postId: data.registerUser.focusId,
+        })
       }
     }
   })
@@ -120,6 +126,7 @@ export default function Register(props: RegisterProps) {
   };
 
   const handleLoginClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
     changeCol(props.col, '/login')
   };
 
@@ -129,22 +136,24 @@ export default function Register(props: RegisterProps) {
 
   const isFormValid = email.length && !emailError && pass.length;
 
+  const color = getColor(paletteDetail.mode);
+
   return (
     <Box>
       <Card elevation={5} sx={{
         padding: 1,
         display: 'flex',
         justifyContent: 'space-between',
+        color,
       }}>
         <Box>
           /register
         </Box>
-        <ColRemovalButton col={props.col}/>
+        <RemoveColButton col={props.col}/>
       </Card>
-      <Box>
-        {message}
-      </Box>
       <Card elevation={5} sx={{padding: 1, margin: 1}}>
+
+        {message}
         <FormControl margin='dense' sx={{width: '100%'}}>
           <TextField
             label='Email'
@@ -171,9 +180,15 @@ export default function Register(props: RegisterProps) {
                   tabIndex={-1}
                   onClick={handleClickShowPass}
                   onMouseDown={handleMouseDownPass}
+                  sx={{
+                    fontSize: 16,
+                  }}
                 >
-                  {showPass ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                </IconButton>
+                  {showPass 
+                    ? <VisibilityIcon fontSize='inherit'/> 
+                    : <VisibilityOffIcon fontSize='inherit'/>
+                  }
+                  </IconButton>
               </InputAdornment>
             }
           />
@@ -186,18 +201,27 @@ export default function Register(props: RegisterProps) {
           >
             register with email
           </Button>
+          <Box sx={{
+            marginTop:1,
+            paddingTop:1,
+            borderTop: '1px solid dimgrey',
+          }}>
+            <GoogleButton isRegistration={true} col={props.col}/>
+          </Box>
+          <Box sx={{
+            marginTop: 2,
+            marginBottom: 1,
+            color,
+            textAlign: 'center',
+          }}>
+            Already registered?&nbsp;
+            <Link onClick={handleLoginClick} sx={{cursor: 'pointer'}}>
+              Log in
+            </Link>
+          </Box>
         </Card>
-        <Card elevation={5} sx={{padding:1, margin:1}} onClick={handleGoogleClick}>
-          <GoogleButton isRegistration={true} setMessage={setMessage} col={props.col}/>
-        </Card>
-      <Box sx={{
-        textAlign: 'center'
-      }}>
-        Already registered?&nbsp;
-        <Link onClick={handleLoginClick} sx={{cursor: 'pointer'}}>
-          Log in
-        </Link>
-      </Box>
+
+
     </Box>
   );
 }

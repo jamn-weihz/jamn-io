@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { adjectives, animals, NumberDictionary, uniqueNamesGenerator } from 'unique-names-generator';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
-import { ColsService } from 'src/cols/cols.service';
+import { PostsService } from 'src/posts/posts.service';
+import { LinksService } from 'src/links/links.service';
+import { VotesService } from 'src/votes/votes.service';
 
 const numbers = NumberDictionary.generate({ min: 100, max: 999 });
 
@@ -13,6 +15,12 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    @Inject(forwardRef(() => PostsService))
+    private readonly postsService: PostsService,
+    @Inject(forwardRef(() => LinksService))
+    private readonly linksService: LinksService,
+    @Inject(forwardRef(() => VotesService))
+    private readonly votesService: VotesService,
   ) {}
 
   async getUserById(id: string): Promise<User> {
@@ -75,7 +83,22 @@ export class UsersService {
     user0.postI = 0;
     user0.voteI = 0;
     const user1 = await this.usersRepository.save(user0);
-    return user1;
+
+    let startPost = await this.postsService.getStartPost();
+    if (!startPost) {
+      startPost = await this.postsService.createStartPost(user1.id);
+    }
+    this.postsService.incrementPostNextCount(startPost.id, 1);
+    
+    const userPost = await this.postsService.createPost(user1.id, null, '', '');
+
+    const link = await this.linksService.createLink(startPost.id, userPost.id, 1, 0);
+    const vote = await this.votesService.createVote(user1.id, link.id, startPost.id, userPost.id, 1, 0);
+
+    user1.focusId = userPost.id;
+
+    const user2 = await this.usersRepository.save(user1);
+    return user2;
   }
 
   async verifyUser(userId: string): Promise<User> {

@@ -1,38 +1,41 @@
 import { useApolloClient, useReactiveVar } from '@apollo/client';
-import { Box, Button, Card, Link } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { linkVar, userVar } from '../cache';
+import { Box, Button, Card } from '@mui/material';
+import { paletteVar, userVar } from '../cache';
 import { FULL_POST_FIELDS } from '../fragments';
 import { Post, PostAction } from '../types/Post';
-import { getTimeString } from '../utils';
+import { getColor, getTimeString } from '../utils';
 import CharCounter from './CharCounter';
 import Editor from './Editor';
 import { convertFromRaw } from 'draft-js';
 import React, { Dispatch, useEffect } from 'react';
+import useChangeCol from '../Col/useChangeCol';
+import { Col } from '../types/Col';
+import ColLink from '../Col/ColLink';
 
 interface PostComponentProps {
+  col: Col;
   post: Post;
-  postKey: string;
+  itemId: string;
   postDispatch: Dispatch<PostAction>;
 }
 export default function PostComponent(props: PostComponentProps) {
-  const navigate = useNavigate();
+  const { changeCol } = useChangeCol();
 
   const client = useApolloClient();
   const userDetail = useReactiveVar(userVar);
-  const linkDetail = useReactiveVar(linkVar);
+  const paletteDetail = useReactiveVar(paletteVar);
 
   useEffect(() => {
     props.postDispatch({
       type: 'ADD',
       postId: props.post.id,
-      postKey: props.postKey,
+      itemId: props.itemId,
     });
     return () => {
       props.postDispatch({
         type: 'REMOVE',
         postId: props.post.id,
-        postKey: props.postKey,
+        itemId: props.itemId,
       });
     };
   }, []);
@@ -43,16 +46,11 @@ export default function PostComponent(props: PostComponentProps) {
     fragmentName: 'FullPostFields',
   }) as Post;
 
-  const handleUserClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    event.preventDefault();
-    navigate(`/u/${encodeURIComponent(post.user.name)}`);
-  };
-
   const handleJamClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     event.preventDefault();
-    navigate(`/j/${encodeURIComponent(post.jam?.name || '')}`);
+    const pathname = `/j/${encodeURIComponent(post.jam?.name || '')}`;
+    changeCol(props.col, pathname);
   };
 
   const handleCommitClick = (event: React.MouseEvent) => {
@@ -70,43 +68,42 @@ export default function PostComponent(props: PostComponentProps) {
   }
   const limit = 1000;
 
-  const isLinking = (
-    linkDetail.sourcePostId === props.post.id || 
-    linkDetail.targetPostId === props.post.id
-  );
   return (
     <Card variant='outlined' sx={{
       margin: 1,
       padding: 1,
-      backgroundColor: isLinking
-        ? 'lavender'
-        : 'white'
-
+      border: props.post.userId === userDetail?.id
+        ? `1px solid ${userDetail.color}`
+        : null
     }}>
       <Box sx={{
         fontSize: 14,
-        color: 'dimgrey',
+        color: getColor(paletteDetail.mode),
+        paddingBottom: '4px',
       }}>
-        <Link onClick={handleUserClick} sx={{
-          display: 'inline-block',
-          cursor: 'pointer',
-          color: post.user.color,
-        }}>
-          u/{post.user.name}
-        </Link>
-        &nbsp;
+        <ColLink
+          col={props.col} 
+          pathname={`/u/${encodeURIComponent(post.user.name)}`}
+          sx={{
+            color: post.user.color,
+          }}
+        >
+          {`u/${post.user.name}`}
+        </ColLink>
+        { ' ' }
         { timeString }
-        &nbsp;
+        { ' ' }
         {
           post.jam
-            ? <Box component='span'>
-                <Link onClick={handleJamClick} sx={{
-                  cursor: 'pointer',
+            ? <ColLink 
+                col={props.col}
+                pathname={`/j/${encodeURIComponent(post.jam?.name || '')}`}
+                sx={{
                   color: post.jam.color,
-                }}>
-                  j/{post.jam.name}
-                </Link>
-              </Box>
+                }}
+              >
+                {`j/${post.jam.name}`}
+              </ColLink>
             : null
         }
       </Box>

@@ -60,52 +60,7 @@ export class PostsService {
     return post1;
   }
 
-  async createJamPost(userId: string, jamId: string, jamName: string, jamDesc: string) {
-    const user = await this.usersService.getUserById(userId);
-    this.usersService.incrementUserPostI(userId);
-
-    const blocks = [{
-      key: uuidv4(),
-      text: jamName,
-      type: 'unstyled',
-      depth: 0,
-      entityRanges: [],
-      inlinStyleRanges: [],
-    }];
-    if (jamDesc) {
-      blocks.push({
-        key: uuidv4(),
-        text: jamDesc,
-        type: 'unstyled',
-        depth: 0,
-        entityRanges: [],
-        inlinStyleRanges: [],
-      });
-    }
-    const draft = JSON.stringify({
-      blocks,
-      entityMap: {}
-    });
-    
-    const post0 = new Post();
-    post0.userId = userId;
-    post0.userI = user.postI + 1;
-    post0.jamId = jamId;
-    post0.jamI = 1;
-    post0.draft = draft;
-    post0.name = jamName;
-    post0.description = jamDesc;
-    post0.privacy = Enums.PostPrivacy.ALL;
-    post0.prevCount = 1;
-    post0.nextCount = 0;
-    post0.saveDate = new Date();
-
-    const post1 = await this.postsRepository.save(post0);
-    this.searchService.savePosts([post1]);
-    return post1;
-  }
-
-  async createPost(userId: string, jamId?: string): Promise<Post> {
+  async createPost(userId: string, jamId: string | null, name: string, desc: string): Promise<Post> {
     const user = await this.usersService.getUserById(userId);
     this.usersService.incrementUserPostI(userId);
 
@@ -116,14 +71,37 @@ export class PostsService {
       jamI = jam.postI;
     }
 
+    const blocks = [{
+      key: uuidv4(),
+      text: name,
+      type: 'unstyled',
+      depth: 0,
+      entityRanges: [],
+      inlinStyleRanges: [],
+    }];
+    if (desc) {
+      blocks.push({
+        key: uuidv4(),
+        text: desc,
+        type: 'unstyled',
+        depth: 0,
+        entityRanges: [],
+        inlinStyleRanges: [],
+      });
+    }
+    const draft = JSON.stringify({
+      blocks,
+      entityMap: {}
+    });
+
     const post0 = new Post();
     post0.userId = userId;
     post0.userI = user.postI + 1;
-    post0.jamId = jamId;
+    post0.jamId = jamId || null;
     post0.jamI = jamI;
-    post0.draft = '';
-    post0.name = '';
-    post0.description = '';
+    post0.draft = draft;
+    post0.name = name;
+    post0.description = desc;
     post0.prevCount = 1;
     post0.nextCount = 0;
     post0.saveDate = new Date();
@@ -155,14 +133,16 @@ export class PostsService {
     post0.draft = draft;
     post0.saveDate = new Date();
 
-    return this.postsRepository.save(post0);
+    const post1 = await this.postsRepository.save(post0);
+    this.searchService.partialUpdatePosts([post1]);
+    return post1;
   }
 
-  incrementPostPrevCount(postId: string) {
-    this.postsRepository.increment({id: postId}, 'prevCount', 1);
+  incrementPostPrevCount(postId: string, value: number) {
+    this.postsRepository.increment({id: postId}, 'prevCount', value);
   }
 
-  incrementPostNextCount(postId: string) {
-    this.postsRepository.increment({id: postId}, 'nextCount', 1);
+  incrementPostNextCount(postId: string, value: number) {
+    this.postsRepository.increment({id: postId}, 'nextCount', value);
   }
 }

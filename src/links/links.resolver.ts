@@ -39,6 +39,7 @@ export class LinksResolver {
   async getLinkVotes(
     @Parent() link: Link,
   ) {
+    if (link.deleteDate) return [];
     return this.votesService.getVotesByLinkId(link.id);
   }
 
@@ -46,17 +47,21 @@ export class LinksResolver {
   @Mutation(() => Link, {name: 'linkPosts'})
   async linkPosts(
     @CurrentUser() user: User,
+    @Args('sessionId') sessionId: string,
     @Args('sourcePostId') sourcePostId: string,
     @Args('targetPostId') targetPostId: string,
   ) {
     const link = await this.linksService.linkPosts(user.id, sourcePostId, targetPostId,1,0);
     const sourcePost = await this.postsService.getPostById(sourcePostId);
     const targetPost = await this.postsService.getPostById(targetPostId);
+    const votes = await this.votesService.getVotesByLinkId(link.id);
     this.pubSub.publish('linkPosts', {
+      sessionId,
       linkPosts: {
         ...link,
         sourcePost,
         targetPost,
+        votes,
       },
     });
     return link;
@@ -64,6 +69,7 @@ export class LinksResolver {
 
   @Subscription(() => Link, {name: 'linkPosts',
     filter: (payload, variables) => {
+      if (payload.sessionId === variables.sessionId) return false;
       return variables.postIds.some(id => {
         return (
           id === payload.linkPosts.sourcePostId ||
@@ -73,6 +79,7 @@ export class LinksResolver {
     }
   })
   linkPostsSubscription(
+    @Args('sessionId') sessionId: string,
     @Args('postIds', {type: () => [String]}) postIds: string[]
   ) {
     console.log('linkPostsSubscription');
@@ -80,20 +87,48 @@ export class LinksResolver {
   }
 
   @UseGuards(GqlAuthGuard)
+  @Mutation(() => Link, {name: 'votePosts'})
+  async votePosts(
+    @CurrentUser() user: User,
+    @Args('sessionId') sessionId: string,
+    @Args('linkId') linkId: string,
+    @Args('clicks', {type: () => Int}) clicks: number,
+  ) {
+    const link = await this.linksService.votePosts(user.id, linkId, clicks, 0);
+    const sourcePost = await this.postsService.getPostById(link.sourcePostId);
+    const targetPost = await this.postsService.getPostById(link.targetPostId);
+    const votes = await this.votesService.getVotesByLinkId(link.id);
+    this.pubSub.publish('linkPosts', {
+      sessionId,
+      linkPosts: {
+        ...link,
+        sourcePost,
+        targetPost,
+        votes,
+      }
+    });
+    return link;
+  }
+
+  @UseGuards(GqlAuthGuard)
   @Mutation(() => Link, {name: 'replyPost'})
   async replyPost(
     @CurrentUser() user: User,
+    @Args('sessionId') sessionId: string,
     @Args('sourcePostId') sourcePostId: string,
     @Args('jamId', {nullable: true}) jamId: string,
   ) {
     const link = await this.linksService.replyPost(user.id, sourcePostId, jamId);
     const sourcePost = await this.postsService.getPostById(sourcePostId);
     const targetPost = await this.postsService.getPostById(link.targetPostId);
+    const votes = await this.votesService.getVotesByLinkId(link.id);
     this.pubSub.publish('linkPosts', {
+      sessionId,
       linkPosts: {
         ...link,
         sourcePost,
         targetPost,
+        votes,
       },
     })
     return link;

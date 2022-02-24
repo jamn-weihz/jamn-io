@@ -1,3 +1,4 @@
+import { palette } from "@mui/system";
 import { MOBILE_WIDTH } from "./constants";
 
 const second = 1000;
@@ -30,11 +31,22 @@ export const getTimeString = (time: number) => {
 
 export const getAppbarWidth = (width: number) => {
   return width < MOBILE_WIDTH
-    ? 38
+    ? 39
     : 55
 }
 export const getColWidth = (width: number) => {
   return width < MOBILE_WIDTH 
     ? width - 42
     : Math.min(350, width - 60)
+}
+
+export const getColor = (mode: 'dark' | 'light', isReverse?: boolean) => {
+  return isReverse
+    ? mode === 'dark'
+      ? 'dimgrey'
+      : 'lavender'
+    : mode === 'dark'
+      ? 'lavender'
+      : 'dimgrey';
+
 }

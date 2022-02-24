@@ -1,11 +1,12 @@
-import { gql, useApolloClient, useMutation, useReactiveVar } from '@apollo/client';
+import { gql, ReactiveVar, useMutation, useReactiveVar } from '@apollo/client';
 import { connectHits } from 'react-instantsearch-dom';
-import { surveyorVar } from '../cache';
-import { SurveyorItem } from '../types/Surveyor';
+import { SurveyorState } from '../types/Surveyor';
 import { v4 as uuidv4 } from 'uuid'; 
 import { Dispatch, SetStateAction, useEffect,  } from 'react';
 import { FULL_POST_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
+import { itemVar } from '../cache';
+import { Item, ItemState } from '../types/Item';
 
 
 const GET_POSTS = gql`
@@ -21,10 +22,12 @@ interface HitsProps {
   col: Col;
   hits: any[];
   setReload?: Dispatch<SetStateAction<boolean>>;
+  surveyorState: SurveyorState;
+  setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
 }
 function Hits(props: HitsProps) {
-  const surveyorDetail = useReactiveVar(surveyorVar);
-  
+  const { state, dispatch } = useReactiveVar(itemVar);
+
   const [getPosts] = useMutation(GET_POSTS, {
     onError: error => {
       console.error(error);
@@ -36,54 +39,60 @@ function Hits(props: HitsProps) {
   });
   
   useEffect(() => {
-    const items = [] as SurveyorItem[];
-    const postIdToTrue = {} as any;
+    const slice = props.surveyorState.stack[props.surveyorState.index];
 
+    const idToItem = {} as ItemState;
+    const itemIds = [] as string[];
     if (props.hits.length) {
       props.hits.forEach(hit => {
         if (hit.__typename === 'Post') {
-          postIdToTrue[hit.id] = true;
-          const item = {
-            postId: hit.id,
-            postKey: uuidv4(),
-            showNext: false,
-            showPrev: false,
-            next: [],
-            prev: [],
-            refresh: false,
-          } as SurveyorItem;
-          items.push(item);
+          let itemId;
+          slice.itemIds.some(id => {
+            if (state[id]?.postId === hit.id) {
+              itemId = id;
+              return true;
+            }
+            return false;
+          });
+          if (itemId) {
+            itemIds.push(itemId);
+          }
+          else {
+            const item = {
+              id: uuidv4(),
+              postId: hit.id,
+              showNext: false,
+              showPrev: false,
+              nextIds: [],
+              prevIds: [],
+              refresh: false,
+            } as Item;
+            idToItem[item.id] = item;
+            itemIds.push(item.id);
+          }
         }
       });
       getPosts({
         variables: {
-          postIds: Object.keys(postIdToTrue),
+          postIds: Object.keys(idToItem).map(id => idToItem[id].postId),
         }
       });
     }
-
-    const surveyorState = surveyorDetail[props.col.id];
-    const isNew = (
-      items.length !== surveyorState.stack[surveyorState.index].items.length ||
-      items.some((item, i) => {
-        return item.postId !== surveyorState.stack[surveyorState.index].items[i]?.postId
-      })
-    );
-    if (isNew) {
-      const stack = surveyorState.stack.slice();
-      stack.splice(surveyorState.index, 1, {
-        ...stack[surveyorState.index],
-        items,
-      });
-      surveyorVar({
-        ...surveyorDetail,
-        [props.col.id]: {
-          ...surveyorState,
-          stack,
-        }
+    if (Object.keys(idToItem).length) {
+      dispatch({
+        type: 'ADD_ITEMS',
+        idToItem,
       });
     }
-    console.log(props.hits);
+    const stack = props.surveyorState.stack.slice()
+    stack.splice(props.surveyorState.index, 1, {
+      ...slice,
+      itemIds,
+    });
+    props.setSurveyorState({
+      ...props.surveyorState,
+      stack,
+    });
   }, [props.hits])
 
   return null;

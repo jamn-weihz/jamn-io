@@ -17,11 +17,12 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { FULL_USER_FIELDS } from '../fragments';
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { colVar, tokenVar, userVar } from '../cache';
+import { colVar, focusVar, paletteVar, tokenVar, userVar } from '../cache';
 import useToken from './useToken';
 import { Col } from '../types/Col';
 import useChangeCol from '../Col/useChangeCol';
-import ColRemovalButton from '../Col/ColRemovalButton';
+import RemoveColButton from '../Col/RemoveColButton';
+import { getColor } from '../utils';
 
 const LOGIN_USER = gql`
   mutation LoginUser($email: String!, $pass: String!) {
@@ -37,7 +38,7 @@ interface LoginProps {
 }
 export default function Login(props: LoginProps) {
   const tokenDetail = useReactiveVar(tokenVar);
-  const colDetail = useReactiveVar(colVar);
+  const paletteDetail = useReactiveVar(paletteVar);
 
   const { changeCol } = useChangeCol();
   const { refreshTokenInterval } = useToken();
@@ -54,6 +55,10 @@ export default function Login(props: LoginProps) {
       }
       refreshTokenInterval();
       userVar(data.loginUser);
+      changeCol(props.col, `/u/${encodeURIComponent(data.loginUser.name)}`);
+      focusVar({
+        postId: data.loginUser.focusId,
+      })
     }
   });
 
@@ -61,8 +66,6 @@ export default function Login(props: LoginProps) {
 
   const [pass, setPass] = useState('');
   const [showPass, setShowPass] = useState(false);
-
-  const [message, setMessage] = useState('');
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
@@ -79,8 +82,6 @@ export default function Login(props: LoginProps) {
   };
 
   const handleSubmit = (event: React.MouseEvent) => {
-    setMessage('')
-
     loginUser({
       variables: {
         email,
@@ -89,31 +90,27 @@ export default function Login(props: LoginProps) {
     })
   };
 
-  const handleGoogleClick = (event: React.MouseEvent) => {
-    setMessage('')
-  };
-
   const handleRegisterClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
     changeCol(props.col, '/register');
   };
 
   const isFormValid = email.length && pass.length;
 
+  const color = getColor(paletteDetail.mode)
   return (
     <Box>
       <Card elevation={5} sx={{
         padding: 1,
         display: 'flex',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        color,
       }}>
         <Box>
           /login
         </Box>
-        <ColRemovalButton col={props.col}/>
+        <RemoveColButton col={props.col}/>
       </Card>
-      <Box>
-        {message}
-      </Box>
       <Card elevation={5} sx={{margin:1, padding:1}}>
         <FormControl margin='dense' sx={{width: '100%'}}>
           <TextField
@@ -139,8 +136,14 @@ export default function Login(props: LoginProps) {
                   tabIndex={-1}
                   onClick={handleClickShowPass}
                   onMouseDown={handleMouseDownPass}
+                  sx={{
+                    fontSize: 16,
+                  }}
                 >
-                  {showPass ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                  {showPass 
+                    ? <VisibilityIcon fontSize='inherit'/> 
+                    : <VisibilityOffIcon fontSize='inherit'/>
+                  }
                 </IconButton>
               </InputAdornment>
             }
@@ -154,20 +157,29 @@ export default function Login(props: LoginProps) {
         }>
           login with email
         </Button>
-      </Card>
-      <Card elevation={5} sx={{margin:1, padding:1}} onClick={handleGoogleClick}>
-        <GoogleButton isRegistration={false} setMessage={setMessage} col={props.col}/>
-      </Card>
-      <Box sx={{
-        textAlign: 'center',
-      }}>
-        New user?&nbsp;
-        <Link onClick={handleRegisterClick} sx={{
-          cursor: 'pointer',
+        <Box sx={{
+          marginTop: 1,
+          paddingTop: 1,
+          borderTop: '1px solid dimgrey',
         }}>
-          Register
-        </Link>
-      </Box>
+          <GoogleButton isRegistration={false} col={props.col}/>
+
+        </Box>
+        <Box sx={{
+          marginTop: 2,
+          marginBottom: 1,
+          textAlign: 'center',
+          color,
+        }}>
+          New user?&nbsp;
+          <Link onClick={handleRegisterClick} sx={{
+            cursor: 'pointer',
+          }}>
+            Register
+          </Link>
+        </Box>
+      </Card>
+
 
     </Box>
   );

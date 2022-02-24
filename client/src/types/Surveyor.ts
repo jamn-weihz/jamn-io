@@ -1,21 +1,9 @@
-import { Link } from './Link'
-import { Post } from './Post'
-
-export type SurveyorItem = {
-  linkId?: string;
-  postId: string;
-  postKey: string;
-  showPrev: boolean;
-  showNext: boolean;
-  prev: SurveyorItem[];
-  next: SurveyorItem[];
-  refresh: boolean;
-}
+import { ReactiveVar } from '@apollo/client'
 
 export type SurveyorSlice = {
   originalQuery: string;
   query: string;
-  items: SurveyorItem[];
+  itemIds: string[];
 }
 
 export type SurveyorState = {
@@ -26,6 +14,15 @@ export type SurveyorState = {
   triggerRefinement: boolean;
 }
 
-export type SurveyorDetailType = {
-  [id: string]: SurveyorState;
+export type SurveyorVarItem = {
+  colId: string;
+  var: ReactiveVar<SurveyorState>;
+}
+
+export type ChildrenState = {
+  [itemId: string]: string[],
+}
+
+export type ChildrenAction = {
+  type: string;
 }

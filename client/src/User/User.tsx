@@ -1,23 +1,22 @@
 import { gql, useLazyQuery, useReactiveVar } from '@apollo/client'
-import { Box, Button, Card, IconButton, Link } from '@mui/material';
-import { pathVar, userVar } from '../cache'
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Box, Card, IconButton } from '@mui/material';
+import { paletteVar, userVar } from '../cache'
 import { JAM_FIELDS, ROLE_FIELDS, USER_FIELDS } from '../fragments';
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, useEffect, useState } from 'react';
 import NotFound from '../NotFound';
 import Logout from '../Auth/Logout';
 import Verify from '../Auth/Verify';
 import { User } from '../types/User';
 import Loading from '../Loading';
 import UserJams from './UserJams';
-import UserPosts from './UserPosts';
+import UserProfile from './UserProfile';
 import UserSettings from './UserSettings';
 import { Col } from '../types/Col';
-import CloseIcon from '@mui/icons-material/Close';
-import ColRemovalButton from '../Col/ColRemovalButton';
-import useChangeCol from '../Col/useChangeCol';
+import RemoveColButton from '../Col/RemoveColButton';
 import ColLink from '../Col/ColLink';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { PostAction } from '../types/Post';
+import { getColor } from '../utils';
 
 const GET_USER_BY_NAME = gql`
   query GetUserByName($name: String!) {
@@ -38,10 +37,11 @@ const GET_USER_BY_NAME = gql`
 interface UserProps {
   col: Col;
   name: string;
+  postDispatch: Dispatch<PostAction>;
 }
 export default function UserComponent(props: UserProps) {
   const userDetail = useReactiveVar(userVar);
-
+  const paletteDetail = useReactiveVar(paletteVar);
   const [user, setUser] = useState(null as User | null);
   const [isLoading, setIsLoading] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -55,7 +55,8 @@ export default function UserComponent(props: UserProps) {
       console.log(data);
       setIsLoading(false);
       setUser(data.getUserByName);
-    }
+    },
+    fetchPolicy: 'cache-and-network',
   });
 
   useEffect(() => {
@@ -69,28 +70,29 @@ export default function UserComponent(props: UserProps) {
 
   if (isLoading) return <Loading />
 
-  if (!user) return <NotFound />
-
   const handleOptionsClick = (event: React.MouseEvent) => {
     setShowOptions(!showOptions);
   }
   
   const path = props.col.pathname.split('/');
 
+  const color = getColor(paletteDetail.mode);
   return (
-    <Box>
+    <Box sx={{
+      height: '100%'
+    }}>
       <Card elevation={5}>
         <Box sx={{
           padding: 1,
-          color: user.color,
+          color: user?.color || color,
           display: 'flex',
           justifyContent: 'space-between'
         }}>
           <Box>
-            u/{ user.name }
+            { props.col.pathname }
           </Box>
           <IconButton size='small' onClick={handleOptionsClick} sx={{
-            color: user.color,
+            color: user?.color || color,
             fontSize: 20,
             padding: 0,
           }}>
@@ -100,14 +102,15 @@ export default function UserComponent(props: UserProps) {
         <Box sx={{
           display: showOptions ? 'flex' : 'none',
           padding: 1,
-          borderTop: '1px solid lavender',
+          borderTop: '1px solid',
+          borderColor: getColor(paletteDetail.mode, true),
         }}>
-          <ColRemovalButton col={props.col} />
+          <RemoveColButton col={props.col} />
         </Box>
 
       </Card>
       {
-        user.id === userDetail?.id
+        user?.id && user.id === userDetail?.id
           ? <Box>
               <Logout />
               {
@@ -118,49 +121,73 @@ export default function UserComponent(props: UserProps) {
             </Box>
           : null
       }
-      <Card elevation={5} sx={{
-        margin: 1,
-        padding: 1,
-      }}>
-        <ColLink col={props.col} pathname={`/u/${encodeURIComponent(user.name)}/j`} sx={{
-          color: path[3] === 'j' ? user.color : 'dimgrey',
-          cursor: 'pointer',
-        }}>
-          Jams
-        </ColLink>
-        &nbsp;&nbsp;
-        <ColLink col={props.col} pathname={`/u/${encodeURIComponent(user.name)}/p`} sx={{
-          color: path[3] === 'p' ? user.color : 'dimgrey',
-          cursor: 'pointer',
-        }}>
-          Posts
-        </ColLink>
-        &nbsp;&nbsp;
-        <ColLink col={props.col} pathname={`/u/${encodeURIComponent(user.name)}/v`} sx={{
-          color: path[3] === 'v' ? user.color : 'dimgrey',
-          cursor: 'pointer',
-        }}>
-          Votes
-        </ColLink>
-        &nbsp;&nbsp;
-        <ColLink col={props.col} pathname={`/u/${encodeURIComponent(user.name)}/s`} sx={{
-          color: path[3] === 's' ? user.color : 'dimgrey',
-          cursor: 'pointer',
-        }}>
-          Settings
-        </ColLink>
-      </Card>
       {
-        path[3] === 'j'
-          ? <UserJams user={user} col={props.col} />
-          : path[3] === 'p'
-            ? null
-            : path[3] === 'v'
-              ? null
-              : path[3] === 's'
-                  ? <UserSettings user={user} />
-                  : null
+        user
+          ? <Box sx={{
+              height: '100%'
+            }}>
+              <Card elevation={5} sx={{
+                margin: 1,
+                padding: 1,
+                marginBottom: 0,
+                borderBottom: '1px solid dimgrey',
+              }}>
+                <ColLink col={props.col} pathname={`/u/${encodeURIComponent(user.name)}/j`} sx={{
+                  color: path[3] === 'j' 
+                    ? user.color 
+                    : color,
+                }}>
+                  Jams
+                </ColLink>
+                &nbsp;&nbsp;
+                <ColLink col={props.col} pathname={`/u/${encodeURIComponent(user.name)}`} sx={{
+                  color: !path[3] || path[3] === '' 
+                    ? user.color 
+                    : color,
+                }}>
+                  Profile
+                </ColLink>
+                &nbsp;&nbsp;
+                <ColLink col={props.col} pathname={`/u/${encodeURIComponent(user.name)}/r`} sx={{
+                  color: path[3] === 'r' 
+                    ? user.color 
+                    : color,
+                }}>
+                  Recent
+                </ColLink>
+                &nbsp;&nbsp;
+                <ColLink col={props.col} pathname={`/u/${encodeURIComponent(user.name)}/s`} sx={{
+                  color: path[3] === 's'
+                    ? user.color 
+                    : color,
+                }}>
+                  Settings
+                </ColLink>
+              </Card>
+              <Box sx={{
+                height: '100%',
+                overflow: 'scroll',
+              }}>
+                {
+                  path[3] === 'j'
+                    ? <UserJams user={user} col={props.col} />
+                    : path[3] === 'r'
+                      ? null
+                      : path[3] === 's'
+                        ? <UserSettings user={user} />
+                        : <UserProfile 
+                            user={user} 
+                            col={props.col} 
+                            postDispatch={props.postDispatch}
+                          />
+                }
+              </Box>
+            </Box>
+          : <NotFound />
       }
+     
+
+
     </Box>
   )
 }

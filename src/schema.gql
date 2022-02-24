@@ -56,22 +56,23 @@ type Mutation {
   getNext(offset: Int!, postId: String!): [Link!]!
   getPosts(postIds: [String!]!): [Post!]!
   getPrev(offset: Int!, postId: String!): [Link!]!
-  linkPosts(sourcePostId: String!, targetPostId: String!): Link!
+  linkPosts(sessionId: String!, sourcePostId: String!, targetPostId: String!): Link!
   loginGoogleUser(pathnames: [String!]!, token: String!): User!
   loginUser(email: String!, pass: String!): User!
   logoutUser: User!
   refreshToken: User!
   registerUser(email: String!, pass: String!, pathnames: [String!]!): User!
   removeCol(colId: String!): [Col!]!
-  replyPost(jamId: String, sourcePostId: String!): Link!
+  replyPost(jamId: String, sessionId: String!, sourcePostId: String!): Link!
   resendUserVerification: User!
   saveCol(colId: String!, pathname: String!): Col!
-  savePost(draft: String!, postId: String!): Post!
+  savePost(draft: String!, postId: String!, sessionId: String!): Post!
   setJamColor(color: String!, jamId: String!): Jam!
   setUserColor(color: String!): User!
   startJam(desc: String!, lat: Float!, lng: Float!, name: String!): Jam!
   updateUserMap(lat: Float!, lng: Float!, zoom: Float!): User!
   verifyUser(code: String!): User!
+  votePosts(clicks: Int!, linkId: String!, sessionId: String!): Link!
 }
 
 type Post {
@@ -121,8 +122,8 @@ type Role {
 }
 
 type Subscription {
-  linkPosts(postIds: [String!]!): Link!
-  savePost(cardIds: [String!]!): Post!
+  linkPosts(postIds: [String!]!, sessionId: String!): Link!
+  savePost(cardIds: [String!]!, sessionId: String!): Post!
 }
 
 type User {
@@ -132,7 +133,7 @@ type User {
   deleteDate: DateTime
   description: String!
   email: String
-  focus: Post
+  focus: Post!
   focusId: String
   id: String!
   isAdmin: Boolean!
@@ -158,6 +159,7 @@ type Vote {
   deleteDate: DateTime
   id: String!
   link: Link!
+  linkI: Float!
   linkId: String!
   sourcePost: Post!
   sourcePostId: String!

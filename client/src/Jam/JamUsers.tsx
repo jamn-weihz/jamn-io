@@ -3,12 +3,17 @@ import { Jam } from '../types/Jam'
 import { useNavigate } from 'react-router-dom';
 import ColLink from '../Col/ColLink';
 import { Col } from '../types/Col';
+import { useReactiveVar } from '@apollo/client';
+import { paletteVar } from '../cache';
+import { getColor } from '../utils';
 
 interface JamUsersProps {
   jam: Jam;
   col: Col;
 }
 export default function JamUsers(props: JamUsersProps) {
+  const paletteDetail = useReactiveVar(paletteVar);
+
   return (
     <Box>
       {
@@ -20,7 +25,6 @@ export default function JamUsers(props: JamUsersProps) {
               fontSize: 16,
             }}>
               <ColLink col={props.col} pathname={`/u/${encodeURIComponent(role.user.name)}`} sx={{
-                cursor: 'pointer',
                 color: role.user.color,
               }}>
                 { `u/${role.user.name}` }
@@ -28,7 +32,7 @@ export default function JamUsers(props: JamUsersProps) {
               <Box sx={{
                 marginTop:1,
                 fontSize: 12,
-                color: 'dimgrey'
+                color: getColor(paletteDetail.mode),
               }}>
                 { role.type }
               </Box>

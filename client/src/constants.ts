@@ -18,3 +18,5 @@ export const ALGOLIA_INDEX_NAME = process.env.NODE_ENV === 'production'
   : 'dev_jamn';
 
 export const MOBILE_WIDTH = 400;
+
+export const LOAD_LIMIT = 10;

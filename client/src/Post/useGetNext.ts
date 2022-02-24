@@ -1,4 +1,5 @@
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useReactiveVar } from '@apollo/client';
+import { itemVar } from '../cache';
 import { LINK_FIELDS, VOTE_FIELDS, FULL_POST_FIELDS } from '../fragments';
 import { Link } from '../types/Link';
 
@@ -23,16 +24,20 @@ const GET_NEXT = gql`
   ${VOTE_FIELDS}
 `;
 
-type HandleCompleted = (links: Link[]) => void;
+export default function useGetNext(itemId: string, postId: string) {
+  const { dispatch } = useReactiveVar(itemVar);
 
-export default function useGetNext(postId: string, handleCompleted: HandleCompleted) {
   const [getNextLinks] = useMutation(GET_NEXT, {
     onError: error => {
       console.error(error);
     },
     onCompleted: data => {
       console.log(data);
-      handleCompleted(data.getNext);
+      dispatch({
+        type: 'ADD_NEXT',
+        itemId,
+        outLinks: data.getNext,
+      })
     },
     fetchPolicy: 'network-only',
   });

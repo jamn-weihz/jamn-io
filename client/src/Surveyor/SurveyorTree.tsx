@@ -1,57 +1,50 @@
-import { Box, IconButton, Link as MUILink } from '@mui/material';
-import { Link } from '../types/Link';
+import { Box, Link as MUILink } from '@mui/material';
 import SurveyorEntry from './SurveyorEntry';
-import React, { Dispatch } from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 
-import { useApolloClient } from '@apollo/client';
+import { ReactiveVar, useApolloClient, useReactiveVar } from '@apollo/client';
 
-import { SurveyorItem } from '../types/Surveyor';
-import { User } from '../types/User';
-import { Jam } from '../types/Jam';
-import { FULL_POST_FIELDS, LINK_FIELDS } from '../fragments';
+import { SurveyorState } from '../types/Surveyor';
+import { FULL_POST_FIELDS } from '../fragments';
 import { Post, PostAction } from '../types/Post';
 import { Col } from '../types/Col';
+import { itemVar } from '../cache';
+import useGetPrev from '../Post/useGetPrev';
+import useGetNext from '../Post/useGetNext';
+import { LOAD_LIMIT } from '../constants';
 
 interface SurveyorTreeProps {
   col: Col;
-  item: SurveyorItem;
-  updateItem(item: SurveyorItem): void;
+  itemId: string;
   depth: number;
   postDispatch: Dispatch<PostAction>;
+  surveyorState: SurveyorState;
+  setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
 }
 export default function SurveyorTree(props: SurveyorTreeProps) {
   const client = useApolloClient();
+  const { state } = useReactiveVar(itemVar);
 
-  const voteOnLink = (clicks: number) => (event: React.MouseEvent) => {
+  const item = state[props.itemId];
 
-  }
+  const { getPrev } = useGetPrev(props.itemId, item?.postId);
+  const { getNext } = useGetNext(props.itemId, item?.postId);
 
-  const updateChildItem = (isNext: boolean, i: number) => (item: SurveyorItem) => {
-    let prev = props.item.prev;
-    let next = props.item.next;
-    if (isNext) {
-      next = next.slice();
-      next.splice(i, 1, item);
+  if (!item) return null;
+
+
+  const handleLoadClick = (event: React.MouseEvent) => {
+    if (item.showPrev) {
+      getPrev(item.prevIds.length);
     }
-    else {
-      prev = prev.slice();
-      prev.splice(i, 1, item);
+    else if (item.showNext) {
+      getNext(item.nextIds.length);
     }
-    const updatedItem = {
-      ...props.item,
-      prev,
-      next,
-    }
-    props.updateItem({
-      ...props.item,
-      prev,
-      next,
-    })
   }
 
   const post = client.cache.readFragment({
     id: client.cache.identify({
-      id: props.item.postId,
+      id: item.postId,
       __typename: 'Post',
     }),
     fragment: FULL_POST_FIELDS,
@@ -59,23 +52,18 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
   }) as Post;
 
   let remaining = 0;
-  let items = [] as SurveyorItem[];
-  if (props.item.showPrev) {
-    items = props.item.prev;
-    remaining = items.length > 0
-      ? Math.min(20, post.prevCount - items.length)
+  let itemIds = [] as string[];
+  if (item.showPrev) {
+    itemIds = item.prevIds;
+    remaining = itemIds.length > 0
+      ? Math.min(LOAD_LIMIT, post.prevCount - itemIds.length)
       : 0;
   }
-  else if (props.item.showNext) {
-    items = props.item.next;
-    remaining = items.length > 0 
-      ? Math.min(20, post.nextCount - items.length)
+  else if (item.showNext) {
+    itemIds = item.nextIds;
+    remaining = itemIds.length > 0 
+      ? Math.min(LOAD_LIMIT, post.nextCount - itemIds.length)
       : 0;
-  }
-
-  const handleLoadClick = (event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
   }
 
   if (!post) return null;
@@ -89,26 +77,28 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
       }}>
         <SurveyorEntry
           col={props.col}
-          item={props.item}
-          updateItem={props.updateItem}
+          item={item}
           depth={props.depth}
           postDispatch={props.postDispatch}
+          surveyorState={props.surveyorState}
+          setSurveyorState={props.setSurveyorState}
         />
       </Box>
       <Box sx={{
         borderLeft: `1px solid ${post.user.color}`,
-        marginLeft: '7px',
+        marginLeft: '8px',
       }}>
         {
-          items.map((item, i) => {
+          itemIds.map(itemId => {
             return (
               <SurveyorTree
-                key={`surveyor-tree-${item.postKey}`}
-                item={item}
-                updateItem={updateChildItem(props.item.showNext, i)}
+                key={`surveyor-tree-${itemId}`}
+                itemId={itemId}
                 depth={props.depth + 1}
                 col={props.col}
                 postDispatch={props.postDispatch}
+                surveyorState={props.surveyorState}
+                setSurveyorState={props.setSurveyorState}
               />
             )
           })
@@ -121,9 +111,12 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
                 marginLeft: '10px',
                 textAlign: 'left',
                 cursor: 'pointer',
-                color: post.user.color,
               }}>
-                <MUILink>load {remaining} more</MUILink>
+                <MUILink sx={{
+                  color: post.user.color,
+                }}>
+                  load {remaining} more
+                </MUILink>
               </Box>
             : null
         }

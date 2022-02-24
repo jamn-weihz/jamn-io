@@ -1,7 +1,7 @@
 import { Box, IconButton, Drawer } from '@mui/material';
 import React from 'react';
 import { useReactiveVar } from '@apollo/client';
-import { colVar, sizeVar, userVar } from './cache';
+import { colVar, paletteVar, sizeVar, userVar } from './cache';
 import icon32 from './favicon-32x32.png';
 import icon16 from './favicon-16x16.png';
 import AddIcon from '@mui/icons-material/Add';
@@ -14,8 +14,8 @@ import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { Col } from './types/Col';
 import { DEFAULT_COLOR } from './constants';
 import { useNavigate } from 'react-router-dom';
-import { getColWidth } from './utils';
-
+import { getColor, getColWidth } from './utils';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
 interface AppbarProps {
   containerEl: React.MutableRefObject<HTMLElement | undefined>;
 }
@@ -25,6 +25,8 @@ export default function Appbar(props: AppbarProps) {
   const userDetail = useReactiveVar(userVar);
   const colDetail = useReactiveVar(colVar);
   const sizeDetail = useReactiveVar(sizeVar);
+  const paletteDetail = useReactiveVar(paletteVar);
+
   const handleItemClick = (col: Col) => (event: React.MouseEvent) => {
     event.stopPropagation();
     colVar({
@@ -73,7 +75,7 @@ export default function Appbar(props: AppbarProps) {
           fontSize: sizeDetail.width < 400 ? 16 : 32,
           color: i === colDetail.i
             ? userDetail?.color || DEFAULT_COLOR
-            : 'secondary',
+            : getColor(paletteDetail.mode),
           border: i === colDetail.i
             ? `1px solid ${userDetail?.color || DEFAULT_COLOR}`
             : 'none',
@@ -98,43 +100,70 @@ export default function Appbar(props: AppbarProps) {
       isAdding: false,
     })
   }
+  const handlePaletteClick = (event:React.MouseEvent) => {
+    paletteVar({
+      mode: paletteDetail.mode === 'dark'
+        ? 'light'
+        : 'dark',
+    })
+  }
   return (
     <Drawer variant='permanent'>
       <Box onClick={handleClick} sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
         textAlign: 'center',
         height: '100%',
+        backgroundColor: paletteDetail.mode === 'dark'
+          ? '#202020'
+          : ''
       }}>
-        <Box sx={{
-          padding: '5px',
-          paddingTop: '10px',
-        }}>
-          <IconButton size='small'>
-            <img src={sizeDetail.width < 400 ? icon16 : icon32}/>
-          </IconButton>
-        </Box>
-        {
-          userDetail?.id
-            ? userDetail.cols
-                .filter(col => !col.deleteDate)
-                .sort((a,b) => a.i < b.i ? -1 :1 )
-                .map(mapColsToItems)
-            : colDetail.cols.map(mapColsToItems)
-        }
-        <Box sx={{
-          borderTop: '1px solid lavender',
-          padding: '5px',
-          position: 'relative',
-        }}>
-          <IconButton size='small' onClick={handleAddClick} sx={{
-            fontSize: sizeDetail.width < 400 ? 16 : 32,
-            color: colDetail.isAdding
-              ? userDetail?.color || DEFAULT_COLOR
-              : 'secondary',
-            border: colDetail.isAdding
-              ? `1px solid ${userDetail?.color || DEFAULT_COLOR}`
-              : 'none',
+        <Box>
+          <Box sx={{
+            padding: '5px',
+            paddingTop: '10px',
           }}>
-            <AddIcon fontSize='inherit' />
+            <IconButton size='small'>
+              <img src={sizeDetail.width < 400 ? icon16 : icon32}/>
+            </IconButton>
+          </Box>
+          {
+            userDetail?.id
+              ? userDetail.cols
+                  .filter(col => !col.deleteDate)
+                  .sort((a,b) => a.i < b.i ? -1 :1 )
+                  .map(mapColsToItems)
+              : colDetail.cols.map(mapColsToItems)
+          }
+          <Box sx={{
+            borderTop: '1px solid',
+            borderColor: getColor(paletteDetail.mode, true),
+            padding: '5px',
+            position: 'relative',
+          }}>
+            <IconButton size='small' onClick={handleAddClick} sx={{
+              fontSize: sizeDetail.width < 400 ? 16 : 32,
+              color: colDetail.isAdding
+                ? userDetail?.color || DEFAULT_COLOR
+                : getColor(paletteDetail.mode),
+                border: colDetail.isAdding
+                ? `1px solid ${userDetail?.color || DEFAULT_COLOR}`
+                : 'none',
+            }}>
+              <AddIcon fontSize='inherit' />
+            </IconButton>
+          </Box>
+        </Box>
+        <Box sx={{
+          marginBottom: '5px',
+          padding: '5px',
+        }}>
+          <IconButton size='small' onClick={handlePaletteClick} sx={{
+            fontSize: sizeDetail.width < 400 ? 16: 32,
+            color: getColor(paletteDetail.mode)
+          }}>
+            <Brightness4Icon fontSize='inherit'/>
           </IconButton>
         </Box>
       </Box>

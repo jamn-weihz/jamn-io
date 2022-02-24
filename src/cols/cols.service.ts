@@ -23,7 +23,9 @@ export class ColsService {
       const col0 = new Col();
       col0.userId = userId;
       col0.i = i;
-      col0.pathname = pathname === '/register' ? `/u/${userName}` : pathname;
+      col0.pathname = pathname === '/register' || pathname === '/login'
+        ? `/u/${userName}` 
+        : pathname;
       return col0;
     })
 

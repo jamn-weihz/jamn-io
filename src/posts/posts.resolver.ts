@@ -40,21 +40,25 @@ export class PostsResolver {
   @Mutation(() => Post, {name: 'savePost'})
   async savePost(
     @CurrentUser() user: User,
+    @Args('sessionId') sessionId: string,
     @Args('postId') postId: string,
     @Args('draft') draft: string,
   ) {
     const post = await this.postsService.savePost(user.id, postId, draft);
     this.pubSub.publish('savePost', {
+      sessionId,
       savePost: post,
     });
     return post;
   }
   @Subscription(() => Post, {name: 'savePost',
     filter: (payload, variables) => {
+      if (payload.sessionId === variables.sessionId) return false;
       return variables.cardIds.some(id => id === payload.savePost.id);
     }
   })
   savePostSubscription(
+    @Args('sessionId') sessionId: string,
     @Args('cardIds', {type: () => [String]}) cardIds: string[]
   ) {
     console.log('savePostSubscription')

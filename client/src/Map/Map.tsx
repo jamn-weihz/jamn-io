@@ -1,7 +1,7 @@
 import { gql, useLazyQuery, useReactiveVar } from '@apollo/client';
 import { Box, Button, Card, IconButton } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
-import { colVar, userVar } from '../cache';
+import { paletteVar, userVar } from '../cache';
 //@ts-ignore
 import mapboxgl from '!mapbox-gl'; //eslint-disable-line import/no-webpack-loader-syntax
 import { Map as MapBoxMap } from 'mapbox-gl';
@@ -12,9 +12,9 @@ import StartJamForm from './StartJamForm';
 import { useNavigate } from 'react-router-dom';
 import useChangeCol from '../Col/useChangeCol';
 import { Col } from '../types/Col';
-import CloseIcon from '@mui/icons-material/Close';
-import ColRemovalButton from '../Col/ColRemovalButton';
+import RemoveColButton from '../Col/RemoveColButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { getColor } from '../utils';
 
 mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
 
@@ -35,9 +35,11 @@ interface MapProps {
 export default function Map(props: MapProps) {
   const navigate = useNavigate();
   const { changeCol } = useChangeCol();
+  const paletteDetail = useReactiveVar(paletteVar);
+
+  const [showOptions, setShowOptions] = useState(false);
 
   const userDetail = useReactiveVar(userVar);
-  const colDetail = useReactiveVar(colVar);
 
   const mapContainer = useRef(null);
   const map = useRef(null as unknown as MapBoxMap);
@@ -324,28 +326,40 @@ export default function Map(props: MapProps) {
   };
 
   const handleOptionsClick = () => {
-    
+    setShowOptions(!showOptions);
   }
 
   return (
     <Box sx={{
       height: '100%'
     }}>
-      <Card elevation={5} sx={{
-        padding:1,
-        display: 'flex',
-        justifyContent: 'space-between',
-        color: 'dimgrey',
-      }}>
-        <Box>
-          /map
-        </Box>
-        <IconButton size='small' onClick={handleOptionsClick} sx={{
+      <Card elevation={5}>
+        <Box sx={{
+          padding:1,
+          display: 'flex',
+          justifyContent: 'space-between',
+          color: getColor(paletteDetail.mode)
+        }}>
+          <Box>
+            /map
+          </Box>
+          <IconButton size='small' onClick={handleOptionsClick} sx={{
             fontSize: 20,
             padding: 0,
+            color: getColor(paletteDetail.mode),
           }}>
             <MoreVertIcon fontSize='inherit'/> 
           </IconButton>
+        </Box>
+        <Box sx={{
+          display: showOptions ? 'block' : 'none',
+          color: 'dimgrey',
+          borderTop: '1px solid',
+          borderColor: getColor(paletteDetail.mode, true),
+          padding: 1,
+        }}>
+          <RemoveColButton col={props.col}/>
+        </Box>
       </Card>
       <Card elevation={5} sx={{
         position: 'relative',
@@ -363,6 +377,7 @@ export default function Map(props: MapProps) {
       <Card elevation={5} sx={{
         margin: 1,
         padding: 1,
+        color: getColor(paletteDetail.mode),
       }}>
         {hasPin ? pinLng.toFixed(4) : lng.toFixed(4)},&nbsp;
         {hasPin ? pinLat.toFixed(4) : lat.toFixed(4)}

@@ -6,11 +6,12 @@ import {
   convertFromRaw,
   ContentBlock,
   ContentState,
+  SelectionState,
 } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import Editor from '@draft-js-plugins/editor';
 import { useApolloClient, useReactiveVar } from '@apollo/client';
-import { replyVar, userVar } from '../cache';
+import { focusVar, userVar } from '../cache';
 import { Box } from '@mui/material';
 import useSavePost from './useSavePost';
 
@@ -29,7 +30,7 @@ interface EditorComponentProps {
 export default function EditorComponent(props: EditorComponentProps) {
   const client = useApolloClient();
   const userDetail = useReactiveVar(userVar);
-  const replyDetail = useReactiveVar(replyVar);
+  const focusDetail = useReactiveVar(focusVar);
 
   const { savePost } = useSavePost(props.post.id);
 
@@ -51,9 +52,19 @@ export default function EditorComponent(props: EditorComponentProps) {
     if (focused && editorRef.current) {
       editorRef.current.focus();
     }
-    if (replyDetail.postId === props.post.id && editorRef.current)  {
-      editorRef.current.focus();
-      replyVar({
+    if (focusDetail.postId === props.post.id && editorRef.current)  {
+      const content = editorState.getCurrentContent();
+      const blockMap = content.getBlockMap();
+      const key = blockMap.last().getKey();
+      const length = blockMap.last().getLength();
+      const selection = new SelectionState({
+        anchorKey: key,
+        anchorOffset: length,
+        focusKey: key,
+        focusOffset: length,
+      });
+      setEditorState(EditorState.forceSelection(editorState, selection));      editorRef.current.focus();
+      focusVar({
         postId: '',
       });
     }

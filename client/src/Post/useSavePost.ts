@@ -1,10 +1,11 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useReactiveVar } from "@apollo/client";
 import { Post } from "../types/Post";
 import { ContentState, convertToRaw } from 'draft-js';
+import { sessionVar } from "../cache";
 
 const SAVE_POST = gql`
-  mutation SavePost($postId: String!, $draft: String!) {
-    savePost(postId: $postId, draft: $draft) {
+  mutation SavePost($sessionId: String!, $postId: String!, $draft: String!) {
+    savePost(sessionId: $sessionId, postId: $postId, draft: $draft) {
       id
       draft
       name
@@ -15,6 +16,7 @@ const SAVE_POST = gql`
 `;
 
 export default function useSavePost(postId: string) {
+  const sessionDetail = useReactiveVar(sessionVar);
   const [save] = useMutation(SAVE_POST, {
     onError: error => {
       console.error(error);
@@ -27,6 +29,7 @@ export default function useSavePost(postId: string) {
   const savePost = (draft: string) => {
     save({
       variables: {
+        sessionId: sessionDetail.id,
         postId,
         draft,
       }

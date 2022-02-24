@@ -3,8 +3,8 @@ import './App.css';
 import Appbar from './Appbar';
 import { gql, useLazyQuery, useReactiveVar } from '@apollo/client';
 import { FULL_USER_FIELDS } from './fragments';
-import { colVar, sizeVar, tokenVar, userVar } from './cache';
-import { Box, Theme } from '@mui/material';
+import { colVar, itemVar, paletteVar, sizeVar, tokenVar, userVar } from './cache';
+import { Box, Paper, Theme } from '@mui/material';
 import useToken from './Auth/useToken';
 import { ThemeProvider, createTheme } from '@mui/material';
 import { grey } from '@mui/material/colors';
@@ -16,6 +16,11 @@ import { getAppbarWidth } from './utils';
 import { PostAction, PostState } from './types/Post';
 import useSavePostSubcription from './Post/useSavePostSubcription';
 import useLinkPostsSubcription from './Post/useLinkPostsSubscription';
+import { ItemAction, ItemState } from './types/Item';
+import reduceAddPrev from './Surveyor/reduceAddPrev';
+import reduceAddNext from './Surveyor/reduceAddNext';
+import reduceAddLink from './Surveyor/reduceAddLink';
+import reduceRemoveLink from './Surveyor/reduceRemoveLink';
 
 const GET_USER = gql`
   query GetUser {
@@ -32,7 +37,7 @@ function App() {
   const userDetail = useReactiveVar(userVar);
   const colDetail = useReactiveVar(colVar);
   const sizeDetail = useReactiveVar(sizeVar);
-
+  const paletteDetail = useReactiveVar(paletteVar);
   const containerEl = useRef<HTMLElement>();
   const { refreshToken, refreshTokenInterval } = useToken();
 
@@ -46,10 +51,11 @@ function App() {
         },
         secondary: {
           main: grey[600],
-        }
+        },
+        mode: paletteDetail.mode,
       },
     }));
-  }, [userDetail?.color])
+  }, [userDetail?.color, paletteDetail.mode])
 
   const [getUser] = useLazyQuery(GET_USER, {
     onError: error => {
@@ -93,8 +99,19 @@ function App() {
 
     window.addEventListener('resize', handleResize);
 
+    const handlePaletteModeChange =  (event: any) => {
+      paletteVar({
+        mode: event.matches ? 'dark' : 'light'
+      });
+    }
+
+    window.matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', handlePaletteModeChange);
+
     return () => {
-      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('resize', handleResize);
+      window.matchMedia('(prefers-color-scheme: dark)')
+        .removeEventListener('change', handlePaletteModeChange)
     }
   }, [])
 
@@ -105,14 +122,14 @@ function App() {
           ...state,
           [action.postId]: [
             ...(state[action.postId] || []),
-            action.postKey,
+            action.itemId,
           ],
         }
       case 'REMOVE':
         return {
           ...state,
           [action.postId]: (state[action.postId] || [])
-            .filter(postKey => postKey !== action.postKey),
+            .filter(itemId => itemId !== action.itemId),
         }
       default:
         throw new Error('Invalid action type')
@@ -124,7 +141,47 @@ function App() {
 
   useSavePostSubcription(postIds);
   useLinkPostsSubcription(postIds);
+  
 
+  const itemReducer = (state: ItemState, action: ItemAction) => {
+    console.log(action);
+    switch (action.type) {
+      case 'ADD_ITEMS':
+        return {
+          ...state,
+          ...action.idToItem,
+        };
+      case 'UPDATE_ITEM': 
+        return {
+          ...state,
+          [action.item.id]: action.item,
+        };
+      case 'ADD_PREV':
+        return reduceAddPrev(state, action);
+      case 'ADD_NEXT':
+        return reduceAddNext(state, action);
+      case 'ADD_LINK':
+        return reduceAddLink(state, action);
+      case 'REMOVE_LINK':
+        return reduceRemoveLink(state, action);
+      default:
+        throw new Error('Invalid action type');
+    }
+  };
+
+  const [itemState, itemDispatch] = useReducer(itemReducer, {});
+
+  useEffect(() => {
+    console.log(itemState);
+    itemVar({
+      state: itemState,
+      dispatch: itemDispatch,
+    });
+  }, [itemState])
+
+  const { dispatch } = useReactiveVar(itemVar);
+  if (!dispatch) return null;
+  
   if (!theme) return null;
 
   return (
@@ -134,7 +191,7 @@ function App() {
       height: '100%',
     }}>
         <Appbar  containerEl={containerEl} />
-        <Box sx={{
+        <Paper sx={{
           position: 'fixed',
           left: getAppbarWidth(sizeDetail.width),
           top: 0,
@@ -174,7 +231,7 @@ function App() {
                   })
             }
           </Box>
-        </Box>
+        </Paper>
         <ColAdder containerEl={containerEl}/>
       </Box>
     </ThemeProvider>

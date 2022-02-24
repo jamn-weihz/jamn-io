@@ -18,8 +18,11 @@ export class JamsService {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => RolesService))
     private readonly rolesService: RolesService,
+    @Inject(forwardRef(() => PostsService))
     private readonly postsService: PostsService,
+    @Inject(forwardRef(() => LinksService))
     private readonly linksService: LinksService,
+    @Inject(forwardRef(() => VotesService))
     private readonly votesService: VotesService,
   ) {}
 
@@ -70,9 +73,9 @@ export class JamsService {
     if (!startPost) {
       startPost = await this.postsService.createStartPost(user.id);
     }
-    this.postsService.incrementPostNextCount(startPost.id);
+    this.postsService.incrementPostNextCount(startPost.id, 1);
     
-    const jamPost = await this.postsService.createJamPost(user.id, jam1.id, jam1.name, jam1.description);
+    const jamPost = await this.postsService.createPost(user.id, jam1.id, jam1.name, jam1.description);
 
     const link = await this.linksService.createLink(startPost.id, jamPost.id, 1, 0);
     const vote = await this.votesService.createVote(userId, link.id, startPost.id, jamPost.id, 1, 0);

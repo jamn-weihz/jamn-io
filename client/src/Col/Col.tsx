@@ -1,4 +1,4 @@
-import { Box, } from '@mui/material';
+import { Box, Paper, } from '@mui/material';
 import { Col } from '../types/Col';
 import Login from '../Auth/Login';
 import Register from '../Auth/Register';
@@ -7,11 +7,10 @@ import Jam from '../Jam/Jam';
 import Map from '../Map/Map';
 import Search from '../Search/Search';
 import React, { Dispatch } from 'react';
-import { colVar, sizeVar, userVar } from '../cache';
+import { colVar, paletteVar, sizeVar, userVar } from '../cache';
 import { useReactiveVar } from '@apollo/client';
-import { DEFAULT_COLOR } from '../constants';
 import { useNavigate } from 'react-router-dom';
-import { getColWidth } from '../utils';
+import { getColor, getColWidth } from '../utils';
 import { PostAction } from '../types/Post';
 
 interface ColComponentProps {
@@ -22,6 +21,7 @@ export default function ColComponent(props: ColComponentProps) {
   const navigate = useNavigate();
   const colDetail = useReactiveVar(colVar);
   const sizeDetail = useReactiveVar(sizeVar);
+  const paletteDetail = useReactiveVar(paletteVar);
 
   const handleClick = (event: React.MouseEvent) => {
     colVar({
@@ -43,28 +43,48 @@ export default function ColComponent(props: ColComponentProps) {
       return <Map col={col}/>;
     }
     else if (path[1] === 'search') {
-      return <Search col={col} postDispatch={props.postDispatch}/>;
+      return (
+        <Search 
+          col={col} 
+          postDispatch={props.postDispatch}
+        />
+      );
     }
     else if (path[1] === 'u') {
-      return <User col={col} name={path[2]}/>;
+      return (
+        <User 
+          col={col} 
+          name={path[2]} 
+          postDispatch={props.postDispatch}
+        />
+      );
     }
     else if (path[1] === 'j') {
-      return <Jam col={col} name={path[2]} postDispatch={props.postDispatch}/>;
+      return (
+        <Jam 
+          col={col} 
+          name={path[2]} 
+          postDispatch={props.postDispatch}
+        />
+      );
     }
   }
 
   return (
-    <Box onClick={handleClick} sx={{
-      border: '1px solid lavender',
+    <Paper onClick={handleClick} sx={{
+      border: '1px solid',
+      borderColor: getColor(paletteDetail.mode, true),
       minWidth: getColWidth(sizeDetail.width),
       width: getColWidth(sizeDetail.width),
       height: '100%',
       position: 'relative',
       backgroundColor: colDetail.i === props.col.i
-        ? 'aliceblue'
-        : 'white',
+        ? paletteDetail.mode === 'dark'
+          ? 'black'
+          : 'aliceblue'
+        : 'none',
     }}>
       { mapColToComponent(props.col) }
-    </Box>
+    </Paper>
   )
 }

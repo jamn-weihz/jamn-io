@@ -1,8 +1,9 @@
-import { gql, useApolloClient, useSubscription } from '@apollo/client';
+import { gql, useApolloClient, useReactiveVar, useSubscription } from '@apollo/client';
+import { sessionVar } from '../cache';
 
 const SAVE_POST = gql`
-  subscription SavePost($cardIds: [String!]!) {
-    savePost(cardIds: $cardIds) {
+  subscription SavePost($sessionId: String!, $cardIds: [String!]!) {
+    savePost(sessionId: $sessionId, cardIds: $cardIds) {
       id
       draft
       saveDate
@@ -11,10 +12,11 @@ const SAVE_POST = gql`
 `
 export default function useSavePostSubcription(cardIds: string[]) {
   const client = useApolloClient();
-
+  const sessionDetail = useReactiveVar(sessionVar);
   useSubscription(SAVE_POST, {
     shouldResubscribe: true,
     variables: {
+      sessionId: sessionDetail.id,
       cardIds,
     },
     onSubscriptionData: ({subscriptionData: {data: {savePost}}}) => {

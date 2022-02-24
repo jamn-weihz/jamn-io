@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LinksService } from 'src/links/links.service';
 import { UsersService } from 'src/users/users.service';
 import { findDefaultWeight } from 'src/utils';
-import { Repository } from 'typeorm';
+import { MoreThan, Not, Repository } from 'typeorm';
 import { Vote } from './vote.entity';
 
 @Injectable()
@@ -11,6 +11,7 @@ export class VotesService {
   constructor(
     @InjectRepository(Vote)
     private readonly votesRepository: Repository<Vote>,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => LinksService))
     private readonly linksService: LinksService,
@@ -32,6 +33,16 @@ export class VotesService {
       }
     })
   }
+
+  async getPositiveForeignVote(userId: string, linkId: string) {
+    return this.votesRepository.findOne({
+      where: {
+        userId: Not(userId),
+        linkId,
+        weight: MoreThan(0),
+      }
+    })
+  }
   
   async createVote(userId: string, linkId: string, sourcePostId: string, targetPostId: string, clicks: number, tokens: number): Promise<Vote> {
     const user = await this.usersService.getUserById(userId);
@@ -44,6 +55,7 @@ export class VotesService {
     vote0.userId = userId;
     vote0.userI = user.voteI + 1;
     vote0.linkId = linkId;
+    vote0.linkI = link.voteI + 1;
     vote0.sourcePostId = sourcePostId;
     vote0.targetPostId = targetPostId;
     vote0.clicks = clicks;

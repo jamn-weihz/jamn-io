@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Link } from './link.entity';
 import { LinksService } from './links.service';
@@ -10,7 +10,7 @@ import { PubSubModule } from 'src/pub-sub/pub-sub.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Link]),
-    PostsModule,
+    forwardRef(() => PostsModule),
     VotesModule,
     PubSubModule,
   ],

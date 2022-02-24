@@ -4,10 +4,10 @@ import React from 'react';
 import useRemoveCol from './useRemoveCol';
 import { Col } from '../types/Col';
 
-interface ColRemovalButtonProps{
+interface RemoveColButtonProps{
   col: Col
 }
-export default function ColRemovalButton(props: ColRemovalButtonProps) {
+export default function RemoveColButton(props: RemoveColButtonProps) {
   const { removeCol } = useRemoveCol();
 
   const handleCloseClick = (event:React.MouseEvent) => {

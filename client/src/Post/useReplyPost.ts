@@ -1,14 +1,11 @@
-import { gql, useMutation } from '@apollo/client';
-import { replyVar } from '../cache';
+import { gql, useMutation, useReactiveVar } from '@apollo/client';
+import { focusVar, itemVar, sessionVar } from '../cache';
 import { FULL_POST_FIELDS, LINK_FIELDS, VOTE_FIELDS } from '../fragments';
-import { Jam } from '../types/Jam';
-import { Link } from '../types/Link';
-import { Post } from '../types/Post';
-import { User } from '../types/User';
+import { v4 as uuidv4 } from 'uuid';
 
 const REPLY_POST = gql`
-  mutation ReplyPost($sourcePostId: String!, $jamId: String) {
-    replyPost(sourcePostId: $sourcePostId, jamId: $jamId) {
+  mutation ReplyPost($sessionId: String!, $sourcePostId: String!, $jamId: String) {
+    replyPost(sessionId: $sessionId, sourcePostId: $sourcePostId, jamId: $jamId) {
       ...LinkFields
       sourcePost {
         id
@@ -27,26 +24,50 @@ const REPLY_POST = gql`
   ${VOTE_FIELDS}
 `;
 
-type HandleCompleted = (link: Link) => void;
-
-export default function useReplyPost(sourcePostId: string, jam: Jam | undefined, handleCompleted: HandleCompleted) {
+export default function useReplyPost(itemId: string, sourcePostId: string, jamId?: string) {
+  const { state, dispatch } = useReactiveVar(itemVar);
+  const sessionDetail = useReactiveVar(sessionVar);
   const [reply] = useMutation(REPLY_POST, {
     onError: error => {
       console.error(error);
     },
     onCompleted: data => {
       console.log(data);
-      handleCompleted(data.replyPost);
-      replyVar({
+      focusVar({
         postId: data.replyPost.targetPost.id,
+      });
+      const newItem = {
+        id: uuidv4(),
+        linkId: data.replyPost.id,
+        postId: data.replyPost.targetPost.id,
+        showPrev: false,
+        showNext: true,
+        prevIds: [],
+        nextIds: [],
+        refresh: false,
+      };
+      dispatch({
+        type: 'ADD_ITEMS',
+        idToItem: {
+          [newItem.id]: newItem,
+        },
       })
-    }
+      dispatch({
+        type: 'UPDATE_ITEM',
+        item: {
+          ...state[itemId],
+          showPrev: false,
+          showNext: true,
+          nextIds: [newItem.id, ...state[itemId].nextIds],
+        }
+      })
+    },
   });
 
   const replyPost = () => {
-    const jamId = jam?.id;
     reply({
       variables: {
+        sessionId: sessionDetail.id,
         sourcePostId,
         jamId,
       }

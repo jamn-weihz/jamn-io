@@ -24,6 +24,9 @@ export class Vote {
   link: Link;
 
   @Field()
+  linkI: number;
+
+  @Field()
   sourcePostId: string;
 
   @Field(() => Post)

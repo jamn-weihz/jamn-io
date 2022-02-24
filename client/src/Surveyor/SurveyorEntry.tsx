@@ -1,35 +1,43 @@
-import { Box, Button, Card as MUICard, IconButton } from '@mui/material';
+import { Box, Button, Card, Card as MUICard, IconButton } from '@mui/material';
 import NorthIcon from '@mui/icons-material/North';
 import ReplyIcon from '@mui/icons-material/Reply';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
+import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import FilterAltTwoToneIcon from '@mui/icons-material/FilterAltTwoTone';
 import NotificationsTwoToneIcon from '@mui/icons-material/NotificationsTwoTone';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import { linkVar, surveyorVar, userVar } from '../cache';
-import { useReactiveVar } from '@apollo/client';
+import { itemVar, linkVar, paletteVar, userVar } from '../cache';
+import { gql, ReactiveVar, useReactiveVar } from '@apollo/client';
 import { Post, PostAction } from '../types/Post';
 import { useApolloClient } from '@apollo/client';
-import React, { Dispatch, useEffect } from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid'; 
 import { Link } from '../types/Link';
 import { useSearchParams } from 'react-router-dom';
-import { SurveyorItem } from '../types/Surveyor';
+import { SurveyorState } from '../types/Surveyor';
 import PostComponent from '../Post/Post';
 import useReplyPost from '../Post/useReplyPost';
 import { Jam } from '../types/Jam';
-import { FULL_POST_FIELDS, LINK_FIELDS } from '../fragments';
+import { FULL_POST_FIELDS, LINK_FIELDS, VOTE_FIELDS } from '../fragments';
 import useGetPrev from '../Post/useGetPrev';
 import useGetNext from '../Post/useGetNext';
 import { Col } from '../types/Col';
 import useLinkPosts from '../Post/useLinkPosts';
+import { getColor } from '../utils';
+import { Vote } from '../types/Vote';
+import { DEFAULT_COLOR } from '../constants';
+import useVotePosts from '../Post/useVotePosts';
+import { Item } from '../types/Item';
 
 interface SurveyorEntryProps {
   jam?: Jam;
   col: Col;
-  item: SurveyorItem;
-  updateItem(item: SurveyorItem): void;
+  item: Item;
   depth: number;
   postDispatch: Dispatch<PostAction>;
+  surveyorState: SurveyorState;
+  setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
 }
 
 export default function SurveyorEntry(props: SurveyorEntryProps) {
@@ -37,95 +45,19 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
 
   const client = useApolloClient();
   const userDetail = useReactiveVar(userVar);
-  const surveyorDetail = useReactiveVar(surveyorVar);
   const linkDetail = useReactiveVar(linkVar);  
+  const paletteDetail = useReactiveVar(paletteVar);
+
+  const { state, dispatch } = useReactiveVar(itemVar);
 
   const { linkPosts } = useLinkPosts();
+  const { votePosts } = useVotePosts()
 
-  const surveyorState = surveyorDetail[props.col.id]
 
-  const handleGetPrevCompleted = (inLinks: Link[]) => {
-    const items = inLinks.map(link => {
-      let existingItem = null as SurveyorItem | null;
-      props.item.prev.some(item => {
-        if (item.linkId === link.id) {
-          existingItem = item;
-          return true;
-        }
-        return false;
-      });
-      return {
-        linkId: link.id,
-        postId: link.sourcePostId,
-        postKey: uuidv4(),
-        showPrev: !!existingItem?.showPrev,
-        showNext: !!existingItem?.showNext,
-        prev: existingItem?.prev || [],
-        next: existingItem?.next || [],
-        refresh: false,
-      } as SurveyorItem;
-    });
-    props.updateItem({
-      ...props.item,
-      showPrev: true,
-      showNext: false,
-      prev: [...props.item.prev, ...items],
-    });
-  }
-  const { getPrev } = useGetPrev(props.item.postId, handleGetPrevCompleted);
+  const { getPrev } = useGetPrev(props.item.id, props.item.postId);
+  const { getNext } = useGetNext(props.item.id, props.item.postId);
 
-  const handleGetNextCompleted = (outLinks: Link[]) => {
-    const items = outLinks.map(link => {
-      let existingItem = null as SurveyorItem | null;
-      props.item.prev.some(item => {
-        if (item.linkId === link.id) {
-          existingItem = item;
-          return true;
-        }
-        return false;
-      });
-      return {
-        linkId: link.id,
-        postId: link.targetPostId,
-        postKey: uuidv4(),
-        showPrev: !!existingItem?.showPrev,
-        showNext: !!existingItem?.showNext,
-        prev: existingItem?.prev || [],
-        next: existingItem?.next || [],
-        refresh: false,
-      } as SurveyorItem;
-    });
-    props.updateItem({
-      ...props.item,
-      showPrev: false,
-      showNext: true,
-      next: [...props.item.next, ...items],
-      refresh: false,
-    });
-  }
-  const { getNext } = useGetNext(props.item.postId, handleGetNextCompleted);
-
-  const handleReplyCompleted = (link: Link) => {
-    const newItem = {
-      linkId: link.id,
-      postId: link.targetPostId,
-      postKey: uuidv4(),
-      showPrev: false,
-      showNext: true,
-      prev: [],
-      next: [],
-      refresh: false,
-    };
-    props.updateItem({
-      ...props.item,
-      showPrev: false,
-      showNext: true,
-      next: [newItem, ...props.item.next],
-      refresh: false,
-    })
-  }
-
-  const { replyPost } = useReplyPost(props.item.postId, props.jam, handleReplyCompleted);
+  const { replyPost } = useReplyPost(props.item.id, props.item.postId, props.jam?.id);
 
   useEffect(() => {
     if (props.item.refresh) {
@@ -135,73 +67,86 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
       else if (props.item.showPrev) {
         getPrev(0);
       }
-      props.updateItem({
-        ...props.item,
-        refresh: false,
+      dispatch({
+        type: 'UPDATE_ITEM',
+        item: {
+          ...props.item,
+          refresh: false,
+        }
       });
+
     }
   }, [props.item.refresh]);
 
   const handlePrevClick = (event: React.MouseEvent) => {
     if (props.item.showPrev) {
-      props.updateItem({
-        ...props.item,
-        showPrev: false,
-      })
+      dispatch({
+        type: 'UPDATE_ITEM',
+        item: {
+          ...props.item,
+          showPrev: false,
+        }
+      });
     }
     else {
-      getPrev(props.item.prev.length);
-      props.updateItem({
-        ...props.item,
-        showPrev: true,
-        showNext: false,
+      getPrev(props.item.prevIds.length);
+      dispatch({
+        type: 'UPDATE_ITEM',
+        item: {
+          ...props.item,
+          showPrev: true,
+          showNext: false,
+        },
       });
     }
   }
 
   const handleNextClick = (event: React.MouseEvent) => {
     if (props.item.showNext) {
-      props.updateItem({
-        ...props.item,
-        showNext: false,
-      })
+      dispatch({
+        type: 'UPDATE_ITEM',
+        item: {
+          ...props.item,
+          showNext: false,
+        }
+      });
     }
     else {
-      getNext(props.item.next.length);
-      props.updateItem({
-        ...props.item,
-        showPrev: false,
-        showNext: true,
-      })
+      getNext(props.item.nextIds.length);
+      dispatch({
+        type: 'UPDATE_ITEM',
+        item: {
+          ...props.item,
+          showPrev: false,
+          showNext: true,
+        },
+      });
     }
   }
   
   const handlePromoteClick = (event: React.MouseEvent) => {
-    const stack = surveyorState.stack.slice();
+    /* TODO make a new item tree, push onto state
+    const stack = props.surveyorState.stack.slice();
     stack.push({
       originalQuery: '',
       query:'',
-      items: [{
-        ...props.item,
-        linkId: undefined,
-      }]
+      itemIds: [props.item.id],
     });
-    surveyorVar({
-      ...surveyorDetail,
-      [props.col.id]: {
-        ...surveyorState,
-        index: surveyorState.index + 1,
-        stack,
-        scrollToTop: true,
-      },
-    });
+    ({
+      ...surveyorState,
+      index: surveyorState.index + 1,
+      stack,
+      scrollToTop: true,
+    });*/
   }
 
   const handleReplyClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
     replyPost();
   }
 
   const handleLinkClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
     if (linkDetail.sourcePostId === props.item.postId) {
       linkVar({
         sourcePostId: '',
@@ -235,18 +180,21 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
   }
 
   const handleClick = (event: React.MouseEvent) => {
+    if (linkDetail.sourcePostId === props.item.postId) {
+      linkVar({
+        sourcePostId: '',
+        targetPostId: '',
+      })
+    }
     if (linkDetail.sourcePostId && linkDetail.targetPostId === props.item.postId) {
       linkPosts();
-    } 
+    }
   }
 
-  const handleFilterClick = (event: React.MouseEvent) => {
-
-  }
-
-  const handleSubscribeClick = (isSubcribed: boolean) =>  (event: React.MouseEvent) => {
-    event.stopPropagation();
-    event.preventDefault();
+  const handleVoteClick = (clicks: number) => (event: React.MouseEvent) => {
+    if (props.item.linkId) {
+      votePosts(props.item.linkId, clicks);
+    }
   }
 
   const post = client.cache.readFragment({
@@ -258,18 +206,50 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
     fragmentName: 'FullPostFields',
   }) as Post;
 
-  const link = props.item.linkId
-    ? client.cache.readFragment({
-        id: client.cache.identify({
-          id: props.item.linkId,
-          __typename: 'Link',
-        }),
-        fragment: LINK_FIELDS,
-      }) as Link
-    : null;
-
-
   if (!post) return null;
+
+  const link = props.item.linkId
+  ? client.cache.readFragment({
+      id: client.cache.identify({
+        id: props.item.linkId,
+        __typename: 'Link',
+      }),
+      fragment: gql`
+        fragment LinkWithVotes on Link {
+          ...LinkFields
+          votes {
+            ...VoteFields
+          }
+        }  
+        ${LINK_FIELDS}
+        ${VOTE_FIELDS}    
+      `,
+      fragmentName: 'LinkWithVotes'
+    }) as Link
+  : null;
+
+  let userVote = null as Vote | null;
+  if (link) {
+    link.votes.some(vote => {
+      if (vote.userId === userDetail?.id) {
+        userVote = vote;
+        return true;
+      }
+      return false;
+    });
+  }
+  else if (props.item.linkId) {
+    console.error('Missing link', props.item.linkId)
+  }
+
+  const color = getColor(paletteDetail.mode);
+
+  const isLinking = (
+    linkDetail.sourcePostId === props.item.postId || 
+    linkDetail.targetPostId === props.item.postId
+  );
+
+  const slice = props.surveyorState.stack[props.surveyorState.index];
   return (
     <MUICard elevation={5} 
       onMouseEnter={handleMouseEnter} 
@@ -279,11 +259,18 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
         margin: 1,
         marginBottom: 0,
         width: 'calc(100% - 10px)',
+        backgroundColor: isLinking
+          ? getColor(paletteDetail.mode, true)
+          : '',
+        cursor: linkDetail.sourcePostId && linkDetail.sourcePostId !== props.item.postId
+          ? 'crosshair'
+          : '',
       }}
     >
       <PostComponent
+        col={props.col}
         post={post}
-        postKey={props.item.postKey}
+        itemId={props.item.id}
         postDispatch={props.postDispatch}
       />
       <Box sx={{
@@ -294,22 +281,66 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
       }}>
         {
           link 
-            ? <Box sx={{
-                color: 'dimgrey',
-                paddingBottom: '5px'
+            ? <Card variant='outlined' sx={{
+                marginBottom: '5px',
               }}>
+                <Button 
+                  size='small' 
+                  onClick={handleVoteClick(
+                    userVote && userVote.weight === 1 
+                      ? 0
+                      : 1
+                  )}
+                  sx={{
+                    fontSize:12,
+                    color: (userVote?.weight || 0) > 0
+                      ? userDetail?.color || DEFAULT_COLOR
+                      : color,
+                    minWidth: 0,
+                    minHeight: 0,
+                  }}
+                >
+                  { 
+                    (userVote?.weight || 0) > 0
+                      ? <ControlPointIcon fontSize='inherit' />
+                      : '+'
+                  }
+                </Button>
                 <Button
                   color='inherit'
                   size='small'
                   sx={{
                     fontSize: 10,
                     minWidth: 0,
+                    minHeight: 0,
+                    color,
                   }}
                 >
-                  { link.weight > 0 ? '+' : ''}
                   { link.weight }
                 </Button>
-              </Box>
+                <Button
+                  size='small' 
+                  onClick={handleVoteClick(
+                    userVote && userVote.weight === -1
+                      ? 0
+                      : -1
+                  )}
+                  sx={{
+                    fontSize: 12,
+                    color: (userVote?.weight || 0) < 0
+                      ? userDetail?.color || DEFAULT_COLOR
+                      : color,
+                    minWidth: 0,
+                    minHeight: 0,
+                  }}
+                >
+                  { 
+                    (userVote?.weight || 0) < 0
+                      ? <RemoveCircleOutlineIcon fontSize='inherit' />
+                      : '-'
+                  }
+                </Button>
+              </Card>
             : null
         }
         <Box sx={{ 
@@ -318,12 +349,12 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
           whiteSpace: 'nowrap',
         }}>
           <IconButton
-            disabled={props.depth === 0 && surveyorState.stack[surveyorState.index].items.length === 1}
+            disabled={props.depth === 0 && slice.itemIds.length === 1}
             size='small'
             onClick={handlePromoteClick}
             sx={{
               fontSize: 12,
-              color: 'dimgrey',
+              color,
             }}
           >
             <NorthIcon fontSize='inherit' />
@@ -336,7 +367,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
               onClick={handleReplyClick}
               sx={{
                 fontSize: 12,
-                color: 'dimgrey'
+                color,
               }}
             >
               <ReplyIcon fontSize='inherit'/>
@@ -348,7 +379,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
               onClick={handleLinkClick}
               sx={{
                 fontSize: 12,
-                color: 'dimgrey'
+                color,
               }}
             >
               <DoubleArrowIcon fontSize='inherit'/>
@@ -356,10 +387,9 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
           </Box>
         </Box>
         <Box>
-          
         </Box>
         <Box sx={{
-          color: 'dimgrey',
+          color,
           paddingBottom: '5px',
           whiteSpace: 'nowrap',
         }}>
