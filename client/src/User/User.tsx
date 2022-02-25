@@ -52,9 +52,11 @@ export default function UserComponent(props: UserProps) {
       setIsLoading(false);
     },
     onCompleted: data => {
-      console.log(data);
-      setIsLoading(false);
-      setUser(data.getUserByName);
+      if (isLoading) {
+        console.log(data);
+        setIsLoading(false);
+        setUser(data.getUserByName);
+      }
     },
     fetchPolicy: 'cache-and-network',
   });

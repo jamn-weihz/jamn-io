@@ -52,9 +52,11 @@ export default function JamComponent(props: JamComponentProps) {
       setIsLoading(false);
     },
     onCompleted: data => {
-      console.log(data);
-      setJam(data.getJamByName);
-      setIsLoading(false);
+      if (isLoading) {
+        console.log(data);
+        setJam(data.getJamByName);
+        setIsLoading(false);
+      }
     },
   });
 

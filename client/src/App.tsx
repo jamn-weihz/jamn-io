@@ -53,6 +53,8 @@ function App() {
   const { refreshToken, refreshTokenInterval } = useToken();
 
   const [theme, setTheme] = useState(null as Theme | null);
+  
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setTheme(createTheme({
@@ -74,13 +76,14 @@ function App() {
     },
     onCompleted: data => {
       console.log(data);
-      if (data.getUser.id) {
+      if (data.getUser.id && isLoading) {
         refreshTokenInterval();
         userVar(data.getUser);
         colVar({
           ...colDetail,
           cols: data.getUser.cols,
-        })
+        });
+        setIsLoading(false);
       }
     }
   });
@@ -92,6 +95,7 @@ function App() {
   useEffect(() => {
     if (tokenDetail.isInit) {
       if (tokenDetail.isValid) {
+        setIsLoading(true);
         getUser();
       }
       else {
@@ -251,7 +255,6 @@ function App() {
         </Paper>
       </ThemeProvider>
     </ItemContext.Provider>
-
     </PostContext.Provider>
   );
 }
