@@ -19,13 +19,13 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import useChangeCol from './useChangeCol';
 import useShiftCol from './useShiftCol';
 
-interface ColbarProps {
+interface ColBarProps {
   col: Col;
   user?: User;
   jam?: Jam;
 }
 
-export default function Colbar(props: ColbarProps) {
+export default function ColBar(props: ColBarProps) {
   const paletteDetail = useReactiveVar(paletteVar);
   const userDetail = useReactiveVar(userVar);
   const colDetail = useReactiveVar(colVar);
@@ -123,7 +123,7 @@ export default function Colbar(props: ColbarProps) {
           }}>
             <SearchIcon fontSize='inherit'/>
           </IconButton>
-          &nbsp;
+          &nbsp;&nbsp;
           <IconButton size='small' onClick={handleOptionsClick} sx={{
             color,
             fontSize: 20,

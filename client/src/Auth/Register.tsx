@@ -11,7 +11,7 @@ import useToken from './useToken';
 import { Col } from '../types/Col';
 import useChangeCol from '../Col/useChangeCol';
 import { getColor } from '../utils';
-import Colbar from '../Col/Colbar';
+import ColBar from '../Col/ColBar';
 const GET_USER_BY_EMAIL = gql`
   query GetUserByEmail($email: String!) {
     getUserByEmail(email: $email) {
@@ -142,7 +142,7 @@ export default function Register(props: RegisterProps) {
 
   return (
     <Box>
-      <Colbar col={props.col} />
+      <ColBar col={props.col} />
       <Card elevation={5} sx={{padding: 1, margin: 1}}>
 
         {message}

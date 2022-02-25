@@ -14,7 +14,7 @@ import Hits from './Hits';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { getColor } from '../utils';
-import Colbar from '../Col/Colbar';
+import ColBar from '../Col/ColBar';
 
 interface SearchProps {
   col: Col;
@@ -86,7 +86,7 @@ export default function Search(props: SearchProps) {
     <Box sx={{
       height: '100%',
     }}>
-      <Colbar col={props.col} />
+      <ColBar col={props.col} />
       {
         searchClient
           ? <InstantSearch searchClient={searchClient} indexName={ALGOLIA_INDEX_NAME}>

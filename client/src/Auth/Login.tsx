@@ -22,7 +22,7 @@ import useToken from './useToken';
 import { Col } from '../types/Col';
 import useChangeCol from '../Col/useChangeCol';
 import { getColor } from '../utils';
-import Colbar from '../Col/Colbar';
+import ColBar from '../Col/ColBar';
 const LOGIN_USER = gql`
   mutation LoginUser($email: String!, $pass: String!) {
     loginUser(email: $email, pass: $pass) {
@@ -106,7 +106,7 @@ export default function Login(props: LoginProps) {
   const color = getColor(paletteDetail.mode)
   return (
     <Box>
-      <Colbar col={props.col}/>
+      <ColBar col={props.col}/>
       <Card elevation={5} sx={{margin:1, padding:1}}>
         <FormControl margin='dense' sx={{width: '100%'}}>
           <TextField

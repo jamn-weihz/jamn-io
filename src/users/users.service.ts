@@ -30,7 +30,7 @@ export class UsersService {
   async getUserByEmail(email: string): Promise<User> {
     return this.usersRepository.findOne({
       where: {
-        email,
+        email: email.trim().toLocaleLowerCase(),
       },
     });
   }

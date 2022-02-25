@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import useChangeCol from '../Col/useChangeCol';
 import { Col } from '../types/Col';
 import { getColor } from '../utils';
-import Colbar from '../Col/Colbar';
+import ColBar from '../Col/ColBar';
 
 mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
 
@@ -326,7 +326,7 @@ export default function Map(props: MapProps) {
     <Box sx={{
       height: '100%'
     }}>
-      <Colbar col={props.col} />
+      <ColBar col={props.col} />
       <Card elevation={5} sx={{
         position: 'relative',
         height: isStartingJam

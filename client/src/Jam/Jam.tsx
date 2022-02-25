@@ -12,7 +12,7 @@ import ColLink from '../Col/ColLink';
 import JamnRecent from './JamRecent';
 import { paletteVar } from '../cache';
 import { getColor } from '../utils'
-import Colbar from '../Col/Colbar';
+import ColBar from '../Col/ColBar';
 const GET_JAM_BY_NAME = gql`
   query GetJamByName($name: String!) {
     getJamByName(name: $name) {
@@ -81,7 +81,7 @@ export default function JamComponent(props: JamComponentProps) {
     <Box sx={{
       height: '100%'
     }}>
-      <Colbar col={props.col} />
+      <ColBar col={props.col} />
       {
         jam 
           ? <Box sx={{

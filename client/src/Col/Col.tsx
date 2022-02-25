@@ -11,7 +11,7 @@ import { colVar, paletteVar, sizeVar } from '../cache';
 import { useReactiveVar } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
 import { getColor, getColWidth } from '../utils';
-import Colbar from './Colbar';
+import ColBar from './ColBar';
 import NotFound from '../NotFound';
 
 interface ColComponentProps {
@@ -70,7 +70,7 @@ export default function ColComponent(props: ColComponentProps) {
     else {
       return (
         <Box>
-          <Colbar col={props.col} />
+          <ColBar col={props.col} />
           <NotFound />
         </Box>
       )

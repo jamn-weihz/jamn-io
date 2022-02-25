@@ -14,7 +14,7 @@ import UserSettings from './UserSettings';
 import { Col } from '../types/Col';
 import ColLink from '../Col/ColLink';
 import { getColor } from '../utils';
-import Colbar from '../Col/Colbar';
+import ColBar from '../Col/ColBar';
 
 const GET_USER_BY_NAME = gql`
   query GetUserByName($name: String!) {
@@ -74,7 +74,7 @@ export default function UserComponent(props: UserProps) {
     <Box sx={{
       height: '100%'
     }}>
-      <Colbar col={props.col} />
+      <ColBar col={props.col} />
       {
         user?.id && user.id === userDetail?.id
           ? <Box>
