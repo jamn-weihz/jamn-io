@@ -1,12 +1,11 @@
 import { ReactiveVar, useReactiveVar } from '@apollo/client';
 import { Box } from '@mui/material';
-import { Dispatch, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Surveyor from '../Surveyor/Surveyor';
 import { User } from '../types/User';
 import { v4 as uuidv4 } from 'uuid';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
 import { Col } from '../types/Col';
-import { PostAction } from '../types/Post';
 import { Item } from '../types/Item';
 import { ItemContext } from '../App';
 

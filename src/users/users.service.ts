@@ -75,7 +75,7 @@ export class UsersService {
     const user0 = new User();
     user0.name = name;
     user0.lowercaseName = name;
-    user0.email = email;
+    user0.email = email.trim().toLowerCase();
     user0.color = '#' + Math.round(Math.random() * Math.pow(16, 6)).toString(16).padStart(6, '0')
     user0.hashedPassword = hash;
     user0.isRegisteredWithGoogle = isGoogle;

@@ -1,7 +1,7 @@
 import { gql, useLazyQuery, useReactiveVar } from '@apollo/client'
 import { Box, Card } from '@mui/material';
 import { paletteVar, userVar } from '../cache'
-import { JAM_FIELDS, ROLE_FIELDS, USER_FIELDS } from '../fragments';
+import { FULL_POST_FIELDS, JAM_FIELDS, ROLE_FIELDS, USER_FIELDS } from '../fragments';
 import { useEffect, useState } from 'react';
 import NotFound from '../NotFound';
 import Logout from '../Auth/Logout';
@@ -26,11 +26,15 @@ const GET_USER_BY_NAME = gql`
           ...JamFields
         }
       }
+      focus {
+        ...FullPostFields
+      }
     }
   }
   ${USER_FIELDS}
   ${ROLE_FIELDS}
   ${JAM_FIELDS}
+  ${FULL_POST_FIELDS}
 `;
 interface UserProps {
   col: Col;
