@@ -48,13 +48,6 @@ export default function PostComponent(props: PostComponentProps) {
     fragmentName: 'FullPostFields',
   }) as Post;
 
-  const handleJamClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    event.preventDefault();
-    const pathname = `/j/${encodeURIComponent(post.jam?.name || '')}`;
-    changeCol(props.col, pathname);
-  };
-
   const handleCommitClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     event.preventDefault();

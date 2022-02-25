@@ -1,6 +1,6 @@
 import React, { Dispatch, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import './App.css';
-import Appbar from './Appbar';
+import AppBar from './AppBar';
 import { gql, useLazyQuery, useReactiveVar } from '@apollo/client';
 import { FULL_USER_FIELDS } from './fragments';
 import { colVar, paletteVar, sizeVar, tokenVar, userVar } from './cache';
@@ -201,10 +201,11 @@ function App() {
     <ItemContext.Provider value={{state: itemState, dispatch: itemDispatch}}>
       <ThemeProvider theme={theme}>
         <Paper sx={{
+          position: 'relative',
           width: '100%',
           height: '100%',
         }}>
-          <Appbar  containerEl={containerEl} />
+          <AppBar containerEl={containerEl} />
           <Paper sx={{
             position: 'fixed',
             left: getAppbarWidth(sizeDetail.width),

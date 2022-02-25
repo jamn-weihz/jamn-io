@@ -19,3 +19,7 @@ html,body {
   margin-top: 7px;
   margin-bottom: 7px;
 }
+
+#root {
+  height: 100%;
+}
