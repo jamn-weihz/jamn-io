@@ -10,7 +10,7 @@ const month = 30 * day;
 const year = 365 * day;
 
 export const getTimeString = (time: number) => {
-  const dTime = Date.now() - time;
+  const dTime = Math.max(0, Date.now() - time);
   return (
     dTime > year 
     ? (dTime / year).toFixed(0) + 'yr'
@@ -31,8 +31,8 @@ export const getTimeString = (time: number) => {
 
 export const getAppbarWidth = (width: number) => {
   return width < MOBILE_WIDTH
-    ? 39
-    : 55
+    ? 36
+    : 52
 }
 export const getColWidth = (width: number) => {
   return width < MOBILE_WIDTH 

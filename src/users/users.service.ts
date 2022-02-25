@@ -163,7 +163,8 @@ export class UsersService {
     }
     const user0 = new User();
     user0.id = userId;
-    user0.name = name;
+    user0.name = name.trim();
+    user0.lowercaseName = user0.name.toLowerCase();
     return this.usersRepository.save(user0);
   }
   

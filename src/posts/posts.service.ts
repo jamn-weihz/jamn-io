@@ -21,6 +21,11 @@ export class PostsService {
     private readonly searchService: SearchService,
   ) {}
 
+  async indexPosts() {
+    const posts = await this.postsRepository.find();
+    this.searchService.savePosts(posts);
+    return posts;
+  }
   async getPostById(id: string) {
     return this.postsRepository.findOne({ id });
   }
