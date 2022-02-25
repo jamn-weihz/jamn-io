@@ -1,4 +1,4 @@
-import { Box, IconButton, Paper } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import React from 'react';
 import { useReactiveVar } from '@apollo/client';
 import { colVar, paletteVar, sizeVar, userVar } from './cache';
@@ -12,10 +12,11 @@ import PersonIcon from '@mui/icons-material/Person';
 import BoltIcon from '@mui/icons-material/Bolt';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { Col } from './types/Col';
-import { DEFAULT_COLOR } from './constants';
+import { DEFAULT_COLOR, MOBILE_WIDTH } from './constants';
 import { useNavigate } from 'react-router-dom';
 import { getAppbarWidth, getColor, getColWidth } from './utils';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
+
 interface AppbarProps {
   containerEl: React.MutableRefObject<HTMLElement | undefined>;
 }
@@ -72,7 +73,7 @@ export default function AppBar(props: AppbarProps) {
         padding: '5px',
       }}>
         <IconButton size='small' onClick={handleItemClick(col)} sx={{
-          fontSize: sizeDetail.width < 400 ? 16 : 32,
+          fontSize: sizeDetail.width < MOBILE_WIDTH ? 16 : 32,
           color: i === colDetail.i
             ? userDetail?.color || DEFAULT_COLOR
             : getColor(paletteDetail.mode),
@@ -125,7 +126,7 @@ export default function AppBar(props: AppbarProps) {
           paddingTop: '10px',
         }}>
           <IconButton size='small'>
-            <img src={sizeDetail.width < 400 ? icon16 : icon32}/>
+            <img src={sizeDetail.width < MOBILE_WIDTH ? icon16 : icon32}/>
           </IconButton>
         </Box>
         {
@@ -143,7 +144,7 @@ export default function AppBar(props: AppbarProps) {
           position: 'relative',
         }}>
           <IconButton size='small' onClick={handleAddClick} sx={{
-            fontSize: sizeDetail.width < 400 ? 16 : 32,
+            fontSize: sizeDetail.width < MOBILE_WIDTH ? 16 : 32,
             color: colDetail.isAdding
               ? userDetail?.color || DEFAULT_COLOR
               : getColor(paletteDetail.mode),
@@ -160,7 +161,7 @@ export default function AppBar(props: AppbarProps) {
         padding: '5px',
       }}>
         <IconButton size='small' onClick={handlePaletteClick} sx={{
-          fontSize: sizeDetail.width < 400 ? 16: 32,
+          fontSize: sizeDetail.width < MOBILE_WIDTH ? 16: 32,
           color: getColor(paletteDetail.mode)
         }}>
           <Brightness4Icon fontSize='inherit'/>
