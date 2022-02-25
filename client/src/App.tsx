@@ -75,15 +75,17 @@ function App() {
       console.error(error);
     },
     onCompleted: data => {
-      console.log(data);
-      if (data.getUser.id && isLoading) {
-        refreshTokenInterval();
-        userVar(data.getUser);
-        colVar({
-          ...colDetail,
-          cols: data.getUser.cols,
-        });
-        setIsLoading(false);
+      if (isLoading) {
+        console.log(data);
+        if (data.getUser.id) {
+          refreshTokenInterval();
+          userVar(data.getUser);
+          colVar({
+            ...colDetail,
+            cols: data.getUser.cols,
+          });
+          setIsLoading(false);
+        }
       }
     }
   });
