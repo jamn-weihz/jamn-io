@@ -23,6 +23,8 @@ export default function UserProfile(props: UserProfileProps) {
   useEffect(() => {
     const item: Item = {
       id: uuidv4(),
+      parentId: '',
+      linkId: '',
       postId: props.user.focusId,
       showPrev: false,
       showNext: true,

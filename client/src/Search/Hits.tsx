@@ -2,7 +2,7 @@ import { gql, ReactiveVar, useMutation, useReactiveVar } from '@apollo/client';
 import { connectHits } from 'react-instantsearch-dom';
 import { SurveyorState } from '../types/Surveyor';
 import { v4 as uuidv4 } from 'uuid'; 
-import { Dispatch, SetStateAction, useContext, useEffect,  } from 'react';
+import { Dispatch, SetStateAction, useContext, useEffect, useState,  } from 'react';
 import { FULL_POST_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
 import { Item, ItemState } from '../types/Item';
@@ -28,6 +28,8 @@ interface HitsProps {
 function Hits(props: HitsProps) {
   const { state, dispatch } = useContext(ItemContext);
 
+  const [hits, setHits] = useState([] as any[]);
+
   const [getPosts] = useMutation(GET_POSTS, {
     onError: error => {
       console.error(error);
@@ -39,6 +41,11 @@ function Hits(props: HitsProps) {
   });
   
   useEffect(() => {
+    let isChange = props.hits.some((hit, i) => hit.id != hits[i]?.id);
+    if (!isChange) return;
+
+    setHits(props.hits);
+
     const slice = props.surveyorState.stack[props.surveyorState.index];
 
     const idToItem = {} as ItemState;
@@ -60,6 +67,8 @@ function Hits(props: HitsProps) {
           else {
             const item = {
               id: uuidv4(),
+              parentId: '',
+              linkId: '',
               postId: hit.id,
               showNext: false,
               showPrev: false,
@@ -97,7 +106,7 @@ function Hits(props: HitsProps) {
       triggerRefinement: false,
     });
     console.log('hits')
-  }, [state, props.hits])
+  }, [props.hits])
 
   return null;
 }

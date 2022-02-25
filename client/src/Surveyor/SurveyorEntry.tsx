@@ -1,4 +1,4 @@
-import { Box, Button, Card, Card as MUICard, IconButton } from '@mui/material';
+import { Box, Button, Card, Card as MUICard, fabClasses, IconButton, Stack } from '@mui/material';
 import NorthIcon from '@mui/icons-material/North';
 import ReplyIcon from '@mui/icons-material/Reply';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
@@ -27,8 +27,9 @@ import { getColor } from '../utils';
 import { Vote } from '../types/Vote';
 import { DEFAULT_COLOR } from '../constants';
 import useVotePosts from '../Post/useVotePosts';
-import { Item } from '../types/Item';
+import { Item, ItemState } from '../types/Item';
 import { ItemContext } from '../App';
+import promoteItem from './promoteItem';
 
 interface SurveyorEntryProps {
   jam?: Jam;
@@ -47,7 +48,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
   const linkDetail = useReactiveVar(linkVar);  
   const paletteDetail = useReactiveVar(paletteVar);
 
-  const { dispatch } = useContext(ItemContext);
+  const { state, dispatch } = useContext(ItemContext);
 
   const { linkPosts } = useLinkPosts();
   const { votePosts } = useVotePosts()
@@ -123,20 +124,27 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
     }
   }
   
-  const handlePromoteClick = (event: React.MouseEvent) => {
-    /* TODO make a new item tree, push onto state
+  const handlePromoteClick = (event: React.MouseEvent) => { 
+    event.stopPropagation();
+    const { idToItem, rootItem } = promoteItem(state, props.item);
+
+    dispatch({
+      type: 'ADD_ITEMS',
+      idToItem,
+    });
+
     const stack = props.surveyorState.stack.slice();
     stack.push({
       originalQuery: '',
-      query:'',
-      itemIds: [props.item.id],
+      query: '',
+      itemIds: [rootItem.id],
     });
-    ({
-      ...surveyorState,
-      index: surveyorState.index + 1,
+    props.setSurveyorState({
+      ...props.surveyorState,
       stack,
-      scrollToTop: true,
-    });*/
+      index: props.surveyorState.index + 1,
+      triggerRefinement: false,
+    });
   }
 
   const handleReplyClick = (event: React.MouseEvent) => {

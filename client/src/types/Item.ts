@@ -2,8 +2,8 @@ import { Link } from "./Link"
 
 export type Item = {
   id: string;
-  parentId?: string;
-  linkId?: string;
+  parentId: string;
+  linkId: string;
   postId: string;
   showPrev: boolean;
   showNext: boolean;

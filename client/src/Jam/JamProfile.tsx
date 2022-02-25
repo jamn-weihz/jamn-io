@@ -22,6 +22,8 @@ export default function JamProfile(props: JamProfileProps) {
   useEffect(() => {
     const item: Item = {
       id: uuidv4(),
+      parentId: '',
+      linkId: '',
       postId: props.jam.focusId,
       showPrev: false,
       showNext: true,

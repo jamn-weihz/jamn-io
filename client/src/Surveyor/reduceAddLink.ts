@@ -9,6 +9,7 @@ export default function reduceAddLink(state: ItemState, action: any) {
       if (!item.nextIds.some(id => state[id].postId === action.link.targetPostId)) {
         const newItem = {
           id: uuidv4(),
+          parentId: itemId,
           linkId: action.link.id,
           postId: action.link.targetPostId,
           showPrev: false,
@@ -28,6 +29,7 @@ export default function reduceAddLink(state: ItemState, action: any) {
       if (!item.prevIds.some(id => state[id].postId === action.link.sourcePostId)) {
         const newItem = {
           id: uuidv4(),
+          parentId: itemId,
           linkId: action.link.id,
           postId: action.link.sourcePostId,
           showPrev: false,

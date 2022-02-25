@@ -40,6 +40,7 @@ export default function useReplyPost(itemId: string, sourcePostId: string, jamId
       });
       const newItem = {
         id: uuidv4(),
+        parentId: itemId,
         linkId: data.replyPost.id,
         postId: data.replyPost.targetPost.id,
         showPrev: false,
