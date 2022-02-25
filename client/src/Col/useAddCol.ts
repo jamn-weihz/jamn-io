@@ -76,14 +76,18 @@ export default function useAddCol(containerEl: React.MutableRefObject<HTMLElemen
     }
     else {
       colVar({
-        ...colDetail,
-        cols: [...colDetail.cols, { 
-          id: uuidv4(),
-          i: colDetail.cols.length,
-          pathname,
-          __typename: 'Col',
-        }],
+        cols: [
+          ...colDetail.cols, 
+          { 
+            i: colDetail.cols.length,
+            id: uuidv4(),
+            pathname,
+            __typename: 'Col',
+          }
+        ],
+        i:  colDetail.cols.length,
         isAdding: false,
+        scroll: true,
       });
     }
   }

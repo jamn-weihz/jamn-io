@@ -27,6 +27,7 @@ export const colVar = makeVar({
   isAdding: false,
   cols: [] as Col[],
   i: 0,
+  scroll: false,
 });
 
 export const focusVar = makeVar({

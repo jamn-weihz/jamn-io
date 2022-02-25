@@ -55,6 +55,38 @@ export class ColsService {
     return this.colsRepository.save(col0);
   }
 
+  async shiftCol(userId: string, colId: string, di: number): Promise<Col[]> {
+    if (di !== -1 && di !== 1) return [];
+
+    const cols = await this.colsRepository.find({
+      where: {
+        userId,
+      },
+    });
+
+    cols.sort((a, b) => a.i < b.i ? -1 : 1)
+
+    let col;
+    cols.some(col_i => {
+      if (col_i.id === colId) {
+        col = col_i;
+        return true;
+      }
+      return false;
+    });
+    if (!col || !cols[col.i + di] ) return [];
+
+    const col0 = new Col();
+    col0.id = colId;
+    col0.i = col.i + di;
+    
+    const targetCol0 = new Col();
+    targetCol0.id = cols[col.i + di].id;
+    targetCol0.i = col.i;
+    
+    return this.colsRepository.save([col0, targetCol0]);
+  }
+
   async removeCol(userId: string, colId: string): Promise<Col[]> {
     const col = await this.colsRepository.findOne({
       where: {

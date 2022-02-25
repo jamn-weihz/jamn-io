@@ -2,11 +2,9 @@ import Surveyor from '../Surveyor/Surveyor';
 import React, { useEffect, useState } from 'react';
 import { Box, Card, IconButton } from '@mui/material';
 import { Col } from '../types/Col';
-import RemoveColButton from '../Col/RemoveColButton';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
 import { paletteVar } from '../cache';
 import { useReactiveVar } from '@apollo/client';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { InstantSearch } from 'react-instantsearch-dom';
 import algoliasearch, { SearchClient } from 'algoliasearch/lite';
 import { ALGOLIA_APP_ID, ALGOLIA_APP_KEY, ALGOLIA_INDEX_NAME } from '../constants';
@@ -16,13 +14,14 @@ import Hits from './Hits';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { getColor } from '../utils';
+import Colbar from '../Col/Colbar';
 
 interface SearchProps {
   col: Col;
 }
 export default function Search(props: SearchProps) {
   const paletteDetail = useReactiveVar(paletteVar);
-  const [showOptions, setShowOptions] = useState(false);
+
   const [reload, setReload] = useState(false);
   useEffect(() => {
     if (reload) {
@@ -49,10 +48,6 @@ export default function Search(props: SearchProps) {
     };
     return surveyorState;
   });
-
-  const handleOptionsClick = (event: React.MouseEvent) => {
-    setShowOptions(!showOptions);
-  };
 
   const handleBackClick = (event: React.MouseEvent) => {
     const stack = surveyorState.stack.slice();
@@ -91,92 +86,66 @@ export default function Search(props: SearchProps) {
     <Box sx={{
       height: '100%',
     }}>
-      <Card elevation={5}>
-        <Box sx={{
-          padding: 1,
-          display: 'flex',
-          justifyContent: 'space-between',
-          color,
-        }}>
-        <Box>
-            /search
-          </Box>
-          <IconButton size='small' onClick={handleOptionsClick} sx={{
-              fontSize: 20,
-              padding: 0,
-              color,
-            }}>
-              <MoreVertIcon fontSize='inherit'/> 
-            </IconButton>
-        </Box>
-        <Box sx={{
-          display: showOptions ? 'flex' : 'none',
-          padding: 1,
-          borderTop: '1px solid',
-          borderColor: getColor(paletteDetail.mode, true),
-        }}>
-          <RemoveColButton col={props.col} />
-        </Box>
-      </Card>
-          {
-            searchClient
-              ? <InstantSearch searchClient={searchClient} indexName={ALGOLIA_INDEX_NAME}>
-                  <Card elevation={5} sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    margin: 1,
-                    padding: 1,
-                    marginBottom: 0,
-                    borderBottom: '1px solid grey',
-                    color,
-                  }}>
-                    <Box sx={{ whiteSpace: 'nowrap', paddingRight: 1,}}>
-                      <IconButton
-                        disabled={surveyorState.index <= 0} 
-                        size='small'
-                        color='inherit'
-                        onClick={handleBackClick}
-                      >
-                        <ArrowBackIcon fontSize='inherit' />
-                      </IconButton>
-                      <IconButton
-                        disabled={surveyorState.index >= surveyorState.stack.length - 1} 
-                        size='small'
-                        color='inherit'
-                        onClick={handleForwardClick}
-                      >
-                        <ArrowForwardIcon fontSize='inherit' />
-                      </IconButton> 
-                    </Box>
-                    <Box> 
-                      <SearchBox
-                        col={props.col} 
-                        defaultRefinement='JAMN.IO'
-                        surveyorState={surveyorState}
-                        setSurveyorState={setSurveyorState}
-                      />
-                      <Hits
-                        col={props.col}
-                        surveyorState={surveyorState}
-                        setSurveyorState={setSurveyorState}
-                        setReload={setReload}
-                      />
-                    </Box>
-                  </Card>
-                  <Box sx={{
-                    height: '100%',
-                    overflow: 'scroll',
-                  }}>
-                    <Surveyor 
-                      key={`surveyor-${props.col.id}`} 
-                      col={props.col}
-                      surveyorState={surveyorState}
-                      setSurveyorState={setSurveyorState}
-                    />
-                   </Box>
-                </InstantSearch>
-              : null
-          }
+      <Colbar col={props.col} />
+      {
+        searchClient
+          ? <InstantSearch searchClient={searchClient} indexName={ALGOLIA_INDEX_NAME}>
+              <Card elevation={5} sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                margin: 1,
+                padding: 1,
+                marginBottom: 0,
+                borderBottom: '1px solid grey',
+                color,
+              }}>
+                <Box sx={{ whiteSpace: 'nowrap', paddingRight: 1,}}>
+                  <IconButton
+                    disabled={surveyorState.index <= 0} 
+                    size='small'
+                    color='inherit'
+                    onClick={handleBackClick}
+                  >
+                    <ArrowBackIcon fontSize='inherit' />
+                  </IconButton>
+                  <IconButton
+                    disabled={surveyorState.index >= surveyorState.stack.length - 1} 
+                    size='small'
+                    color='inherit'
+                    onClick={handleForwardClick}
+                  >
+                    <ArrowForwardIcon fontSize='inherit' />
+                  </IconButton> 
+                </Box>
+                <Box> 
+                  <SearchBox
+                    col={props.col} 
+                    defaultRefinement='JAMN.IO'
+                    surveyorState={surveyorState}
+                    setSurveyorState={setSurveyorState}
+                  />
+                  <Hits
+                    col={props.col}
+                    surveyorState={surveyorState}
+                    setSurveyorState={setSurveyorState}
+                    setReload={setReload}
+                  />
+                </Box>
+              </Card>
+              <Box sx={{
+                height: '100%',
+                overflow: 'scroll',
+              }}>
+                <Surveyor 
+                  key={`surveyor-${props.col.id}`} 
+                  col={props.col}
+                  surveyorState={surveyorState}
+                  setSurveyorState={setSurveyorState}
+                />
+                </Box>
+            </InstantSearch>
+          : null
+      }
     </Box>
   )
 }

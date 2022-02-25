@@ -17,13 +17,12 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { FULL_USER_FIELDS } from '../fragments';
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { colVar, focusVar, paletteVar, tokenVar, userVar } from '../cache';
+import { focusVar, paletteVar, tokenVar, userVar } from '../cache';
 import useToken from './useToken';
 import { Col } from '../types/Col';
 import useChangeCol from '../Col/useChangeCol';
-import RemoveColButton from '../Col/RemoveColButton';
 import { getColor } from '../utils';
-
+import Colbar from '../Col/Colbar';
 const LOGIN_USER = gql`
   mutation LoginUser($email: String!, $pass: String!) {
     loginUser(email: $email, pass: $pass) {
@@ -39,6 +38,8 @@ interface LoginProps {
 export default function Login(props: LoginProps) {
   const tokenDetail = useReactiveVar(tokenVar);
   const paletteDetail = useReactiveVar(paletteVar);
+
+  const [showOptions, setShowOptions] = useState(false);
 
   const { changeCol } = useChangeCol();
   const { refreshTokenInterval } = useToken();
@@ -95,22 +96,17 @@ export default function Login(props: LoginProps) {
     changeCol(props.col, '/register');
   };
 
+  const handleOptionsClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    setShowOptions(!showOptions);
+  };
+
   const isFormValid = email.length && pass.length;
 
   const color = getColor(paletteDetail.mode)
   return (
     <Box>
-      <Card elevation={5} sx={{
-        padding: 1,
-        display: 'flex',
-        justifyContent: 'space-between',
-        color,
-      }}>
-        <Box>
-          /login
-        </Box>
-        <RemoveColButton col={props.col}/>
-      </Card>
+      <Colbar col={props.col}/>
       <Card elevation={5} sx={{margin:1, padding:1}}>
         <FormControl margin='dense' sx={{width: '100%'}}>
           <TextField

@@ -1,5 +1,5 @@
 import { gql, useLazyQuery, useReactiveVar } from '@apollo/client';
-import { Box, Button, Card, IconButton } from '@mui/material';
+import { Box, Button, Card } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { paletteVar, userVar } from '../cache';
 //@ts-ignore
@@ -12,9 +12,8 @@ import StartJamForm from './StartJamForm';
 import { useNavigate } from 'react-router-dom';
 import useChangeCol from '../Col/useChangeCol';
 import { Col } from '../types/Col';
-import RemoveColButton from '../Col/RemoveColButton';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { getColor } from '../utils';
+import Colbar from '../Col/Colbar';
 
 mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
 
@@ -36,8 +35,6 @@ export default function Map(props: MapProps) {
   const navigate = useNavigate();
   const { changeCol } = useChangeCol();
   const paletteDetail = useReactiveVar(paletteVar);
-
-  const [showOptions, setShowOptions] = useState(false);
 
   const userDetail = useReactiveVar(userVar);
 
@@ -325,42 +322,11 @@ export default function Map(props: MapProps) {
     }
   };
 
-  const handleOptionsClick = () => {
-    setShowOptions(!showOptions);
-  }
-
   return (
     <Box sx={{
       height: '100%'
     }}>
-      <Card elevation={5}>
-        <Box sx={{
-          padding:1,
-          display: 'flex',
-          justifyContent: 'space-between',
-          color: getColor(paletteDetail.mode)
-        }}>
-          <Box>
-            /map
-          </Box>
-          <IconButton size='small' onClick={handleOptionsClick} sx={{
-            fontSize: 20,
-            padding: 0,
-            color: getColor(paletteDetail.mode),
-          }}>
-            <MoreVertIcon fontSize='inherit'/> 
-          </IconButton>
-        </Box>
-        <Box sx={{
-          display: showOptions ? 'block' : 'none',
-          color: 'dimgrey',
-          borderTop: '1px solid',
-          borderColor: getColor(paletteDetail.mode, true),
-          padding: 1,
-        }}>
-          <RemoveColButton col={props.col}/>
-        </Box>
-      </Card>
+      <Colbar col={props.col} />
       <Card elevation={5} sx={{
         position: 'relative',
         height: isStartingJam

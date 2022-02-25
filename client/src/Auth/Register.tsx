@@ -10,9 +10,8 @@ import { colVar, focusVar, paletteVar, tokenVar, userVar } from '../cache';
 import useToken from './useToken';
 import { Col } from '../types/Col';
 import useChangeCol from '../Col/useChangeCol';
-import RemoveColButton from '../Col/RemoveColButton';
 import { getColor } from '../utils';
-
+import Colbar from '../Col/Colbar';
 const GET_USER_BY_EMAIL = gql`
   query GetUserByEmail($email: String!) {
     getUserByEmail(email: $email) {
@@ -39,6 +38,8 @@ export default function Register(props: RegisterProps) {
   const paletteDetail = useReactiveVar(paletteVar);
 
   const { refreshTokenInterval } = useToken();
+
+  const [showOptions, setShowOptions] = useState(false);
 
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -130,8 +131,9 @@ export default function Register(props: RegisterProps) {
     changeCol(props.col, '/login')
   };
 
-  const handleGoogleClick = (event: React.MouseEvent) => {
-    setMessage('');
+  const handleOptionsClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    setShowOptions(!showOptions);
   }
 
   const isFormValid = email.length && !emailError && pass.length;
@@ -140,17 +142,7 @@ export default function Register(props: RegisterProps) {
 
   return (
     <Box>
-      <Card elevation={5} sx={{
-        padding: 1,
-        display: 'flex',
-        justifyContent: 'space-between',
-        color,
-      }}>
-        <Box>
-          /register
-        </Box>
-        <RemoveColButton col={props.col}/>
-      </Card>
+      <Colbar col={props.col} />
       <Card elevation={5} sx={{padding: 1, margin: 1}}>
 
         {message}

@@ -12,7 +12,7 @@ import {DEFAULT_COLOR } from './constants';
 import ColAdder from './Col/ColAdder';
 import ColComponent from './Col/Col';
 import resetCols from './Col/resetCols';
-import { getAppbarWidth } from './utils';
+import { getAppbarWidth, getColWidth } from './utils';
 import { PostAction, PostState } from './types/Post';
 import useSavePostSubcription from './Post/useSavePostSubcription';
 import useLinkPostsSubcription from './Post/useLinkPostsSubscription';
@@ -124,7 +124,20 @@ function App() {
       window.matchMedia('(prefers-color-scheme: dark)')
         .removeEventListener('change', handlePaletteModeChange)
     }
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    if (colDetail.scroll) {
+      colVar({
+        ...colDetail,
+        scroll: false,
+      });
+      containerEl.current?.scrollTo({
+        left: colDetail.i * getColWidth(sizeDetail.width),
+        behavior: 'smooth',
+      })
+    }
+  }, [colDetail.scroll])
 
   const postReducer = (state: PostState, action: PostAction) => {
     switch (action.type) {
@@ -187,7 +200,7 @@ function App() {
     <PostContext.Provider value={{state: postState, dispatch: postDispatch}}>
     <ItemContext.Provider value={{state: itemState, dispatch: itemDispatch}}>
       <ThemeProvider theme={theme}>
-        <Box sx={{
+        <Paper sx={{
           width: '100%',
           height: '100%',
         }}>
@@ -206,6 +219,7 @@ function App() {
               overflowX: 'scroll',
               height: '100%',
               width: sizeDetail.width - getAppbarWidth(sizeDetail.width),
+              backgroundColor: 'inherit',
             }}>
               {
                 userDetail?.id
@@ -215,15 +229,16 @@ function App() {
                       .map(col => {
                         return (
                           <ColComponent 
-                            key={`col-${col.i}`}
+                            key={`col-${col.id}`}
                             col={col} 
                           />
                         );
                       })
                   : colDetail.cols.map(col => {
+                      console.log(col);
                       return (
                         <ColComponent 
-                          key={`col-${col.i}`}
+                          key={`col-${col.id}`}
                           col={col} 
                         />
                       );
@@ -232,7 +247,7 @@ function App() {
             </Box>
           </Paper>
           <ColAdder containerEl={containerEl}/>
-        </Box>
+        </Paper>
       </ThemeProvider>
     </ItemContext.Provider>
 

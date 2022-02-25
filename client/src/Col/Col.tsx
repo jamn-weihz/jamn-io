@@ -6,12 +6,13 @@ import User from '../User/User';
 import Jam from '../Jam/Jam';
 import Map from '../Map/Map';
 import Search from '../Search/Search';
-import React, { Dispatch } from 'react';
-import { colVar, paletteVar, sizeVar, userVar } from '../cache';
+import React, { useState } from 'react';
+import { colVar, paletteVar, sizeVar } from '../cache';
 import { useReactiveVar } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
 import { getColor, getColWidth } from '../utils';
-import { PostAction } from '../types/Post';
+import Colbar from './Colbar';
+import NotFound from '../NotFound';
 
 interface ColComponentProps {
   col: Col;
@@ -22,6 +23,8 @@ export default function ColComponent(props: ColComponentProps) {
   const sizeDetail = useReactiveVar(sizeVar);
   const paletteDetail = useReactiveVar(paletteVar);
 
+  const [colState, setColState] = useState()
+  
   const handleClick = (event: React.MouseEvent) => {
     colVar({
       ...colDetail,
@@ -63,6 +66,14 @@ export default function ColComponent(props: ColComponentProps) {
           name={path[2]} 
         />
       );
+    }
+    else {
+      return (
+        <Box>
+          <Colbar col={props.col} />
+          <NotFound />
+        </Box>
+      )
     }
   }
 

@@ -1,8 +1,8 @@
 import { gql, useLazyQuery, useReactiveVar } from '@apollo/client'
-import { Box, Card, IconButton } from '@mui/material';
+import { Box, Card } from '@mui/material';
 import { paletteVar, userVar } from '../cache'
 import { JAM_FIELDS, ROLE_FIELDS, USER_FIELDS } from '../fragments';
-import React, { Dispatch, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import NotFound from '../NotFound';
 import Logout from '../Auth/Logout';
 import Verify from '../Auth/Verify';
@@ -12,11 +12,9 @@ import UserJams from './UserJams';
 import UserProfile from './UserProfile';
 import UserSettings from './UserSettings';
 import { Col } from '../types/Col';
-import RemoveColButton from '../Col/RemoveColButton';
 import ColLink from '../Col/ColLink';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { PostAction } from '../types/Post';
 import { getColor } from '../utils';
+import Colbar from '../Col/Colbar';
 
 const GET_USER_BY_NAME = gql`
   query GetUserByName($name: String!) {
@@ -43,7 +41,6 @@ export default function UserComponent(props: UserProps) {
   const paletteDetail = useReactiveVar(paletteVar);
   const [user, setUser] = useState(null as User | null);
   const [isLoading, setIsLoading] = useState(false);
-  const [showOptions, setShowOptions] = useState(false);
 
   const [getUserByName] = useLazyQuery(GET_USER_BY_NAME, {
     onError: error => {
@@ -69,9 +66,6 @@ export default function UserComponent(props: UserProps) {
 
   if (isLoading) return <Loading />
 
-  const handleOptionsClick = (event: React.MouseEvent) => {
-    setShowOptions(!showOptions);
-  }
   
   const path = props.col.pathname.split('/');
 
@@ -80,34 +74,7 @@ export default function UserComponent(props: UserProps) {
     <Box sx={{
       height: '100%'
     }}>
-      <Card elevation={5}>
-        <Box sx={{
-          padding: 1,
-          color: user?.color || color,
-          display: 'flex',
-          justifyContent: 'space-between'
-        }}>
-          <Box>
-            { user?.name ? `u/${user.name}` : 'Not found.' } 
-          </Box>
-          <IconButton size='small' onClick={handleOptionsClick} sx={{
-            color: user?.color || color,
-            fontSize: 20,
-            padding: 0,
-          }}>
-            <MoreVertIcon fontSize='inherit'/> 
-          </IconButton>
-        </Box>
-        <Box sx={{
-          display: showOptions ? 'flex' : 'none',
-          padding: 1,
-          borderTop: '1px solid',
-          borderColor: getColor(paletteDetail.mode, true),
-        }}>
-          <RemoveColButton col={props.col} />
-        </Box>
-
-      </Card>
+      <Colbar col={props.col} />
       {
         user?.id && user.id === userDetail?.id
           ? <Box>
@@ -176,7 +143,7 @@ export default function UserComponent(props: UserProps) {
                     : path[3] === 'r'
                       ? null
                       : path[3] === 's'
-                        ? <UserSettings user={user} />
+                        ? <UserSettings col={props.col} user={user} />
                         : <UserProfile 
                             user={user} 
                             col={props.col} 

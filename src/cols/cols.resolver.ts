@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Resolver } from '@nestjs/graphql';
 import { CurrentUser, GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { User } from 'src/users/user.model';
 import { Col } from './col.model';
@@ -39,5 +39,14 @@ export class ColsResolver {
     return this.colsService.removeCol(user.id, colId);
   }
 
+  @UseGuards(GqlAuthGuard)
+  @Mutation(() => [Col], {name: 'shiftCol'})
+  async shiftCol(
+    @CurrentUser() user: User,
+    @Args('colId') colId: string,
+    @Args('di', {type: () => Int}) di: number
+  ) {
+    return this.colsService.shiftCol(user.id, colId, di)
+  }
 
 }

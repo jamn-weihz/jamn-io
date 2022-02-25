@@ -25,5 +25,6 @@ export default function resetCols() {
       }
     ],
     i: 0,
+    scroll: true
   });
 }

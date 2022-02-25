@@ -23,10 +23,6 @@ export default function ColAdder(props: ColAdderProps) {
     event.stopPropagation();
     event.preventDefault();
     addCol(pathname);
-    colVar({
-      ...colDetail,
-      isAdding: false,
-    });
   };
 
   const colCount = 

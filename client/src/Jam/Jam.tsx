@@ -1,22 +1,18 @@
-import { gql, ReactiveVar, useLazyQuery, useReactiveVar } from '@apollo/client';
-import { Box, Card, IconButton } from '@mui/material';
-import React, { Dispatch, useEffect, useState } from 'react';
+import { gql, useLazyQuery, useReactiveVar } from '@apollo/client';
+import { Box, Card } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import { FULL_POST_FIELDS, JAM_FIELDS, ROLE_FIELDS, USER_FIELDS } from '../fragments';
 import Loading from '../Loading';
-import NotFound from '../NotFound';
 import { Col } from '../types/Col';
 import { Jam } from '../types/Jam';
 import JamProfile from './JamProfile';
 import JamSettings from './JamSettings';
 import JamUsers from './JamUsers';
-import RemoveColButton from '../Col/RemoveColButton';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ColLink from '../Col/ColLink';
 import JamnRecent from './JamRecent';
-import { PostAction } from '../types/Post';
 import { paletteVar } from '../cache';
 import { getColor } from '../utils'
-import { SurveyorState } from '../types/Surveyor';
+import Colbar from '../Col/Colbar';
 const GET_JAM_BY_NAME = gql`
   query GetJamByName($name: String!) {
     getJamByName(name: $name) {
@@ -85,34 +81,7 @@ export default function JamComponent(props: JamComponentProps) {
     <Box sx={{
       height: '100%'
     }}>
-      <Card elevation={5}>
-        <Box sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          padding: 1,
-          color: jam?.color || color,
-        }}>
-          <Box>
-            { jam?.name ? `j/${jam.name}` : 'Not found.' }
-          </Box>
-          <IconButton size='small' onClick={handleOptionsClick} sx={{
-            color: jam?.color || color,
-            fontSize: 20,
-            padding: 0,
-          }}>
-            <MoreVertIcon fontSize='inherit'/> 
-          </IconButton>
-        </Box>
-        <Box sx={{
-          display: showOptions ? 'block' : 'none',
-          color,
-          borderTop: '1px solid',
-          borderColor: getColor(paletteDetail.mode, true),
-          padding: 1,
-        }}>
-          <RemoveColButton col={props.col}/>
-        </Box>
-      </Card>
+      <Colbar col={props.col} />
       {
         jam 
           ? <Box sx={{

@@ -8,6 +8,8 @@ import { User } from '../types/User';
 
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from '@mui/icons-material/Send';
+import useChangeCol from '../Col/useChangeCol';
+import { Col } from '../types/Col';
 
 const SET_USER_COLOR = gql`
   mutation SetUserColor($color: String!) {
@@ -37,6 +39,7 @@ const GET_USER_BY_NAME = gql`
 `;
 
 interface UserSettingsProps {
+  col: Col;
   user: User;
 }
 
@@ -49,6 +52,8 @@ export default function UserSettings(props: UserSettingsProps) {
   const [nameTimeout, setNameTimeout] = useState(null as ReturnType<typeof setTimeout> | null);
   const [color, setColor] = useState(props.user.color);
   const [colorTimeout, setColorTimeout] = useState(null as ReturnType<typeof setTimeout> | null);
+
+  const { changeCol } = useChangeCol();
 
   const [getUserByName] = useLazyQuery(GET_USER_BY_NAME, {
     onError: error => {
@@ -91,6 +96,7 @@ export default function UserSettings(props: UserSettingsProps) {
       console.log(user);
       userVar(user);
       setIsEditingName(false);
+      changeCol(props.col, `/u/${user.name}`);
     }
   })
 

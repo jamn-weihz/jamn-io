@@ -31,8 +31,8 @@ export const getTimeString = (time: number) => {
 
 export const getAppbarWidth = (width: number) => {
   return width < MOBILE_WIDTH
-    ? 36
-    : 52
+    ? 39
+    : 55
 }
 export const getColWidth = (width: number) => {
   return width < MOBILE_WIDTH 
