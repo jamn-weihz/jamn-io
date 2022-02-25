@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import React, { Dispatch, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import './App.css';
 import Appbar from './Appbar';
 import { gql, useLazyQuery, useReactiveVar } from '@apollo/client';
 import { FULL_USER_FIELDS } from './fragments';
-import { colVar, itemVar, paletteVar, sizeVar, tokenVar, userVar } from './cache';
+import { colVar, paletteVar, sizeVar, tokenVar, userVar } from './cache';
 import { Box, Paper, Theme } from '@mui/material';
 import useToken from './Auth/useToken';
 import { ThemeProvider, createTheme } from '@mui/material';
@@ -31,6 +31,17 @@ const GET_USER = gql`
   ${FULL_USER_FIELDS}
 `;
 
+type ItemContextType = {
+  state: ItemState;
+  dispatch: Dispatch<ItemAction>;
+};
+export const ItemContext = React.createContext({} as ItemContextType);
+
+type PostContextType = {
+  state: PostState;
+  dispatch: Dispatch<PostAction>;
+}
+export const PostContext = React.createContext({} as PostContextType);
 
 function App() {
   const tokenDetail = useReactiveVar(tokenVar);
@@ -139,10 +150,6 @@ function App() {
 
   const postIds = useMemo(() => Object.keys(postState), [postState]);
 
-  useSavePostSubcription(postIds);
-  useLinkPostsSubcription(postIds);
-  
-
   const itemReducer = (state: ItemState, action: ItemAction) => {
     console.log(action);
     switch (action.type) {
@@ -171,71 +178,66 @@ function App() {
 
   const [itemState, itemDispatch] = useReducer(itemReducer, {});
 
-  useEffect(() => {
-    console.log(itemState);
-    itemVar({
-      state: itemState,
-      dispatch: itemDispatch,
-    });
-  }, [itemState])
-
-  const { dispatch } = useReactiveVar(itemVar);
-  if (!dispatch) return null;
+  useSavePostSubcription(postIds);
+  useLinkPostsSubcription(postIds, itemDispatch);
   
   if (!theme) return null;
 
   return (
-    <ThemeProvider theme={theme}>
-    <Box sx={{
-      width: '100%',
-      height: '100%',
-    }}>
-        <Appbar  containerEl={containerEl} />
-        <Paper sx={{
-          position: 'fixed',
-          left: getAppbarWidth(sizeDetail.width),
-          top: 0,
-          bottom: 0,
-          rigth: 0,
+    <PostContext.Provider value={{state: postState, dispatch: postDispatch}}>
+    <ItemContext.Provider value={{state: itemState, dispatch: itemDispatch}}>
+      <ThemeProvider theme={theme}>
+        <Box sx={{
+          width: '100%',
+          height: '100%',
         }}>
-          <Box ref={containerEl}  sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            overflowY: 'hidden',
-            overflowX: 'scroll',
-            height: '100%',
-            width: sizeDetail.width - getAppbarWidth(sizeDetail.width),
+          <Appbar  containerEl={containerEl} />
+          <Paper sx={{
+            position: 'fixed',
+            left: getAppbarWidth(sizeDetail.width),
+            top: 0,
+            bottom: 0,
+            rigth: 0,
           }}>
-            {
-              userDetail?.id
-                ? userDetail.cols
-                    .filter(col => !col.deleteDate)
-                    .sort((a, b) => a.i < b.i ? -1 : 1)
-                    .map(col => {
+            <Box ref={containerEl}  sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              overflowY: 'hidden',
+              overflowX: 'scroll',
+              height: '100%',
+              width: sizeDetail.width - getAppbarWidth(sizeDetail.width),
+            }}>
+              {
+                userDetail?.id
+                  ? userDetail.cols
+                      .filter(col => !col.deleteDate)
+                      .sort((a, b) => a.i < b.i ? -1 : 1)
+                      .map(col => {
+                        return (
+                          <ColComponent 
+                            key={`col-${col.i}`}
+                            col={col} 
+                          />
+                        );
+                      })
+                  : colDetail.cols.map(col => {
                       return (
                         <ColComponent 
                           key={`col-${col.i}`}
                           col={col} 
-                          postDispatch={postDispatch}
                         />
                       );
                     })
-                : colDetail.cols.map(col => {
-                    return (
-                      <ColComponent 
-                        key={`col-${col.i}`}
-                        col={col} 
-                        postDispatch={postDispatch}
-                      />
-                    );
-                  })
-            }
-          </Box>
-        </Paper>
-        <ColAdder containerEl={containerEl}/>
-      </Box>
-    </ThemeProvider>
-  )
+              }
+            </Box>
+          </Paper>
+          <ColAdder containerEl={containerEl}/>
+        </Box>
+      </ThemeProvider>
+    </ItemContext.Provider>
+
+    </PostContext.Provider>
+  );
 }
 
 export default App;

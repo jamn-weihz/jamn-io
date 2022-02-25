@@ -41,7 +41,6 @@ const GET_JAM_BY_NAME = gql`
 interface JamComponentProps {
   col: Col;
   name: string;
-  postDispatch: Dispatch<PostAction>;
 }
 export default function JamComponent(props: JamComponentProps) {
   const paletteDetail = useReactiveVar(paletteVar);
@@ -163,7 +162,6 @@ export default function JamComponent(props: JamComponentProps) {
                         : <JamProfile 
                             jam={jam} 
                             col={props.col} 
-                            postDispatch={props.postDispatch}
                           />
                 }
               </Box>

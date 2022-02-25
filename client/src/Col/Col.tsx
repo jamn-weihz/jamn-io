@@ -15,7 +15,6 @@ import { PostAction } from '../types/Post';
 
 interface ColComponentProps {
   col: Col;
-  postDispatch: Dispatch<PostAction>;
 }
 export default function ColComponent(props: ColComponentProps) {
   const navigate = useNavigate();
@@ -46,7 +45,6 @@ export default function ColComponent(props: ColComponentProps) {
       return (
         <Search 
           col={col} 
-          postDispatch={props.postDispatch}
         />
       );
     }
@@ -55,7 +53,6 @@ export default function ColComponent(props: ColComponentProps) {
         <User 
           col={col} 
           name={path[2]} 
-          postDispatch={props.postDispatch}
         />
       );
     }
@@ -64,7 +61,6 @@ export default function ColComponent(props: ColComponentProps) {
         <Jam 
           col={col} 
           name={path[2]} 
-          postDispatch={props.postDispatch}
         />
       );
     }

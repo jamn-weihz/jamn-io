@@ -1,11 +1,11 @@
 import Surveyor from '../Surveyor/Surveyor';
-import React, { Dispatch, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Card, IconButton } from '@mui/material';
 import { Col } from '../types/Col';
 import RemoveColButton from '../Col/RemoveColButton';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
 import { paletteVar } from '../cache';
-import { ReactiveVar, useReactiveVar } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { InstantSearch } from 'react-instantsearch-dom';
 import algoliasearch, { SearchClient } from 'algoliasearch/lite';
@@ -15,17 +15,20 @@ import Hits from './Hits';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { PostAction } from '../types/Post';
 import { getColor } from '../utils';
 
 interface SearchProps {
   col: Col;
-  postDispatch: Dispatch<PostAction>;
 }
 export default function Search(props: SearchProps) {
   const paletteDetail = useReactiveVar(paletteVar);
   const [showOptions, setShowOptions] = useState(false);
-
+  const [reload, setReload] = useState(false);
+  useEffect(() => {
+    if (reload) {
+      setReload(false);
+    }
+  }, [reload])
   const [searchClient, setSearchClient] = useState(null as SearchClient | null);
   useEffect(() => {
     setSearchClient(algoliasearch(ALGOLIA_APP_ID, ALGOLIA_APP_KEY));
@@ -156,6 +159,7 @@ export default function Search(props: SearchProps) {
                         col={props.col}
                         surveyorState={surveyorState}
                         setSurveyorState={setSurveyorState}
+                        setReload={setReload}
                       />
                     </Box>
                   </Card>
@@ -166,7 +170,6 @@ export default function Search(props: SearchProps) {
                     <Surveyor 
                       key={`surveyor-${props.col.id}`} 
                       col={props.col}
-                      postDispatch={props.postDispatch}
                       surveyorState={surveyorState}
                       setSurveyorState={setSurveyorState}
                     />

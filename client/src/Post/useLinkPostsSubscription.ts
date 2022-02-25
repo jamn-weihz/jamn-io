@@ -4,8 +4,12 @@ import {
   useReactiveVar,
   useSubscription,
 } from '@apollo/client';
-import { itemVar, sessionVar } from '../cache';
+import { Dispatch, useContext } from 'react';
+import { ItemContext } from '../App';
+import { sessionVar } from '../cache';
 import { FULL_POST_FIELDS, LINK_FIELDS, VOTE_FIELDS } from '../fragments';
+import { ItemAction } from '../types/Item';
+import { PostAction } from '../types/Post';
 
 const LINK_POSTS = gql`
   subscription LinkPosts($sessionId: String!, $postIds: [String!]!) {
@@ -27,12 +31,10 @@ const LINK_POSTS = gql`
   ${VOTE_FIELDS}
 `;
 
-export default function useLinkPostsSubcription(postIds: string[]) {
+export default function useLinkPostsSubcription(postIds: string[], dispatch: Dispatch<ItemAction>) {
   const client = useApolloClient();
 
   const sessionDetail = useReactiveVar(sessionVar);
-
-  const { dispatch } = useReactiveVar(itemVar);
 
   useSubscription(LINK_POSTS, {
     shouldResubscribe: true,

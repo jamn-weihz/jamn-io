@@ -1,6 +1,6 @@
 import { ReactiveVar, useReactiveVar } from '@apollo/client';
 import { Box } from '@mui/material';
-import { Dispatch, useEffect, useState } from 'react';
+import { Dispatch, useContext, useEffect, useState } from 'react';
 import Surveyor from '../Surveyor/Surveyor';
 import { Jam } from '../types/Jam';
 import { v4 as uuidv4 } from 'uuid';
@@ -8,16 +8,15 @@ import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
 import { Col } from '../types/Col';
 import { PostAction } from '../types/Post';
 import { Item } from '../types/Item';
-import { itemVar } from '../cache';
+import { ItemContext } from '../App';
 
 interface JamProfileProps {
   jam: Jam;
   col: Col;
-  postDispatch: Dispatch<PostAction>;
 }
 
 export default function JamProfile(props: JamProfileProps) {
-  const { dispatch } = useReactiveVar(itemVar);
+  const { dispatch } = useContext(ItemContext);
   const [surveyorState, setSurveyorState] = useState(null as unknown as SurveyorState);
 
   useEffect(() => {
@@ -60,7 +59,6 @@ export default function JamProfile(props: JamProfileProps) {
       <Surveyor 
         key={`surveyor-${props.col.id}`}
         col={props.col}
-        postDispatch={props.postDispatch}
         surveyorState={surveyorState}
         setSurveyorState={setSurveyorState}
       />

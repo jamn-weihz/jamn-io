@@ -1,37 +1,35 @@
 import { Box, Link as MUILink } from '@mui/material';
 import SurveyorEntry from './SurveyorEntry';
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 
-import { ReactiveVar, useApolloClient, useReactiveVar } from '@apollo/client';
+import { useApolloClient } from '@apollo/client';
 
 import { SurveyorState } from '../types/Surveyor';
 import { FULL_POST_FIELDS } from '../fragments';
 import { Post, PostAction } from '../types/Post';
 import { Col } from '../types/Col';
-import { itemVar } from '../cache';
 import useGetPrev from '../Post/useGetPrev';
 import useGetNext from '../Post/useGetNext';
 import { LOAD_LIMIT } from '../constants';
+import { ItemContext } from '../App';
 
 interface SurveyorTreeProps {
   col: Col;
   itemId: string;
   depth: number;
-  postDispatch: Dispatch<PostAction>;
   surveyorState: SurveyorState;
   setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
 }
 export default function SurveyorTree(props: SurveyorTreeProps) {
   const client = useApolloClient();
-  const { state } = useReactiveVar(itemVar);
 
+  const {state, dispatch} = useContext(ItemContext);
   const item = state[props.itemId];
 
   const { getPrev } = useGetPrev(props.itemId, item?.postId);
   const { getNext } = useGetNext(props.itemId, item?.postId);
 
   if (!item) return null;
-
 
   const handleLoadClick = (event: React.MouseEvent) => {
     if (item.showPrev) {
@@ -79,7 +77,6 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
           col={props.col}
           item={item}
           depth={props.depth}
-          postDispatch={props.postDispatch}
           surveyorState={props.surveyorState}
           setSurveyorState={props.setSurveyorState}
         />
@@ -96,7 +93,6 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
                 itemId={itemId}
                 depth={props.depth + 1}
                 col={props.col}
-                postDispatch={props.postDispatch}
                 surveyorState={props.surveyorState}
                 setSurveyorState={props.setSurveyorState}
               />

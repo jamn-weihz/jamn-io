@@ -1,7 +1,9 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { focusVar, itemVar, sessionVar } from '../cache';
+import { focusVar, sessionVar } from '../cache';
 import { FULL_POST_FIELDS, LINK_FIELDS, VOTE_FIELDS } from '../fragments';
 import { v4 as uuidv4 } from 'uuid';
+import { useContext } from 'react';
+import { ItemContext } from '../App';
 
 const REPLY_POST = gql`
   mutation ReplyPost($sessionId: String!, $sourcePostId: String!, $jamId: String) {
@@ -25,7 +27,7 @@ const REPLY_POST = gql`
 `;
 
 export default function useReplyPost(itemId: string, sourcePostId: string, jamId?: string) {
-  const { state, dispatch } = useReactiveVar(itemVar);
+  const { state, dispatch } = useContext(ItemContext);
   const sessionDetail = useReactiveVar(sessionVar);
   const [reply] = useMutation(REPLY_POST, {
     onError: error => {

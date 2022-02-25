@@ -1,5 +1,7 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { itemVar, sessionVar } from '../cache';
+import { useContext } from 'react';
+import { ItemContext } from '../App';
+import { sessionVar } from '../cache';
 import { LINK_FIELDS, VOTE_FIELDS } from '../fragments';
 
 const VOTE_POSTS = gql`
@@ -25,7 +27,7 @@ const VOTE_POSTS = gql`
 
 
 export default function useVotePosts() {
-  const { dispatch } = useReactiveVar(itemVar);
+  const { dispatch } = useContext(ItemContext);
   const sessionDetail = useReactiveVar(sessionVar);
   const [vote] = useMutation(VOTE_POSTS, {
     onError: error => {

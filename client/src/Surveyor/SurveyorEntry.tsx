@@ -7,12 +7,11 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import FilterAltTwoToneIcon from '@mui/icons-material/FilterAltTwoTone';
 import NotificationsTwoToneIcon from '@mui/icons-material/NotificationsTwoTone';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import { itemVar, linkVar, paletteVar, userVar } from '../cache';
-import { gql, ReactiveVar, useReactiveVar } from '@apollo/client';
+import { linkVar, paletteVar, userVar } from '../cache';
+import { gql, useReactiveVar } from '@apollo/client';
 import { Post, PostAction } from '../types/Post';
 import { useApolloClient } from '@apollo/client';
-import React, { Dispatch, SetStateAction, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid'; 
+import React, { Dispatch, SetStateAction, useContext, useEffect } from 'react';
 import { Link } from '../types/Link';
 import { useSearchParams } from 'react-router-dom';
 import { SurveyorState } from '../types/Surveyor';
@@ -29,13 +28,13 @@ import { Vote } from '../types/Vote';
 import { DEFAULT_COLOR } from '../constants';
 import useVotePosts from '../Post/useVotePosts';
 import { Item } from '../types/Item';
+import { ItemContext } from '../App';
 
 interface SurveyorEntryProps {
   jam?: Jam;
   col: Col;
   item: Item;
   depth: number;
-  postDispatch: Dispatch<PostAction>;
   surveyorState: SurveyorState;
   setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
 }
@@ -48,7 +47,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
   const linkDetail = useReactiveVar(linkVar);  
   const paletteDetail = useReactiveVar(paletteVar);
 
-  const { state, dispatch } = useReactiveVar(itemVar);
+  const { dispatch } = useContext(ItemContext);
 
   const { linkPosts } = useLinkPosts();
   const { votePosts } = useVotePosts()
@@ -271,7 +270,6 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
         col={props.col}
         post={post}
         itemId={props.item.id}
-        postDispatch={props.postDispatch}
       />
       <Box sx={{
         display: 'flex',

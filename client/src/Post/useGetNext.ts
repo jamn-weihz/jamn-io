@@ -1,5 +1,6 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { itemVar } from '../cache';
+import { useContext } from 'react';
+import { ItemContext } from '../App';
 import { LINK_FIELDS, VOTE_FIELDS, FULL_POST_FIELDS } from '../fragments';
 import { Link } from '../types/Link';
 
@@ -25,7 +26,7 @@ const GET_NEXT = gql`
 `;
 
 export default function useGetNext(itemId: string, postId: string) {
-  const { dispatch } = useReactiveVar(itemVar);
+  const { dispatch } = useContext(ItemContext);
 
   const [getNextLinks] = useMutation(GET_NEXT, {
     onError: error => {

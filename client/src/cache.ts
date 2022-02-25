@@ -45,11 +45,6 @@ export const paletteVar = makeVar({
   ) ? 'dark' : 'light' as PaletteMode,
 })
 
-export const itemVar = makeVar({
-  state: {} as ItemState,
-  dispatch: null as unknown as Dispatch<ItemAction>,
-})
-
 export const sessionVar = makeVar({
   id: uuidv4(),
 });

@@ -2,11 +2,11 @@ import { gql, ReactiveVar, useMutation, useReactiveVar } from '@apollo/client';
 import { connectHits } from 'react-instantsearch-dom';
 import { SurveyorState } from '../types/Surveyor';
 import { v4 as uuidv4 } from 'uuid'; 
-import { Dispatch, SetStateAction, useEffect,  } from 'react';
+import { Dispatch, SetStateAction, useContext, useEffect,  } from 'react';
 import { FULL_POST_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
-import { itemVar } from '../cache';
 import { Item, ItemState } from '../types/Item';
+import { ItemContext } from '../App';
 
 
 const GET_POSTS = gql`
@@ -21,12 +21,12 @@ const GET_POSTS = gql`
 interface HitsProps {
   col: Col;
   hits: any[];
-  setReload?: Dispatch<SetStateAction<boolean>>;
+  setReload: Dispatch<SetStateAction<boolean>>;
   surveyorState: SurveyorState;
   setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
 }
 function Hits(props: HitsProps) {
-  const { state, dispatch } = useReactiveVar(itemVar);
+  const { state, dispatch } = useContext(ItemContext);
 
   const [getPosts] = useMutation(GET_POSTS, {
     onError: error => {
@@ -34,7 +34,7 @@ function Hits(props: HitsProps) {
     },
     onCompleted: data => {
       console.log(data);
-      //props.setReload(true);
+      props.setReload(true)
     },
   });
   
@@ -48,7 +48,7 @@ function Hits(props: HitsProps) {
         if (hit.__typename === 'Post') {
           let itemId;
           slice.itemIds.some(id => {
-            if (state[id]?.postId === hit.id) {
+            if (state[id].postId === hit.id) {
               itemId = id;
               return true;
             }
@@ -72,11 +72,13 @@ function Hits(props: HitsProps) {
           }
         }
       });
-      getPosts({
-        variables: {
-          postIds: Object.keys(idToItem).map(id => idToItem[id].postId),
-        }
-      });
+      if (Object.keys(idToItem).length) {
+        getPosts({
+          variables: {
+            postIds: Object.keys(idToItem).map(id => idToItem[id].postId),
+          }
+        });
+      }
     }
     if (Object.keys(idToItem).length) {
       dispatch({
@@ -92,8 +94,10 @@ function Hits(props: HitsProps) {
     props.setSurveyorState({
       ...props.surveyorState,
       stack,
+      triggerRefinement: false,
     });
-  }, [props.hits])
+    console.log('hits')
+  }, [state, props.hits])
 
   return null;
 }

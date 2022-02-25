@@ -37,7 +37,6 @@ const GET_USER_BY_NAME = gql`
 interface UserProps {
   col: Col;
   name: string;
-  postDispatch: Dispatch<PostAction>;
 }
 export default function UserComponent(props: UserProps) {
   const userDetail = useReactiveVar(userVar);
@@ -178,7 +177,6 @@ export default function UserComponent(props: UserProps) {
                         : <UserProfile 
                             user={user} 
                             col={props.col} 
-                            postDispatch={props.postDispatch}
                           />
                 }
               </Box>

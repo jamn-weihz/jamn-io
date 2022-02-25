@@ -1,5 +1,6 @@
-import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { itemVar } from '../cache';
+import { gql, useMutation } from '@apollo/client';
+import { useContext } from 'react';
+import { ItemContext } from '../App';
 import { LINK_FIELDS, VOTE_FIELDS, FULL_POST_FIELDS } from '../fragments';
 
 const GET_PREV = gql`
@@ -24,7 +25,7 @@ const GET_PREV = gql`
 `;
 
 export default function useGetPrev(itemId: string, postId: string) {
-  const { dispatch } = useReactiveVar(itemVar);
+  const { dispatch } = useContext(ItemContext);
   const [getPrevLinks] = useMutation(GET_PREV, {
     onError: error => {
       console.error(error);

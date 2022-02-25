@@ -7,38 +7,40 @@ import { getColor, getTimeString } from '../utils';
 import CharCounter from './CharCounter';
 import Editor from './Editor';
 import { convertFromRaw } from 'draft-js';
-import React, { Dispatch, useEffect } from 'react';
+import React, { Dispatch, useContext, useEffect } from 'react';
 import useChangeCol from '../Col/useChangeCol';
 import { Col } from '../types/Col';
 import ColLink from '../Col/ColLink';
+import { PostContext } from '../App';
 
 interface PostComponentProps {
   col: Col;
   post: Post;
   itemId: string;
-  postDispatch: Dispatch<PostAction>;
 }
 export default function PostComponent(props: PostComponentProps) {
   const { changeCol } = useChangeCol();
-
+  const { dispatch } = useContext(PostContext);
   const client = useApolloClient();
   const userDetail = useReactiveVar(userVar);
   const paletteDetail = useReactiveVar(paletteVar);
 
   useEffect(() => {
-    props.postDispatch({
-      type: 'ADD',
-      postId: props.post.id,
-      itemId: props.itemId,
-    });
-    return () => {
-      props.postDispatch({
-        type: 'REMOVE',
+    if (dispatch) {
+      dispatch({
+        type: 'ADD',
         postId: props.post.id,
         itemId: props.itemId,
       });
-    };
-  }, []);
+      return () => {
+        dispatch({
+          type: 'REMOVE',
+          postId: props.post.id,
+          itemId: props.itemId,
+        });
+      };
+    }
+  }, [dispatch]);
 
   const post = client.cache.readFragment({
     id: client.cache.identify(props.post),

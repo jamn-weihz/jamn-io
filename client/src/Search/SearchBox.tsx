@@ -56,7 +56,6 @@ function SearchBox(props: SearchBoxProps) {
 
   const refineQuery = () => {
     const slice = props.surveyorState.stack[props.surveyorState.index]
-    console.log(props.surveyorState, slice);
     props.refine(slice.query);
     const stack = props.surveyorState.stack.slice(0, props.surveyorState.index + 1);
     const query = stack[props.surveyorState.index].query;
@@ -65,7 +64,6 @@ function SearchBox(props: SearchBoxProps) {
       query,
       itemIds: [],
     });
-    console.log(stack);
     props.setSurveyorState({
       ...props.surveyorState,
       stack,
@@ -83,7 +81,6 @@ function SearchBox(props: SearchBoxProps) {
   const color = getColor(paletteDetail.mode);
 
   const slice = props.surveyorState.stack[props.surveyorState.index];
-  console.log(props.surveyorState, slice);
   if (!slice) return null;
   return (
     <Box sx={{

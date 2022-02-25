@@ -1,6 +1,8 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { itemVar, linkVar, sessionVar } from '../cache';
-import { LINK_FIELDS, POST_FIELDS, VOTE_FIELDS } from '../fragments';
+import { useContext } from 'react';
+import { ItemContext } from '../App';
+import { linkVar, sessionVar } from '../cache';
+import { LINK_FIELDS, VOTE_FIELDS } from '../fragments';
 
 const LINK_POSTS = gql`
   mutation LinkPosts($sessionId: String!, $sourcePostId: String!, $targetPostId: String!) {
@@ -25,7 +27,7 @@ const LINK_POSTS = gql`
 export default function useLinkPosts() {
   const linkDetail = useReactiveVar(linkVar);
   const sessionDetail = useReactiveVar(sessionVar);
-  const { dispatch } = useReactiveVar(itemVar);
+  const { dispatch } = useContext(ItemContext);
 
   const [link] = useMutation(LINK_POSTS, {
     onError: error => {
