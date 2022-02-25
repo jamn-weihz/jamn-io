@@ -81,4 +81,13 @@ export class UsersResolver {
   ) {
     return this.usersService.setUserColor(user.id, color);
   }
+
+  @UseGuards(GqlAuthGuard)
+  @Mutation(() => User, {name: 'setUserName'})
+  async setUserName(
+    @CurrentUser() user: User,
+    @Args('name') name: string,
+  ) {
+    return this.usersService.setUserName(user.id, name);
+  }
 }

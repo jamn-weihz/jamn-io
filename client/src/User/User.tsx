@@ -88,7 +88,7 @@ export default function UserComponent(props: UserProps) {
           justifyContent: 'space-between'
         }}>
           <Box>
-            { props.col.pathname }
+            { user?.name ? `u/${user.name}` : 'Not found.' } 
           </Box>
           <IconButton size='small' onClick={handleOptionsClick} sx={{
             color: user?.color || color,
@@ -156,6 +156,9 @@ export default function UserComponent(props: UserProps) {
                 </ColLink>
                 &nbsp;&nbsp;
                 <ColLink col={props.col} pathname={`/u/${encodeURIComponent(user.name)}/s`} sx={{
+                  display: user.id === userDetail?.id
+                    ? 'initial'
+                    : 'none',
                   color: path[3] === 's'
                     ? user.color 
                     : color,

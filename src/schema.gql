@@ -69,6 +69,7 @@ type Mutation {
   savePost(draft: String!, postId: String!, sessionId: String!): Post!
   setJamColor(color: String!, jamId: String!): Jam!
   setUserColor(color: String!): User!
+  setUserName(name: String!): User!
   startJam(desc: String!, lat: Float!, lng: Float!, name: String!): Jam!
   updateUserMap(lat: Float!, lng: Float!, zoom: Float!): User!
   verifyUser(code: String!): User!

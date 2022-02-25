@@ -155,5 +155,16 @@ export class UsersService {
     user0.color = color;
     return this.usersRepository.save(user0);
   }
+
+  async setUserName(userId: string, name: string): Promise<User> {
+    const user = await this.getUserByName(name);
+    if (user && user.id !== userId) {
+      return null;
+    }
+    const user0 = new User();
+    user0.id = userId;
+    user0.name = name;
+    return this.usersRepository.save(user0);
+  }
   
 }
