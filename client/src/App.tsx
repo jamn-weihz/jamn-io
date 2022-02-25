@@ -1,6 +1,6 @@
 import React, { Dispatch, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import './App.css';
-import AppBar from './Appbar';
+import AppBar from './AppBar';
 import { gql, useLazyQuery, useReactiveVar } from '@apollo/client';
 import { FULL_USER_FIELDS } from './fragments';
 import { colVar, paletteVar, sizeVar, tokenVar, userVar } from './cache';
