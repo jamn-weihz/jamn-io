@@ -56,7 +56,7 @@ export default function Login(props: LoginProps) {
       }
       refreshTokenInterval();
       userVar(data.loginUser);
-      changeCol(props.col, `/u/${encodeURIComponent(data.loginUser.name)}`);
+      changeCol(props.col, `/u/${data.loginUser.name}`);
       focusVar({
         postId: data.loginUser.focusId,
       })

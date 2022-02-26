@@ -25,7 +25,7 @@ export default function UserJams(props: UserJamsProps) {
               padding:1,
               fontSize: 16,
             }}>
-              <ColLink col={props.col} pathname={`/j/${encodeURIComponent(role.jam.name)}`} sx={{
+              <ColLink col={props.col} pathname={`/j/${role.jam.name}`} sx={{
                 color: role.jam.color,
               }}>
                 {`j/${role.jam.name}`}

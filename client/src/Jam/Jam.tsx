@@ -1,4 +1,4 @@
-import { gql, useLazyQuery, useReactiveVar } from '@apollo/client';
+import { gql, useApolloClient, useLazyQuery, useReactiveVar } from '@apollo/client';
 import { Box, Card } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { FULL_POST_FIELDS, JAM_FIELDS, ROLE_FIELDS, USER_FIELDS } from '../fragments';
@@ -10,7 +10,7 @@ import JamSettings from './JamSettings';
 import JamUsers from './JamUsers';
 import ColLink from '../Col/ColLink';
 import JamnRecent from './JamRecent';
-import { paletteVar } from '../cache';
+import { paletteVar, startJamVar } from '../cache';
 import { getColor } from '../utils'
 import ColBar from '../Col/ColBar';
 const GET_JAM_BY_NAME = gql`
@@ -39,7 +39,10 @@ interface JamComponentProps {
   name: string;
 }
 export default function JamComponent(props: JamComponentProps) {
+  const client = useApolloClient();
+
   const paletteDetail = useReactiveVar(paletteVar);
+  const startJamDetail = useReactiveVar(startJamVar);
 
   const [jam, setJam] = useState(null as Jam | null);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,12 +65,21 @@ export default function JamComponent(props: JamComponentProps) {
 
   useEffect(() => {
     setIsLoading(true);
-    getJamByName({
-      variables: {
-        name: props.name,
-      },
-    });
-  }, [props.name]);
+    if (startJamDetail.jam && startJamDetail.jam.name === props.name) {
+      setJam(startJamDetail.jam);
+      startJamVar({
+        jam: null,
+      })
+    }
+    else {
+      getJamByName({
+        variables: {
+          name: props.name,
+        },
+      });
+    }
+
+  }, [startJamDetail.jam, props.name]);
 
 
   if (isLoading) return <Loading />
@@ -95,25 +107,25 @@ export default function JamComponent(props: JamComponentProps) {
                 marginBottom: 0,
                 borderBottom: '1px solid dimgrey',
               }}>
-                <ColLink col={props.col} pathname={`/j/${encodeURIComponent(jam.name)}/u`} sx={{
+                <ColLink col={props.col} pathname={`/j/${jam.name}/u`} sx={{
                   color: path[3] === 'u' ? jam.color : color,
                 }}>
                   Users
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/j/${encodeURIComponent(jam.name)}`} sx={{
+                <ColLink col={props.col} pathname={`/j/${jam.name}`} sx={{
                   color: !path[3] || path[3] === '' ? jam.color : color,
                 }}>
                   Profile
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/j/${encodeURIComponent(jam.name)}/r`} sx={{
+                <ColLink col={props.col} pathname={`/j/${jam.name}/r`} sx={{
                   color: path[3] === 'r' ? jam.color : color,
                 }}>
                   Recent
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/j/${encodeURIComponent(jam.name)}/s`} sx={{
+                <ColLink col={props.col} pathname={`/j/${jam.name}/s`} sx={{
                   color: path[3] === 's' ? jam.color : color,
                 }}>
                   Settings

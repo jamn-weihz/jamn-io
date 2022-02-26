@@ -8,8 +8,9 @@ import {
   Button,
 } from '@mui/material';
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import { colVar } from '../cache';
+import { colVar, startJamVar } from '../cache';
 import useChangeCol from '../Col/useChangeCol';
+import { FULL_POST_FIELDS, JAM_FIELDS, ROLE_FIELDS, USER_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
 
 const GET_JAM_BY_NAME = gql`
@@ -23,10 +24,22 @@ const GET_JAM_BY_NAME = gql`
 const START_JAM = gql`
   mutation StartJam($name: String!, $desc: String!, $lng: Float!, $lat: Float!) {
     startJam(name: $name, desc: $desc, lng: $lng, lat: $lat) {
-      id
-      name
+      ...JamFields
+      roles {
+        ...RoleFields
+        user {
+          ...UserFields
+        }
+      }
+      focus {
+        ...FullPostFields
+      }
     }
   }
+  ${JAM_FIELDS}
+  ${USER_FIELDS}
+  ${FULL_POST_FIELDS}
+  ${ROLE_FIELDS}
 `;
 
 interface StartJamModalProps {
@@ -65,8 +78,11 @@ export default function StartJamForm(props: StartJamModalProps) {
     onCompleted: data => {
       console.log(data);
       props.setIsOpen(false);
-      const pathname = `/j/${encodeURIComponent(data.startJam.name)}`;
+      const pathname = `/j/${data.startJam.name}`;
       changeCol(props.col, pathname);
+      startJamVar({
+        jam: data.startJam,
+      })
     }
   });
 

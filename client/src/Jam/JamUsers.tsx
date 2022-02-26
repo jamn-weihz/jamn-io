@@ -24,7 +24,7 @@ export default function JamUsers(props: JamUsersProps) {
               padding:1,
               fontSize: 16,
             }}>
-              <ColLink col={props.col} pathname={`/u/${encodeURIComponent(role.user.name)}`} sx={{
+              <ColLink col={props.col} pathname={`/u/${role.user.name}`} sx={{
                 color: role.user.color,
               }}>
                 { `u/${role.user.name}` }

@@ -78,7 +78,7 @@ export default function PostComponent(props: PostComponentProps) {
       }}>
         <ColLink
           col={props.col} 
-          pathname={`/u/${encodeURIComponent(post.user.name)}`}
+          pathname={`/u/${post.user.name}`}
           sx={{
             color: post.user.color,
           }}
@@ -92,7 +92,7 @@ export default function PostComponent(props: PostComponentProps) {
           post.jam
             ? <ColLink 
                 col={props.col}
-                pathname={`/j/${encodeURIComponent(post.jam?.name || '')}`}
+                pathname={`/j/${post.jam?.name}`}
                 sx={{
                   color: post.jam.color,
                 }}

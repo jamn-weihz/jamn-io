@@ -67,7 +67,7 @@ export default function Register(props: RegisterProps) {
         }
         refreshTokenInterval();
         userVar(data.registerUser);
-        changeCol(props.col, `/u/${encodeURIComponent(data.loginUser.name)}`);
+        changeCol(props.col, `/u/${data.loginUser.name}`);
         focusVar({
           postId: data.registerUser.focusId,
         })

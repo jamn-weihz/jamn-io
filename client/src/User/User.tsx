@@ -104,7 +104,7 @@ export default function UserComponent(props: UserProps) {
                 marginBottom: 0,
                 borderBottom: '1px solid dimgrey',
               }}>
-                <ColLink col={props.col} pathname={`/u/${encodeURIComponent(user.name)}/j`} sx={{
+                <ColLink col={props.col} pathname={`/u/${user.name}/j`} sx={{
                   color: path[3] === 'j' 
                     ? user.color 
                     : color,
@@ -112,7 +112,7 @@ export default function UserComponent(props: UserProps) {
                   Jams
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/u/${encodeURIComponent(user.name)}`} sx={{
+                <ColLink col={props.col} pathname={`/u/${user.name}`} sx={{
                   color: !path[3] || path[3] === '' 
                     ? user.color 
                     : color,
@@ -120,7 +120,7 @@ export default function UserComponent(props: UserProps) {
                   Profile
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/u/${encodeURIComponent(user.name)}/r`} sx={{
+                <ColLink col={props.col} pathname={`/u/${user.name}/r`} sx={{
                   color: path[3] === 'r' 
                     ? user.color 
                     : color,
@@ -128,7 +128,7 @@ export default function UserComponent(props: UserProps) {
                   Recent
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/u/${encodeURIComponent(user.name)}/s`} sx={{
+                <ColLink col={props.col} pathname={`/u/${user.name}/s`} sx={{
                   display: user.id === userDetail?.id
                     ? 'initial'
                     : 'none',

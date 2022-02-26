@@ -5,6 +5,7 @@ import { PaletteMode } from '@mui/material';
 import { ItemAction, ItemState } from './types/Item';
 import { Dispatch } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { Jam } from './types/Jam';
 
 export const tokenVar = makeVar({
   isInit: false,
@@ -49,3 +50,7 @@ export const paletteVar = makeVar({
 export const sessionVar = makeVar({
   id: uuidv4(),
 });
+
+export const startJamVar = makeVar({
+  jam: null as Jam | null,
+})

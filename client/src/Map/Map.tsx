@@ -247,7 +247,7 @@ export default function Map(props: MapProps) {
     map.current.on('click', 'points', (event) => {
       const features = event.features as any[];
       const jam = JSON.parse(features[0].properties?.jam) as Jam;
-      const pathname = `/j/${encodeURIComponent(jam.name)}`
+      const pathname = `/j/${jam.name}`
       changeCol(props.col, pathname);
       navigate(pathname)
     });
