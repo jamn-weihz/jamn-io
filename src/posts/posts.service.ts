@@ -126,7 +126,7 @@ export class PostsService {
     const i = text.indexOf('\n');
     const name = i < 0
       ? text
-      : text.slice(0, 1);
+      : text.slice(0, i);
     const description = i < 0
       ? ''
       : text.slice(i + 1);
