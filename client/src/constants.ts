@@ -20,3 +20,7 @@ export const ALGOLIA_INDEX_NAME = process.env.NODE_ENV === 'production'
 export const MOBILE_WIDTH = 420;
 
 export const LOAD_LIMIT = 10;
+
+export const IFRAMELY_API_KEY_DARK='94bfef11d502890ea3be39545c43c2f9';
+
+export const IFRAMELY_API_KEY_LIGHT='ccc8c698f47cd34726d1dde82d931c1f';

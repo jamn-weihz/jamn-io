@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Post } from '../types/Post';
+import { Post } from '../../types/Post';
 import {
   EditorState,
   convertToRaw,
@@ -11,9 +11,14 @@ import {
 import 'draft-js/dist/Draft.css';
 import Editor from '@draft-js-plugins/editor';
 import { useApolloClient, useReactiveVar } from '@apollo/client';
-import { focusVar, userVar } from '../cache';
+import { focusVar, userVar } from '../../cache';
 import { Box } from '@mui/material';
-import useSavePost from './useSavePost';
+import useSavePost from '../useSavePost';
+import createIframelyPlugin from './createIframelyPlugin';
+import linkifyIt, { LinkifyIt } from 'linkify-it';
+import tlds from 'tlds';
+
+const iframelyPlugin = createIframelyPlugin();
 
 const blockStyleFn = (contentBlock: ContentBlock) => {
   const type = contentBlock.getType();
@@ -22,6 +27,12 @@ const blockStyleFn = (contentBlock: ContentBlock) => {
   }
   return '';
 };
+
+const linkify: LinkifyIt = linkifyIt().tlds(tlds);
+
+export function extractLinks(text: string): linkifyIt.Match[] | null {
+  return linkify.match(text);
+}
 
 interface EditorComponentProps {
   post: Post;
@@ -109,8 +120,14 @@ export default function EditorComponent(props: EditorComponentProps) {
     }
   };
 
-  const handlePaste = () => {
-
+  const handlePaste = (text: string, html: string, editorState: EditorState) => {
+    const result = extractLinks(text)
+    if (result) {
+      const newEditorState = iframelyPlugin.addEmbed(editorState, { url: result[0].url });
+      handleChange(newEditorState);
+      return 'handled';
+    }
+    return 'not-handled'
   };
 
   const handleFocus = () => {
@@ -125,16 +142,20 @@ export default function EditorComponent(props: EditorComponentProps) {
   return (
     <Box sx={{
       fontSize: 14,
+      width: '100%',
+      position: 'relative',
     }}>
       <Editor
         readOnly={isReadonly}
         editorState={editorState}
+        handlePastedText={handlePaste}
         onChange={handleChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
         spellCheck={true}
         ref={editorRef}
         blockStyleFn={blockStyleFn}
+        plugins={[iframelyPlugin]}
       />
     </Box>
   );

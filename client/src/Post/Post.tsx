@@ -5,7 +5,7 @@ import { FULL_POST_FIELDS } from '../fragments';
 import { Post, PostAction } from '../types/Post';
 import { getColor, getTimeString } from '../utils';
 import CharCounter from './CharCounter';
-import Editor from './Editor';
+import Editor from './Editor/Editor';
 import { convertFromRaw } from 'draft-js';
 import React, { Dispatch, useContext, useEffect } from 'react';
 import useChangeCol from '../Col/useChangeCol';
