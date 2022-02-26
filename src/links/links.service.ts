@@ -70,32 +70,35 @@ export class LinksService {
 
   async linkPosts(userId: string, sourcePostId: string, targetPostId: string, clicks: number, tokens: number): Promise<Link> {
     let link = await this.getLinkBySourcePostIdAndTargetPostId(sourcePostId, targetPostId);
-    if (!link) {
+    if (link) {
+      let dClicks = clicks;
+      let dTokens = tokens;
+      let dWeight = findDefaultWeight(clicks, tokens);
+      let vote = await this.votesService.getVoteByUserIdAndLinkId(userId, link.id);
+      if (vote) {
+        dClicks -= vote.clicks;
+        dTokens -= vote.tokens;
+        dWeight -= vote.weight;
+        const oldVote = await this.votesService.deleteVote(vote.id);
+      }
+      if (dClicks === 0 && dTokens === 0 && dWeight === 0) {
+        return link;
+      }
+      else {
+        await this.linksRepository.increment({id: link.id}, 'clicks', dClicks);
+        await this.linksRepository.increment({id: link.id}, 'tokens', dTokens);
+        await this.linksRepository.increment({id: link.id}, 'weight', dWeight);
+      }
+      const newVote = await this.votesService.createVote(userId, link.id, sourcePostId, targetPostId, clicks, tokens);
+    }
+    else {
       const posts = await this.postsService.getPostsByIds([sourcePostId, targetPostId]);
       if (posts.length !== 2) return null;
       this.postsService.incrementPostNextCount(sourcePostId, 1);
       this.postsService.incrementPostPrevCount(targetPostId, 1);
       link = await this.createLink(sourcePostId, targetPostId, clicks, tokens);
+      const vote = await this.votesService.createVote(userId, link.id, sourcePostId, targetPostId, clicks, tokens);
     }
-    let dClicks = clicks;
-    let dTokens = tokens;
-    let dWeight = findDefaultWeight(clicks, tokens);
-    let vote = await this.votesService.getVoteByUserIdAndLinkId(userId, link.id);
-    if (vote) {
-      dClicks -= vote.clicks;
-      dTokens -= vote.tokens;
-      dWeight -= vote.weight;
-      const oldVote = await this.votesService.deleteVote(vote.id);
-    }
-    if (dClicks === 0 && dTokens === 0 && dWeight === 0) {
-      return link;
-    }
-    else {
-      await this.linksRepository.increment({id: link.id}, 'clicks', dClicks);
-      await this.linksRepository.increment({id: link.id}, 'tokens', dTokens);
-      await this.linksRepository.increment({id: link.id}, 'weight', dWeight);
-    }
-    const newVote = await this.votesService.createVote(userId, link.id, sourcePostId, targetPostId, clicks, tokens);
     return this.getLinkById(link.id);
   }
 

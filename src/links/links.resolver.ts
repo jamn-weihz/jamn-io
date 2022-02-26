@@ -51,7 +51,7 @@ export class LinksResolver {
     @Args('sourcePostId') sourcePostId: string,
     @Args('targetPostId') targetPostId: string,
   ) {
-    const link = await this.linksService.linkPosts(user.id, sourcePostId, targetPostId,1,0);
+    const link = await this.linksService.linkPosts(user.id, sourcePostId, targetPostId, 1, 0);
     const sourcePost = await this.postsService.getPostById(sourcePostId);
     const targetPost = await this.postsService.getPostById(targetPostId);
     const votes = await this.votesService.getVotesByLinkId(link.id);

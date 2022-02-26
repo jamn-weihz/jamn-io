@@ -1,6 +1,6 @@
 import { useReactiveVar } from '@apollo/client';
 import { Box, Card, IconButton } from '@mui/material';
-import { colVar, paletteVar, userVar } from '../cache';
+import { colVar, paletteVar, sizeVar, userVar } from '../cache';
 import { Col } from '../types/Col';
 import { getColor } from '../utils';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -18,6 +18,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import useChangeCol from './useChangeCol';
 import useShiftCol from './useShiftCol';
+import { MOBILE_WIDTH } from '../constants';
 
 interface ColBarProps {
   col: Col;
@@ -29,6 +30,7 @@ export default function ColBar(props: ColBarProps) {
   const paletteDetail = useReactiveVar(paletteVar);
   const userDetail = useReactiveVar(userVar);
   const colDetail = useReactiveVar(colVar);
+  const sizeDetail = useReactiveVar(sizeVar);
 
   const [showOptions, setShowOptions] = useState(false);
   const { removeCol } = useRemoveCol();
@@ -95,11 +97,15 @@ export default function ColBar(props: ColBarProps) {
         color,
       }}>
         <Box sx={{
-          maxWidth: '150px',
+          maxWidth: sizeDetail.width < MOBILE_WIDTH
+            ? '150px'
+            : '220px'
         }}>
           {props.col.pathname.split('/').slice(0, 3).join('/')}
         </Box>
-        <Box>
+        <Box sx={{
+          whiteSpace: 'nowrap',
+        }}>
           <IconButton size='small' onClick={handleAccountClick} sx={{
             color,
             fontSize: 20,
