@@ -1,9 +1,7 @@
 import { useReactiveVar } from '@apollo/client';
-import { Box, Card, Link } from '@mui/material'
-import { useNavigate } from 'react-router-dom';
+import { Box, Card } from '@mui/material'
 import { paletteVar } from '../cache';
 import ColLink from '../Col/ColLink';
-import useChangeCol from '../Col/useChangeCol';
 import { Col } from '../types/Col';
 import { User } from '../types/User'
 import { getColor } from '../utils';

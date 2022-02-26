@@ -1,4 +1,3 @@
-import { palette } from "@mui/system";
 import { MOBILE_WIDTH } from "./constants";
 
 const second = 1000;

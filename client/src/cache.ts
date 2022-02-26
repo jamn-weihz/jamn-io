@@ -2,8 +2,6 @@ import { makeVar } from '@apollo/client';
 import { Col } from './types/Col';
 import { User } from './types/User';
 import { PaletteMode } from '@mui/material';
-import { ItemAction, ItemState } from './types/Item';
-import { Dispatch } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Jam } from './types/Jam';
 
