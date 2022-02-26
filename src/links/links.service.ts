@@ -122,11 +122,11 @@ export class LinksService {
       return link;
     }
     else {
+      const newVote = await this.votesService.createVote(userId, linkId, link.sourcePostId, link.targetPostId, clicks, tokens);
       await this.linksRepository.increment({id: linkId}, 'clicks', dClicks);
       await this.linksRepository.increment({id: linkId}, 'tokens', dTokens);
       await this.linksRepository.increment({id: linkId}, 'weight', dWeight);
     }
-    const newVote = await this.votesService.createVote(userId, linkId, link.sourcePostId, link.targetPostId, clicks, tokens);
     const link1 = await this.getLinkById(linkId);
     if (link1.clicks === 0 && link1.tokens === 0 && link1.weight === 0) {
       const foreignVote = await this.votesService.getPositiveForeignVote(userId, linkId);

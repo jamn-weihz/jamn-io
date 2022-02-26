@@ -1,5 +1,5 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { useContext } from 'react';
+import { Dispatch, SetStateAction, useContext } from 'react';
 import { ItemContext } from '../App';
 import { sessionVar } from '../cache';
 import { LINK_FIELDS, VOTE_FIELDS } from '../fragments';
@@ -26,7 +26,7 @@ const VOTE_POSTS = gql`
 `;
 
 
-export default function useVotePosts() {
+export default function useVotePosts(setIsVoting: Dispatch<SetStateAction<boolean>>) {
   const { dispatch } = useContext(ItemContext);
   const sessionDetail = useReactiveVar(sessionVar);
   const [vote] = useMutation(VOTE_POSTS, {
@@ -39,8 +39,9 @@ export default function useVotePosts() {
         dispatch({
           type: 'REMOVE_LINK',
           link: data.votePosts,
-        })
+        });
       }
+      setIsVoting(false);
     }
   });
 

@@ -11,7 +11,7 @@ import { linkVar, paletteVar, userVar } from '../cache';
 import { gql, useReactiveVar } from '@apollo/client';
 import { Post, PostAction } from '../types/Post';
 import { useApolloClient } from '@apollo/client';
-import React, { Dispatch, SetStateAction, useContext, useEffect } from 'react';
+import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { Link } from '../types/Link';
 import { useSearchParams } from 'react-router-dom';
 import { SurveyorState } from '../types/Surveyor';
@@ -50,9 +50,10 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
 
   const { state, dispatch } = useContext(ItemContext);
 
-  const { linkPosts } = useLinkPosts();
-  const { votePosts } = useVotePosts()
+  const [isVoting, setIsVoting] = useState(false);
+  const { votePosts } = useVotePosts(setIsVoting)
 
+  const { linkPosts } = useLinkPosts();
 
   const { getPrev } = useGetPrev(props.item.id, props.item.postId);
   const { getNext } = useGetNext(props.item.id, props.item.postId);
@@ -201,6 +202,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
   const handleVoteClick = (clicks: number) => (event: React.MouseEvent) => {
     if (props.item.linkId) {
       votePosts(props.item.linkId, clicks);
+      setIsVoting(true)
     }
   }
 
@@ -291,6 +293,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
                 marginBottom: '5px',
               }}>
                 <Button 
+                  disabled={isVoting}
                   size='small' 
                   onClick={handleVoteClick(
                     userVote && userVote.weight === 1 
@@ -325,6 +328,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
                   { link.weight }
                 </Button>
                 <Button
+                  disabled={isVoting}
                   size='small' 
                   onClick={handleVoteClick(
                     userVote && userVote.weight === -1

@@ -17,6 +17,7 @@ import useSavePost from '../useSavePost';
 import createIframelyPlugin from './createIframelyPlugin';
 import linkifyIt, { LinkifyIt } from 'linkify-it';
 import tlds from 'tlds';
+import moveSelectionToEnd from './moveSelectionToEnd';
 
 const iframelyPlugin = createIframelyPlugin();
 
@@ -45,6 +46,7 @@ export default function EditorComponent(props: EditorComponentProps) {
 
   const { savePost } = useSavePost(props.post.id);
 
+  const [isSaving, setIsSaving] = useState(false);
   const [saveTimeout, setSaveTimeout] = useState(null as ReturnType<typeof setTimeout> | null);
   const [focused, setFocused] = useState(false);
   const [editorState, setEditorState] = useState(() => {
@@ -64,17 +66,8 @@ export default function EditorComponent(props: EditorComponentProps) {
       editorRef.current.focus();
     }
     if (focusDetail.postId === props.post.id && editorRef.current)  {
-      const content = editorState.getCurrentContent();
-      const blockMap = content.getBlockMap();
-      const key = blockMap.last().getKey();
-      const length = blockMap.last().getLength();
-      const selection = new SelectionState({
-        anchorKey: key,
-        anchorOffset: length,
-        focusKey: key,
-        focusOffset: length,
-      });
-      setEditorState(EditorState.forceSelection(editorState, selection));      editorRef.current.focus();
+      setEditorState(moveSelectionToEnd(editorState));
+      editorRef.current.focus();
       focusVar({
         postId: '',
       });
@@ -82,14 +75,19 @@ export default function EditorComponent(props: EditorComponentProps) {
   });
 
   useEffect(() => {
-    if (
-      props.post.draft && 
-      (props.post.userId !== userDetail?.id || !focused)
-    ) {
+    if (isSaving) {
+      setIsSaving(false)
+    }
+    else if (props.post.draft) {
       const contentState = convertFromRaw(JSON.parse(props.post.draft));
-      setEditorState(
-        EditorState.createWithContent(contentState)
-      );
+      if (focused) {
+        setEditorState(moveSelectionToEnd(EditorState.createWithContent(contentState)));
+      }
+      else {
+        setEditorState(
+          EditorState.createWithContent(contentState)
+        );
+      }
     }
   }, [props.post.draft])
 
@@ -102,19 +100,13 @@ export default function EditorComponent(props: EditorComponentProps) {
     const contentState = newState.getCurrentContent();
     const draft = JSON.stringify(convertToRaw(contentState));
     if (draft !== props.post.draft) {
-      client.cache.modify({
-        id: client.cache.identify(props.post),
-        fields: {
-          draft: () => draft,
-        },
-      });
-
       if (saveTimeout) {
         clearTimeout(saveTimeout);
       }
       const timeout = setTimeout(() => {
         savePost(draft);
         setSaveTimeout(null);
+        setIsSaving(true);
       }, 1000);
       setSaveTimeout(timeout);
     }
