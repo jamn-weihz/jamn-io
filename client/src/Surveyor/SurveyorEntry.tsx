@@ -293,7 +293,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
                 marginBottom: '5px',
               }}>
                 <Button 
-                  disabled={isVoting}
+                  disabled={!userDetail || isVoting}
                   size='small' 
                   onClick={handleVoteClick(
                     userVote && userVote.weight === 1 
@@ -328,7 +328,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
                   { link.weight }
                 </Button>
                 <Button
-                  disabled={isVoting}
+                  disabled={!userDetail || isVoting}
                   size='small' 
                   onClick={handleVoteClick(
                     userVote && userVote.weight === -1
