@@ -22,8 +22,8 @@ import { MOBILE_WIDTH } from '../constants';
 
 interface ColBarProps {
   col: Col;
-  user?: User;
-  jam?: Jam;
+  user?: User | null;
+  jam?: Jam | null;
 }
 
 export default function ColBar(props: ColBarProps) {
@@ -82,7 +82,7 @@ export default function ColBar(props: ColBarProps) {
     shiftColRight();
   }
 
-  let color = props.user?.color || props.jam?.color || getColor(paletteDetail.mode);
+  let color = getColor(paletteDetail.mode);
 
   let n = userDetail?.id
     ? userDetail.cols.filter(col => !col.deleteDate).length
@@ -94,12 +94,12 @@ export default function ColBar(props: ColBarProps) {
         display: 'flex',
         justifyContent: 'space-between',
         padding: 1,
-        color,
       }}>
         <Box sx={{
           maxWidth: sizeDetail.width < MOBILE_WIDTH
             ? '150px'
-            : '220px'
+            : '220px',
+          color:  props.user?.color || props.jam?.color,
         }}>
           {props.col.pathname.split('/').slice(0, 3).join('/')}
         </Box>

@@ -1,7 +1,7 @@
-import { gql, useLazyQuery, useReactiveVar } from '@apollo/client'
+import { gql, useApolloClient, useLazyQuery, useReactiveVar } from '@apollo/client'
 import { Box, Card } from '@mui/material';
 import { paletteVar, userVar } from '../cache'
-import { FULL_POST_FIELDS, JAM_FIELDS, ROLE_FIELDS, USER_FIELDS } from '../fragments';
+import { FULL_POST_FIELDS, FULL_USER_FIELDS, JAM_FIELDS, ROLE_FIELDS, USER_FIELDS } from '../fragments';
 import { useEffect, useState } from 'react';
 import NotFound from '../NotFound';
 import Logout from '../Auth/Logout';
@@ -19,28 +19,18 @@ import ColBar from '../Col/ColBar';
 const GET_USER_BY_NAME = gql`
   query GetUserByName($name: String!) {
     getUserByName(name: $name) {
-      ...UserFields
-      roles {
-        ...RoleFields
-        jam {
-          ...JamFields
-        }
-      }
-      focus {
-        ...FullPostFields
-      }
+      ...FullUserFields
     }
   }
-  ${USER_FIELDS}
-  ${ROLE_FIELDS}
-  ${JAM_FIELDS}
-  ${FULL_POST_FIELDS}
+  ${FULL_USER_FIELDS}
 `;
 interface UserProps {
   col: Col;
   name: string;
 }
 export default function UserComponent(props: UserProps) {
+  const client = useApolloClient();
+
   const userDetail = useReactiveVar(userVar);
   const paletteDetail = useReactiveVar(paletteVar);
   const [user, setUser] = useState(null as User | null);
@@ -72,17 +62,23 @@ export default function UserComponent(props: UserProps) {
 
   if (isLoading) return <Loading />
 
-  
   const path = props.col.pathname.split('/');
 
   const color = getColor(paletteDetail.mode);
+
+  const user1 = client.cache.readFragment({
+    id: client.cache.identify(user || {}),
+    fragment: FULL_USER_FIELDS,
+    fragmentName: 'FullUserFields'
+  }) as User;
+
   return (
     <Box sx={{
       height: '100%'
     }}>
-      <ColBar col={props.col} />
+      <ColBar col={props.col} user={user1} />
       {
-        user?.id && user.id === userDetail?.id
+        user1?.id && user1.id === userDetail?.id
           ? <Box>
               <Logout />
               {
@@ -94,7 +90,7 @@ export default function UserComponent(props: UserProps) {
           : null
       }
       {
-        user
+        user1.id
           ? <Box sx={{
               height: '100%'
             }}>
@@ -104,36 +100,36 @@ export default function UserComponent(props: UserProps) {
                 marginBottom: 0,
                 borderBottom: '1px solid dimgrey',
               }}>
-                <ColLink col={props.col} pathname={`/u/${user.name}/j`} sx={{
+                <ColLink col={props.col} pathname={`/u/${user1.name}/j`} sx={{
                   color: path[3] === 'j' 
-                    ? user.color 
+                    ? user1.color 
                     : color,
                 }}>
                   Jams
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/u/${user.name}`} sx={{
+                <ColLink col={props.col} pathname={`/u/${user1.name}`} sx={{
                   color: !path[3] || path[3] === '' 
-                    ? user.color 
+                    ? user1.color 
                     : color,
                 }}>
                   Profile
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/u/${user.name}/r`} sx={{
+                <ColLink col={props.col} pathname={`/u/${user1.name}/r`} sx={{
                   color: path[3] === 'r' 
-                    ? user.color 
+                    ? user1.color 
                     : color,
                 }}>
                   Recent
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/u/${user.name}/s`} sx={{
-                  display: user.id === userDetail?.id
+                <ColLink col={props.col} pathname={`/u/${user1.name}/s`} sx={{
+                  display: user1.id === userDetail?.id
                     ? 'initial'
                     : 'none',
                   color: path[3] === 's'
-                    ? user.color 
+                    ? user1.color 
                     : color,
                 }}>
                   Settings
@@ -145,13 +141,13 @@ export default function UserComponent(props: UserProps) {
               }}>
                 {
                   path[3] === 'j'
-                    ? <UserJams user={user} col={props.col} />
+                    ? <UserJams user={user1} col={props.col} />
                     : path[3] === 'r'
                       ? null
                       : path[3] === 's'
-                        ? <UserSettings col={props.col} user={user} />
+                        ? <UserSettings col={props.col} user={user1} />
                         : <UserProfile 
-                            user={user} 
+                            user={user1} 
                             col={props.col} 
                           />
                 }

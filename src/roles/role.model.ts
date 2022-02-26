@@ -24,6 +24,12 @@ export class Role {
   type: string;
 
   @Field()
+  isInvited: boolean;
+
+  @Field()
+  isRequested: boolean;
+
+  @Field()
   createDate: Date;
   
   @Field()

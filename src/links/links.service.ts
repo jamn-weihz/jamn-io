@@ -71,10 +71,10 @@ export class LinksService {
   async linkPosts(userId: string, sourcePostId: string, targetPostId: string, clicks: number, tokens: number): Promise<Link> {
     let link = await this.getLinkBySourcePostIdAndTargetPostId(sourcePostId, targetPostId);
     if (link) {
+      const vote = await this.votesService.getVoteByUserIdAndLinkId(userId, link.id);
       let dClicks = clicks;
       let dTokens = tokens;
       let dWeight = findDefaultWeight(clicks, tokens);
-      let vote = await this.votesService.getVoteByUserIdAndLinkId(userId, link.id);
       if (vote) {
         dClicks -= vote.clicks;
         dTokens -= vote.tokens;

@@ -51,7 +51,6 @@ export default function useChangeCol() {
         fragment: FULL_USER_FIELDS,
         fragmentName: 'FullUserFields',
       }) as User;
-      console.log(user);
       userVar(user);
       colVar({
         ...colDetail,

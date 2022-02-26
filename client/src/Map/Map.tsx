@@ -55,7 +55,6 @@ export default function Map(props: MapProps) {
   const [hasPin, setHasPin] = useState(false);
 
   const [jams, setJams] = useState([] as Jam[]);
-  const [selectedJam, setSelectedJam] = useState(null as Jam | null);
   const [isStartingJam, setIsStartingJam] = useState(false);
 
   const [updateUserTimeout, setUpdateUserTimeout] = useState(null as ReturnType<typeof setTimeout> | null);
@@ -263,7 +262,7 @@ export default function Map(props: MapProps) {
     map.current.on('mouseleave', 'points', () => {
       map.current.getCanvas().style.cursor = '';
     });
-
+    setIsSourceAdded(true);
   }, [jams, isLoaded]);
 
   useEffect(() => {
@@ -322,6 +321,11 @@ export default function Map(props: MapProps) {
     }
   };
 
+  useEffect(() => {
+    if (isStartingJam) {
+
+    }
+  }, [isStartingJam])
   return (
     <Box sx={{
       height: '100%'
@@ -361,7 +365,10 @@ export default function Map(props: MapProps) {
                 isOpen={isStartingJam} 
                 setIsOpen={setIsStartingJam}
               />
-            : <Button disabled={!hasPin || !userDetail?.verifyEmailDate} onClick={handleStartJamClick}>
+            : <Button 
+                disabled={!hasPin || !userDetail?.verifyEmailDate} onClick={handleStartJamClick}
+                variant='contained'
+              >
                 Start a jam
               </Button>
         }

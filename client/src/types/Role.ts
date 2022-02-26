@@ -8,6 +8,8 @@ export type Role = {
   jamId: string;
   jam: Jam;
   type: string;
+  isInvited: boolean;
+  isRequested: boolean;
   createDate: Date;
   updateDate: Date;
   deleteDate: Date | null;

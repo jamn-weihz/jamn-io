@@ -6,6 +6,5 @@ export enum PostPrivacy {
 
 export enum RoleType {
   ADMIN = 'ADMIN',
-  PLAYER = 'PLAYER',
-  VIEWER = 'VIEWER',
+  MEMBER = 'MEMBER',
 }

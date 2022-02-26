@@ -35,7 +35,13 @@ export default function UserJams(props: UserJamsProps) {
                 color: getColor(paletteDetail.mode),
                 marginTop: 1,
               }}>
-                {role.type}
+                {
+                  role.isInvited && role.isRequested
+                    ? role.type
+                    : role.isInvited
+                      ? 'INVITED'
+                      : 'REQUESTED'
+                }
               </Box>
             </Card>
           )

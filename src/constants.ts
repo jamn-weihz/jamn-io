@@ -15,5 +15,4 @@ export const START_POST_DRAFT = JSON.stringify({
   entityMap: {}
 });
 
-
 export const START_POST_I = 1;

@@ -7,11 +7,13 @@ import {
   FormHelperText,
   Button,
 } from '@mui/material';
-import React, { Dispatch, SetStateAction, useState } from 'react';
-import { colVar, startJamVar } from '../cache';
+import { palette } from '@mui/system';
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { colVar, paletteVar, startJamVar } from '../cache';
 import useChangeCol from '../Col/useChangeCol';
-import { FULL_POST_FIELDS, JAM_FIELDS, ROLE_FIELDS, USER_FIELDS } from '../fragments';
+import { FULL_JAM_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
+import { getColor } from '../utils';
 
 const GET_JAM_BY_NAME = gql`
   query GetJamByName($name: String!) {
@@ -24,22 +26,10 @@ const GET_JAM_BY_NAME = gql`
 const START_JAM = gql`
   mutation StartJam($name: String!, $desc: String!, $lng: Float!, $lat: Float!) {
     startJam(name: $name, desc: $desc, lng: $lng, lat: $lat) {
-      ...JamFields
-      roles {
-        ...RoleFields
-        user {
-          ...UserFields
-        }
-      }
-      focus {
-        ...FullPostFields
-      }
+      ...FullJamFields
     }
   }
-  ${JAM_FIELDS}
-  ${USER_FIELDS}
-  ${FULL_POST_FIELDS}
-  ${ROLE_FIELDS}
+  ${FULL_JAM_FIELDS}
 `;
 
 interface StartJamModalProps {
@@ -51,12 +41,16 @@ interface StartJamModalProps {
 }
 export default function StartJamForm(props: StartJamModalProps) {
   const { changeCol } = useChangeCol()
+  const paletteDetail = useReactiveVar(paletteVar);
 
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState('');
   const [nameTimeout, setNameTimeout] = useState(null as ReturnType<typeof setTimeout> | null);
   const [desc, setDesc] = useState('');
-
+  const jamNameEl = useRef<HTMLInputElement>();
+  useEffect(() => {
+    jamNameEl.current?.focus();
+  }, [])
   const [getJamByName] = useLazyQuery(GET_JAM_BY_NAME, {
     onError: error => {
       console.error(error);
@@ -130,7 +124,9 @@ export default function StartJamForm(props: StartJamModalProps) {
     handleClose();
   }
 
-  const isFormValid = !!name.length
+  const isFormValid = !!name.length;
+
+  const color = getColor(paletteDetail.mode);
   return (
     <Box sx={{
       display: props.isOpen ? 'block' : 'none',
@@ -139,6 +135,7 @@ export default function StartJamForm(props: StartJamModalProps) {
       <FormControl margin='dense' sx={{width: '100%'}}>
         <InputLabel htmlFor='jamn-name' variant='outlined'>Name</InputLabel>
         <OutlinedInput
+          inputRef={jamNameEl}
           id='jamn-name'
           type='text'
           value={name}
@@ -165,7 +162,9 @@ export default function StartJamForm(props: StartJamModalProps) {
           Start
         </Button>
         &nbsp;
-        <Button color='secondary' onClick={handleCancelClick}>
+        <Button onClick={handleCancelClick} sx={{
+          color,
+        }}>
           Cancel
         </Button>
 

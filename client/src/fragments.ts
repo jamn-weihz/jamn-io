@@ -42,6 +42,8 @@ export const JAM_FIELDS = gql`
     color
     lng
     lat
+    isOpen
+    isPrivate
     deleteDate
   }
 `;
@@ -52,6 +54,8 @@ export const ROLE_FIELDS = gql`
     userId
     jamId
     type
+    isInvited
+    isRequested
     deleteDate
   }
 `;
@@ -119,6 +123,14 @@ export const VOTE_FIELDS = gql`
 export const FULL_USER_FIELDS = gql`
   fragment FullUserFields on User {
     ...UserFields
+    roles {
+      ...RoleFields
+      jam {
+        id
+        name
+        color
+      }
+    }
     cols {
       ...ColFields
     }
@@ -126,7 +138,27 @@ export const FULL_USER_FIELDS = gql`
       ...FullPostFields
     }
   }
+  ${ROLE_FIELDS}
   ${USER_FIELDS}
   ${COL_FIELDS}
   ${FULL_POST_FIELDS}
 `;
+
+export const FULL_JAM_FIELDS = gql`
+  fragment FullJamFields on Jam {
+    ...JamFields
+    roles {
+      ...RoleFields
+      user {
+        ...UserFields
+      }
+    }
+    focus {
+      ...FullPostFields
+    }
+  }
+  ${JAM_FIELDS}
+  ${ROLE_FIELDS}
+  ${USER_FIELDS}
+  ${FULL_POST_FIELDS}
+`

@@ -11,6 +11,8 @@ export type Jam = {
   color: string;
   lng: number;
   lat: number;
+  isOpen: boolean;
+  isPrivate: boolean;
   createDate: Date;
   updateDate: Date;
   deleteDate: Date | null;

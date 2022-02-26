@@ -35,6 +35,12 @@ export class Jam {
   lat: number;
 
   @Field()
+  isOpen: boolean;
+
+  @Field()
+  isPrivate: boolean;
+  
+  @Field()
   description: string;
   
   @Field()

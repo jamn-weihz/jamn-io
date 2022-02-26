@@ -34,9 +34,15 @@ export class Role {
   @Column({
     type: 'enum',
     enum: Enums.RoleType,
-    default: Enums.RoleType.VIEWER,
+    default: Enums.RoleType.MEMBER,
   })
   type: Enums.RoleType;
+
+  @Column({default: true})
+  isInvited: boolean;
+
+  @Column({default: true})
+  isRequested: boolean;
 
   @CreateDateColumn()
   createDate: Date;

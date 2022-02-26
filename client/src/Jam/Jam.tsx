@@ -1,7 +1,7 @@
 import { gql, useApolloClient, useLazyQuery, useReactiveVar } from '@apollo/client';
 import { Box, Card } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { FULL_POST_FIELDS, JAM_FIELDS, ROLE_FIELDS, USER_FIELDS } from '../fragments';
+import { FULL_JAM_FIELDS } from '../fragments';
 import Loading from '../Loading';
 import { Col } from '../types/Col';
 import { Jam } from '../types/Jam';
@@ -16,22 +16,10 @@ import ColBar from '../Col/ColBar';
 const GET_JAM_BY_NAME = gql`
   query GetJamByName($name: String!) {
     getJamByName(name: $name) {
-      ...JamFields
-      roles {
-        ...RoleFields
-        user {
-          ...UserFields
-        }
-      }
-      focus {
-        ...FullPostFields
-      }
+      ...FullJamFields
     }
   }
-  ${JAM_FIELDS}
-  ${ROLE_FIELDS}
-  ${USER_FIELDS}
-  ${FULL_POST_FIELDS}
+  ${FULL_JAM_FIELDS}
 `;
 
 interface JamComponentProps {
@@ -81,12 +69,13 @@ export default function JamComponent(props: JamComponentProps) {
 
   }, [startJamDetail.jam, props.name]);
 
-
   if (isLoading) return <Loading />
 
-  const handleOptionsClick = (event: React.MouseEvent) => {
-    setShowOptions(!showOptions);
-  }
+  const jam1 = client.cache.readFragment({
+    id: client.cache.identify(jam || {}),
+    fragment: FULL_JAM_FIELDS,
+    fragmentName: 'FullJamFields',
+  }) as Jam;
 
   const path = props.col.pathname.split('/');
 
@@ -95,9 +84,9 @@ export default function JamComponent(props: JamComponentProps) {
     <Box sx={{
       height: '100%'
     }}>
-      <ColBar col={props.col} />
+      <ColBar col={props.col} jam={jam1} />
       {
-        jam 
+        jam1.id
           ? <Box sx={{
               height: '100%'
             }}>
@@ -107,26 +96,26 @@ export default function JamComponent(props: JamComponentProps) {
                 marginBottom: 0,
                 borderBottom: '1px solid dimgrey',
               }}>
-                <ColLink col={props.col} pathname={`/j/${jam.name}/u`} sx={{
-                  color: path[3] === 'u' ? jam.color : color,
+                <ColLink col={props.col} pathname={`/j/${jam1.name}/u`} sx={{
+                  color: path[3] === 'u' ? jam1.color : color,
                 }}>
                   Users
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/j/${jam.name}`} sx={{
-                  color: !path[3] || path[3] === '' ? jam.color : color,
+                <ColLink col={props.col} pathname={`/j/${jam1.name}`} sx={{
+                  color: !path[3] || path[3] === '' ? jam1.color : color,
                 }}>
                   Profile
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/j/${jam.name}/r`} sx={{
-                  color: path[3] === 'r' ? jam.color : color,
+                <ColLink col={props.col} pathname={`/j/${jam1.name}/r`} sx={{
+                  color: path[3] === 'r' ? jam1.color : color,
                 }}>
                   Recent
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/j/${jam.name}/s`} sx={{
-                  color: path[3] === 's' ? jam.color : color,
+                <ColLink col={props.col} pathname={`/j/${jam1.name}/s`} sx={{
+                  color: path[3] === 's' ? jam1.color : color,
                 }}>
                   Settings
                 </ColLink>
@@ -137,13 +126,13 @@ export default function JamComponent(props: JamComponentProps) {
               }}>
                 {
                   path[3] === 'u'
-                    ? <JamUsers jam={jam} col={props.col}/>
+                    ? <JamUsers jam={jam1} col={props.col}/>
                     : path[3] === 'r'
-                      ? <JamnRecent jam={jam} col={props.col} />
+                      ? <JamnRecent jam={jam1} col={props.col} />
                       : path[3] === 's'
-                        ? <JamSettings jam={jam} col={props.col}/>
+                        ? <JamSettings jam={jam1} col={props.col}/>
                         : <JamProfile 
-                            jam={jam} 
+                            jam={jam1} 
                             col={props.col} 
                           />
                 }

@@ -15,8 +15,6 @@ export default function IframelyComponent(props: any) {
     __html: "<div />"
   });
   const paletteDetail = useReactiveVar(paletteVar);
-  const sizeDetail = useReactiveVar(sizeVar);
-
 
   const key = paletteDetail.mode === 'dark'
     ? IFRAMELY_API_KEY_DARK
@@ -30,7 +28,6 @@ export default function IframelyComponent(props: any) {
           (res) => {
             setIsLoaded(true);
             if (res.html) {
-              console.log(res.html)
               setHtml({__html: res.html});
             } else if (res.error) {
               setError({code: res.error, message: res.message});
