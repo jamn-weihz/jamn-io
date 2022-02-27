@@ -2,27 +2,15 @@ import { Box, Button, Card } from '@mui/material'
 import { Jam } from '../types/Jam'
 import ColLink from '../Col/ColLink';
 import { Col } from '../types/Col';
-import { gql, Reference, useMutation, useReactiveVar } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
 import { paletteVar, userVar } from '../cache';
 import { getColor } from '../utils';
 import React, { useState } from 'react';
 import InviteRoleForm from './InviteRoleForm';
 import { Role } from '../types/Role';
-import { ROLE_FIELDS } from '../fragments';
-
-const REQUEST_ROLE = gql`
-  mutation RequestRole($jamId: String!) {
-    requestRole(jamId: $jamId) {
-      ...RoleFields
-      user {
-        id
-        name
-        color
-      }
-    }
-  }
-  ${ROLE_FIELDS}
-`;
+import useRequestRole from '../Role/useRequestRole';
+import useInviteRole from '../Role/useInviteRole';
+import useRemoveRole from '../Role/useRemoveRole';
 
 interface JamUsersProps {
   jam: Jam;
@@ -35,59 +23,25 @@ export default function JamUsers(props: JamUsersProps) {
   
   const [isInviting, setIsInviting] = useState(false);
 
-  const [requestRole] = useMutation(REQUEST_ROLE, {
-    onError: error => {
-      console.error(error);
-    },
-    update: (cache, {data: {requestRole}}) => {
-      const newRef = cache.writeFragment({
-        id: cache.identify(requestRole),
-        fragment: ROLE_FIELDS,
-        data: requestRole,
-      });
-      cache.modify({
-        id: cache.identify(props.jam),
-        fields: {
-          roles: (cachedRefs, {readField}) => {
-            const isPresent = cachedRefs.some((ref: Reference) => {
-              return readField('id', ref) === requestRole.id;
-            })
-            if (isPresent) return cachedRefs;
-            return [...cachedRefs, newRef]
-          },
-        }
-      });
-      cache.modify({
-        id: cache.identify(userDetail || {}),
-        fields: {
-          roles: (cachedRefs, {readField}) => {
-            const isPresent = cachedRefs.some((ref: Reference) => {
-              return readField('id', ref) === requestRole.id;
-            })
-            if (isPresent) return cachedRefs;
-            return [...cachedRefs, newRef]
-          }
-        }
-      })
-    },
-    onCompleted: data => {
-      console.log(data);
-
-    },
-  });
+  const { requestRole } = useRequestRole();
+  const { inviteRole } = useInviteRole(props.jam.id, () => {});
+  const { removeRole } = useRemoveRole();
 
   const handleInviteClick = (event: React.MouseEvent) => {
     setIsInviting(true);
   }
   const handleJoinClick = (event: React.MouseEvent) => {
-    requestRole({
-      variables: {
-        jamId: props.jam.id,
-      },
-    });
+    requestRole(props.jam.id);
   }
+  const handleApproveClick = (userName: string) => (event: React.MouseEvent) => {
+    inviteRole(userName);
+  }
+  const handleLeaveClick = (roleId: string) => (event: React.MouseEvent) => {
+    removeRole(roleId)
+  }
+
   let role = null as Role | null;
-  props.jam.roles.some(role_i => {
+  props.jam.roles.filter(role_i => !role_i.deleteDate).some(role_i => {
     if (role_i.userId === userDetail?.id) {
       role = role_i;
       return true;
@@ -112,32 +66,33 @@ export default function JamUsers(props: JamUsersProps) {
                     : <Button variant='contained' onClick={handleInviteClick}>
                         Invite
                       </Button>
-    
                 }
- 
               </Box>
             : <Box>
                 {
-                  props.jam.isOpen || (role && role.isInvited)
+                  !props.jam.isClosed || (role && role.isInvited)
                     ? <Button variant='contained' onClick={handleJoinClick}>
                         Join
                       </Button>
-                    : null
+                    : <Button onClick={handleJoinClick}>
+                        Request membership
+                      </Button>
                 }
               </Box>
         }
       </Card>
       {
-        (props.jam.roles || []).map(role_i => {
+        (props.jam.roles || []).filter(role_i => !role_i.deleteDate).map(role_i => {
           return (
             <Card key={`role-${role_i.id}`} elevation={5} sx={{
               margin:1,
               padding:1,
               fontSize: 16,
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between'
             }}>
-              <Box sx={{
-                float: 'left',
-              }}>
+              <Box>
                 <ColLink col={props.col} pathname={`/u/${role_i.user.name}`} sx={{
                   color: role_i.user.color,
                 }}>
@@ -157,15 +112,40 @@ export default function JamUsers(props: JamUsersProps) {
                 </Box>
               </Box>
               <Box sx={{
-                float: 'right',
+                display: role && role.isInvited && role.isRequested && !role_i.isInvited
+                  ? 'block'
+                  :'none'
+              }}>
+                <Button onClick={handleApproveClick(role_i.user.name)}>
+                  Approve
+                </Button>
+              </Box>
+              <Box sx={{
+                display: role_i.userId === userDetail?.id && role_i.type !== 'ADMIN'
+                  ? 'block'
+                  : 'none'
               }}>
                 {
-                  role && role.isInvited && role.isRequested && !role_i.isInvited && false
-                    ? <Button>
-                          Approve
-                      </Button>
-                    : null
+                  role_i.isRequested
+                    ? role_i.isInvited
+                      ? <Button onClick={handleLeaveClick(role_i.id)}>
+                          Leave
+                        </Button>
+                      : <Button onClick={handleLeaveClick(role_i.id)}>
+                          Cancel
+                        </Button>
+                    : role_i.isInvited
+                      ? <Box>
+                        <Button onClick={handleJoinClick}>
+                          Accept
+                        </Button>
+                        <Button onClick={handleLeaveClick(role_i.id)}>
+                          Decline
+                        </Button>
+                        </Box>
+                      : null
                 }
+                
               </Box>
             </Card>
           )

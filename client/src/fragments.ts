@@ -42,7 +42,7 @@ export const JAM_FIELDS = gql`
     color
     lng
     lat
-    isOpen
+    isClosed
     isPrivate
     deleteDate
   }

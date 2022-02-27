@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RolesService } from 'src/roles/roles.service';
 import { UsersService } from 'src/users/users.service';
@@ -51,6 +51,10 @@ export class JamsService {
   }
 
   async startJam(userId: string, lng: number, lat: number, name: string, description: string): Promise<Jam> {
+    const jam = await this.getJamByName(name);
+    if (jam) {
+      throw new BadRequestException('This name is already in use');
+    }
     const user = await this.usersService.getUserById(userId);
 
     const jam0 = new Jam();
@@ -86,11 +90,32 @@ export class JamsService {
   }
 
   async setJamColor(userId: string, jamId: string, color: string) {
+    const jam = await this.getJamById(jamId);
+    if (!jam) {
+      throw new BadRequestException('This jam does not exist');
+    }
     const role = await this.rolesService.getRoleByUserIdAndJamId(userId, jamId);
-    if (role.type !== Enums.RoleType.ADMIN) return null;
+    if (role.type !== Enums.RoleType.ADMIN) {
+      throw new BadRequestException('Insufficient privileges');
+    };
     const jam0 = new Jam();
     jam0.id = jamId;
     jam0.color = color;
+    return this.jamsRepository.save(jam0);
+  }
+
+  async setJamIsClosed(userId: string, jamId: string, isClosed: boolean) {
+    const jam = await this.getJamById(jamId);
+    if (!jam) {
+      throw new BadRequestException('This jam does not exist');
+    }
+    const role = await this.rolesService.getRoleByUserIdAndJamId(userId, jamId);
+    if (role.type !== Enums.RoleType.ADMIN) {
+      throw new BadRequestException('Insufficient privileges');
+    };
+    const jam0 = new Jam();
+    jam0.id = jamId;
+    jam0.isClosed = isClosed;
     return this.jamsRepository.save(jam0);
   }
 

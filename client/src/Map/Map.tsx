@@ -14,6 +14,7 @@ import useChangeCol from '../Col/useChangeCol';
 import { Col } from '../types/Col';
 import { getColor } from '../utils';
 import ColBar from '../Col/ColBar';
+import useStartJamSubscription from './useStartJamSubscription';
 
 mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
 
@@ -55,6 +56,9 @@ export default function Map(props: MapProps) {
   const [hasPin, setHasPin] = useState(false);
 
   const [jams, setJams] = useState([] as Jam[]);
+
+  useStartJamSubscription(jams, setJams);
+
   const [isStartingJam, setIsStartingJam] = useState(false);
 
   const [updateUserTimeout, setUpdateUserTimeout] = useState(null as ReturnType<typeof setTimeout> | null);

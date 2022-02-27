@@ -1,18 +1,21 @@
 import { gql, useApolloClient, useLazyQuery, useReactiveVar } from '@apollo/client';
 import { Box, Card } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FULL_JAM_FIELDS } from '../fragments';
 import Loading from '../Loading';
 import { Col } from '../types/Col';
 import { Jam } from '../types/Jam';
+import { Role } from '../types/Role';
 import JamProfile from './JamProfile';
 import JamSettings from './JamSettings';
 import JamUsers from './JamUsers';
 import ColLink from '../Col/ColLink';
-import JamnRecent from './JamRecent';
-import { paletteVar, startJamVar } from '../cache';
+import JamRecent from './JamRecent';
+import { userVar, paletteVar, startJamVar } from '../cache';
 import { getColor } from '../utils'
 import ColBar from '../Col/ColBar';
+import useJamRoleSubscription from '../Role/useJamRoleSubscription';
+
 const GET_JAM_BY_NAME = gql`
   query GetJamByName($name: String!) {
     getJamByName(name: $name) {
@@ -29,13 +32,14 @@ interface JamComponentProps {
 export default function JamComponent(props: JamComponentProps) {
   const client = useApolloClient();
 
+  const userDetail = useReactiveVar(userVar);
   const paletteDetail = useReactiveVar(paletteVar);
   const startJamDetail = useReactiveVar(startJamVar);
 
   const [jam, setJam] = useState(null as Jam | null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [showOptions, setShowOptions] = useState(false);
+  useJamRoleSubscription(jam?.id || '');
 
   const [getJamByName] = useLazyQuery(GET_JAM_BY_NAME, {
     onError: error => {
@@ -77,6 +81,15 @@ export default function JamComponent(props: JamComponentProps) {
     fragmentName: 'FullJamFields',
   }) as Jam;
 
+  let role = null as Role | null;
+  (jam1.roles || []).some(role_i => {
+    if (role_i.userId === userDetail?.id) {
+      role = role_i;
+      return true;
+    }
+    return false;
+  })
+
   const path = props.col.pathname.split('/');
 
   const color = getColor(paletteDetail.mode);
@@ -115,6 +128,9 @@ export default function JamComponent(props: JamComponentProps) {
                 </ColLink>
                 &nbsp;&nbsp;
                 <ColLink col={props.col} pathname={`/j/${jam1.name}/s`} sx={{
+                  display: role && role.type === 'ADMIN'
+                    ? 'initial'
+                    : 'none',
                   color: path[3] === 's' ? jam1.color : color,
                 }}>
                   Settings
@@ -128,7 +144,7 @@ export default function JamComponent(props: JamComponentProps) {
                   path[3] === 'u'
                     ? <JamUsers jam={jam1} col={props.col}/>
                     : path[3] === 'r'
-                      ? <JamnRecent jam={jam1} col={props.col} />
+                      ? <JamRecent jam={jam1} col={props.col} />
                       : path[3] === 's'
                         ? <JamSettings jam={jam1} col={props.col}/>
                         : <JamProfile 

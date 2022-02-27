@@ -8,6 +8,7 @@ import { RolesModule } from 'src/roles/roles.module';
 import { PostsModule } from 'src/posts/posts.module';
 import { LinksModule } from 'src/links/links.module';
 import { VotesModule } from 'src/votes/votes.module';
+import { PubSubModule } from 'src/pub-sub/pub-sub.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { VotesModule } from 'src/votes/votes.module';
     forwardRef(() => PostsModule),
     forwardRef(() => LinksModule),
     forwardRef(() => VotesModule),
+    PubSubModule,
   ],
   providers: [JamsService, JamsResolver],
   exports: [JamsService],

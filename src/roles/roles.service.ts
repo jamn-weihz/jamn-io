@@ -16,12 +16,8 @@ export class RolesService {
     private readonly jamsService: JamsService,
   ) {}
 
-  async createRole(userId: string, jamId: string, type: Enums.RoleType): Promise<Role> {
-    const role0 = new Role();
-    role0.userId = userId;
-    role0.jamId = jamId;
-    role0.type = type;
-    return this.rolesRepository.save(role0);
+  async getRoleById(id): Promise<Role> {
+    return this.rolesRepository.findOne({id});
   }
 
   async getRolesByUserId(userId: string): Promise<Role[]> {
@@ -47,6 +43,14 @@ export class RolesService {
         jamId,
       },
     });
+  }
+
+  async createRole(userId: string, jamId: string, type: Enums.RoleType): Promise<Role> {
+    const role0 = new Role();
+    role0.userId = userId;
+    role0.jamId = jamId;
+    role0.type = type;
+    return this.rolesRepository.save(role0);
   }
 
   async inviteRole(invitingUserId: string, invitedUserName: string, jamId: string): Promise<Role> {
@@ -112,9 +116,31 @@ export class RolesService {
       role0.userId = userId;
       role0.jamId = jamId;
       role0.isRequested = true;
-      role0.isInvited = jam.isOpen;
+      role0.isInvited = !jam.isClosed;
       await this.rolesRepository.save(role0);
     }
     return this.getRoleByUserIdAndJamId(userId, jamId);
+  }
+
+  async removeRole(userId: string, roleId: string): Promise<Role> {
+    const role = await this.getRoleById(roleId);
+    if (!role) {
+      throw new BadRequestException('This role does not exist');
+    }
+    if (role.type === 'ADMIN') {
+      throw new BadRequestException('Admins cannot leave jams at this time');
+    }
+    const removerRole = await this.getRoleByUserIdAndJamId(userId, role.jamId);
+    if (removerRole.type !== 'ADMIN' && removerRole.id !== role.id) {
+      throw new BadRequestException('Insufficient privileges');
+    }
+    await this.rolesRepository.softDelete({id: role.id});
+
+    return this.rolesRepository.findOne({
+      where: {
+        id: roleId, 
+      },
+      withDeleted: true
+    });
   }
 }

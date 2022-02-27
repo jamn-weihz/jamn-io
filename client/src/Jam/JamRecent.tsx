@@ -5,6 +5,6 @@ interface JamRecentProps {
   jam: Jam;
   col: Col;
 }
-export default function JamnRecent(props: JamRecentProps) {
+export default function JamRecent(props: JamRecentProps) {
   return null;
 }

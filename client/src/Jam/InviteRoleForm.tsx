@@ -5,21 +5,7 @@ import { paletteVar } from '../cache';
 import { ROLE_FIELDS } from '../fragments';
 import { Jam } from '../types/Jam';
 import { getColor } from '../utils';
-
-
-const INVITE_ROLE = gql`
-  mutation InviteRole($userName: String!, $jamId: String!) {
-    inviteRole(userName: $userName, jamId: $jamId) {
-      ...RoleFields 
-      user {
-        id
-        color
-        name
-      }
-    }
-  }
-  ${ROLE_FIELDS}
-`;
+import useInviteRole from '../Role/useInviteRole';
 
 interface InviteRoleFormProps {
   jam: Jam;
@@ -37,29 +23,8 @@ export default function InviteRoleForm(props: InviteRoleFormProps) {
     userNameEl.current?.focus();
   }, []);
 
-  const [inviteRole] = useMutation(INVITE_ROLE, {
-    onError: error => {
-      console.error(error);
-      setError(error.message);
-    },
-    update: (cache, {data: {inviteRole}}) => {
-      cache.modify({
-        id: cache.identify(props.jam),
-        fields: {
-          roles: cachedRefs => {
-            const newRef = cache.writeFragment({
-              id: cache.identify(inviteRole),
-              fragment: ROLE_FIELDS,
-              data: inviteRole,
-            });
-            return [...cachedRefs, newRef];
-          }
-        }
-      })
-    },
-    onCompleted: data =>  {
-      console.log(data);
-    },
+  const { inviteRole } = useInviteRole(props.jam.id, (error: any) => {
+    setError(error.messasge)
   })
 
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,12 +36,7 @@ export default function InviteRoleForm(props: InviteRoleFormProps) {
   }
 
   const handleInviteClick = (event: React.MouseEvent) => {
-    inviteRole({
-      variables: {
-        userName: name,
-        jamId: props.jam.id,
-      },
-    });
+    inviteRole(name);
   }
 
   const color = getColor(paletteDetail.mode)

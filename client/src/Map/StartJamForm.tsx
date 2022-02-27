@@ -133,10 +133,10 @@ export default function StartJamForm(props: StartJamModalProps) {
       padding: 1,
     }}>
       <FormControl margin='dense' sx={{width: '100%'}}>
-        <InputLabel htmlFor='jamn-name' variant='outlined'>Name</InputLabel>
+        <InputLabel htmlFor='jam-name' variant='outlined'>Name</InputLabel>
         <OutlinedInput
           inputRef={jamNameEl}
-          id='jamn-name'
+          id='jam-name'
           type='text'
           value={name}
           onChange={handleNameChange}
@@ -146,9 +146,9 @@ export default function StartJamForm(props: StartJamModalProps) {
         <FormHelperText>{nameError}</FormHelperText>
       </FormControl>
       <FormControl margin='dense' sx={{width: '100%'}}>
-        <InputLabel htmlFor='jamn-desc' variant='outlined'>Description (optional)</InputLabel>
+        <InputLabel htmlFor='jam-desc' variant='outlined'>Description (optional)</InputLabel>
         <OutlinedInput
-          id='jamn-desc'
+          id='jam-desc'
           type='text'
           value={desc}
           onChange={handleDescChange}

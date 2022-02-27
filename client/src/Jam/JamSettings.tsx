@@ -1,6 +1,6 @@
 import { gql, useMutation } from '@apollo/client';
-import { Box } from '@mui/material';
-import { useState } from 'react';
+import { Box, Card, Checkbox } from '@mui/material';
+import React, { useState } from 'react';
 import { ChromePicker } from 'react-color';
 import { Col } from '../types/Col';
 import { Jam } from '../types/Jam';
@@ -14,6 +14,14 @@ const SET_JAM_COLOR = gql`
   }
 `;
 
+const SET_JAM_ISCLOSED = gql`
+  mutation SetJamIsClosed($jamId: String!, $isClosed: Boolean!) {
+    setJamIsClosed(jamId: $jamId, isClosed: $isClosed) {
+      id
+      isClosed
+    }
+  }
+`;
 
 interface JamSettingsProps {
   jam: Jam;
@@ -22,6 +30,8 @@ interface JamSettingsProps {
 
 export default function JamSettings(props: JamSettingsProps) {
   const [color, setColor] = useState(props.jam.color);
+
+  const [isClosed, setIsClosed] = useState(props.jam.isClosed);
 
   const [colorTimeout, setColorTimeout] = useState(null as ReturnType<typeof setTimeout> | null);
 
@@ -33,6 +43,15 @@ export default function JamSettings(props: JamSettingsProps) {
       console.log(data);
     },
   });
+
+  const [setJamIsClosed] = useMutation(SET_JAM_ISCLOSED, {
+    onError: error => {
+      console.error(error);
+    },
+    onCompleted: data => {
+      console.log(data);
+    },
+  })
 
   const handleColorChange = (color: any) => {
     setColor(color.hex);
@@ -54,18 +73,50 @@ export default function JamSettings(props: JamSettingsProps) {
     setColorTimeout(timeout);
   };
 
+  const handleCloseChange = () => {
+    setJamIsClosed({
+      variables: {
+        jamId: props.jam.id,
+        isClosed: !isClosed,
+      }
+    });
+    setIsClosed(!isClosed);
+  }
+
   return (
     <Box>
-      <Box sx={{
+      <Card elevation={5} sx={{
         margin: 1,
+        padding: 1,
       }}>
-        <ChromePicker 
-          color={color}
-          disableAlpha={true}
-          onChange={handleColorChange}
-          onChangeComplete={handleColorChangeComplete}
-        />
-      </Box>
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          margin: 1,
+        }}>
+          <Checkbox checked={isClosed} onChange={handleCloseChange}/>
+          Closed (new members require approval)
+        </Box>
+        <Box sx={{
+          margin: 1,
+          display: 'none',
+          flexDirection: 'row',
+        }}>
+          <Checkbox />
+          Private (posts visible only to members)
+        </Box>
+        <Box sx={{
+          margin: 1,
+        }}>
+          <ChromePicker 
+            color={color}
+            disableAlpha={true}
+            onChange={handleColorChange}
+            onChangeComplete={handleColorChangeComplete}
+          />
+        </Box>
+
+      </Card>
 
     </Box>
   )

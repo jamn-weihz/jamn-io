@@ -15,6 +15,7 @@ import { Col } from '../types/Col';
 import ColLink from '../Col/ColLink';
 import { getColor } from '../utils';
 import ColBar from '../Col/ColBar';
+import useUserRoleSubscription from '../Role/useUserRoleSubscription';
 
 const GET_USER_BY_NAME = gql`
   query GetUserByName($name: String!) {
@@ -36,6 +37,8 @@ export default function UserComponent(props: UserProps) {
   const [user, setUser] = useState(null as User | null);
   const [isLoading, setIsLoading] = useState(false);
 
+  useUserRoleSubscription(user?.id || '');
+  
   const [getUserByName] = useLazyQuery(GET_USER_BY_NAME, {
     onError: error => {
       console.error(error);

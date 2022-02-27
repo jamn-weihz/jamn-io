@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { START_POST_DESC, START_POST_DRAFT, START_POST_I, START_POST_NAME } from 'src/constants';
 import { In, Repository } from 'typeorm';
@@ -119,7 +119,9 @@ export class PostsService {
   async savePost(userId: string, postId: string, draft: string): Promise<Post> {
     const post = await this.postsRepository.findOne({id: postId});
 
-    if (post.userId !== userId) return null;
+    if (post.userId !== userId) {
+      throw new BadRequestException('Unauthorized');
+    };
 
     const contentState = convertFromRaw(JSON.parse(draft));
     const text = contentState.getPlainText('\n');

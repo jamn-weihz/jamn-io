@@ -20,7 +20,7 @@ export default function useSavePostSubcription(cardIds: string[]) {
       cardIds,
     },
     onSubscriptionData: ({subscriptionData: {data: {savePost}}}) => {
-      console.log('savePost', savePost);
+      console.log(savePost);
       client.cache.writeQuery({
         query: gql`
           query SavePost {

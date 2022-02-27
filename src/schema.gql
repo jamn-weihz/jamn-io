@@ -26,7 +26,7 @@ type Jam {
   focus: Post!
   focusId: String
   id: String!
-  isOpen: Boolean!
+  isClosed: Boolean!
   isPrivate: Boolean!
   lat: Float!
   lng: Float!
@@ -58,7 +58,7 @@ type Mutation {
   getNext(offset: Int!, postId: String!): [Link!]!
   getPosts(postIds: [String!]!): [Post!]!
   getPrev(offset: Int!, postId: String!): [Link!]!
-  inviteRole(jamId: String!, userName: String!): Role!
+  inviteRole(jamId: String!, sessionId: String!, userName: String!): Role!
   linkPosts(sessionId: String!, sourcePostId: String!, targetPostId: String!): Link!
   loginGoogleUser(pathnames: [String!]!, token: String!): User!
   loginUser(email: String!, pass: String!): User!
@@ -66,12 +66,14 @@ type Mutation {
   refreshToken: User!
   registerUser(email: String!, pass: String!, pathnames: [String!]!): User!
   removeCol(colId: String!): [Col!]!
+  removeRole(roleId: String!, sessionId: String!): Role!
   replyPost(jamId: String, sessionId: String!, sourcePostId: String!): Link!
-  requestRole(jamId: String!): Role!
+  requestRole(jamId: String!, sessionId: String!): Role!
   resendUserVerification: User!
   saveCol(colId: String!, pathname: String!): Col!
   savePost(draft: String!, postId: String!, sessionId: String!): Post!
   setJamColor(color: String!, jamId: String!): Jam!
+  setJamIsClosed(isClosed: Boolean!, jamId: String!): Jam!
   setUserColor(color: String!): User!
   setUserName(name: String!): User!
   shiftCol(colId: String!, di: Int!): [Col!]!
@@ -130,8 +132,11 @@ type Role {
 }
 
 type Subscription {
+  jamRole(jamId: String!, sessionId: String!): Role!
   linkPosts(postIds: [String!]!, sessionId: String!): Link!
   savePost(cardIds: [String!]!, sessionId: String!): Post!
+  startJam: Jam!
+  userRole(sessionId: String!, userId: String!): Role!
 }
 
 type User {

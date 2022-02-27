@@ -60,8 +60,8 @@ export class Jam {
   @Index({ spatial: true })
   location: Point;
 
-  @Column({default: true})
-  isOpen: boolean;
+  @Column({default: false})
+  isClosed: boolean;
 
   @Column({default: false})
   isPrivate: boolean;

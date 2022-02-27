@@ -1,7 +1,10 @@
 import { useReactiveVar } from '@apollo/client';
-import { Box, Card } from '@mui/material'
+import { Box, Button, Card } from '@mui/material'
+import React from 'react';
 import { paletteVar } from '../cache';
 import ColLink from '../Col/ColLink';
+import useRemoveRole from '../Role/useRemoveRole';
+import useRequestRole from '../Role/useRequestRole';
 import { Col } from '../types/Col';
 import { User } from '../types/User'
 import { getColor } from '../utils';
@@ -12,34 +15,77 @@ interface UserJamsProps {
 }
 export default function UserJams(props: UserJamsProps) {
   const paletteDetail = useReactiveVar(paletteVar);
-  
+  const { requestRole } = useRequestRole();
+  const { removeRole } = useRemoveRole();
+
+  const handleAcceptClick = (jamId: string) => (event: React.MouseEvent) => {
+    requestRole(jamId);
+  }
+  const handleDeclineClick = (roleId: string) => (evnet: React.MouseEvent) => {
+    removeRole(roleId);
+  }
   return (
     <Box>
       {
-        props.user.roles.map(role => {
+        props.user.roles.filter(role => !role.deleteDate).map(role => {
           return (
             <Card elevation={5} key={`role-${role.id}`} sx={{
               margin:1,
               padding:1,
               fontSize: 16,
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
             }}>
-              <ColLink col={props.col} pathname={`/j/${role.jam.name}`} sx={{
-                color: role.jam.color,
-              }}>
-                {`j/${role.jam.name}`}
-              </ColLink>
+              <Box>
+                <ColLink col={props.col} pathname={`/j/${role.jam.name}`} sx={{
+                  color: role.jam.color,
+                }}>
+                  {`j/${role.jam.name}`}
+                </ColLink>
+                <Box sx={{
+                  fontSize: 12,
+                  color: getColor(paletteDetail.mode),
+                  marginTop: 1,
+                }}>
+                  {
+                    role.isInvited && role.isRequested
+                      ? role.type
+                      : role.isInvited
+                        ? 'INVITED'
+                        : 'REQUESTED'
+                  }
+                </Box>
+              </Box>
               <Box sx={{
-                fontSize: 12,
-                color: getColor(paletteDetail.mode),
-                marginTop: 1,
+                display: !role.isRequested
+                  ? 'block'
+                  : 'none',
               }}>
-                {
-                  role.isInvited && role.isRequested
-                    ? role.type
-                    : role.isInvited
-                      ? 'INVITED'
-                      : 'REQUESTED'
-                }
+                <Button onClick={handleAcceptClick(role.jamId)}>
+                  Accept
+                </Button>
+                <Button onClick={handleDeclineClick(role.id)}>
+                  Decline
+                </Button>
+              </Box>
+              <Box sx={{
+                display: !role.isInvited
+                  ? 'block'
+                  : 'none',
+              }}>
+                <Button onClick={handleDeclineClick(role.id)}>
+                  Cancel
+                </Button>
+              </Box>
+              <Box sx={{
+                display: role.isInvited && role.isRequested && role.type !== 'ADMIN'
+                  ? 'block'
+                  : 'none',
+              }}>
+                <Button onClick={handleDeclineClick(role.id)}>
+                  Leave
+                </Button>
               </Box>
             </Card>
           )

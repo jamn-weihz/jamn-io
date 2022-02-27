@@ -43,7 +43,7 @@ export default function useLinkPostsSubcription(postIds: string[], dispatch: Dis
       postIds,
     },
     onSubscriptionData: ({subscriptionData: {data: {linkPosts}}}) => {
-      console.log('linkPosts', linkPosts);
+      console.log(linkPosts);
 
       client.cache.writeQuery({
         query: gql`
