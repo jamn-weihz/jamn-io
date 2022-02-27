@@ -85,6 +85,7 @@ export class JamsResolver {
   ) {
     return this.jamsService.setJamColor(user.id, jamId, color);
   }
+  
   @UseGuards(GqlAuthGuard)
   @Mutation(() => Jam, {name: 'setJamIsClosed'})
   async setJam(

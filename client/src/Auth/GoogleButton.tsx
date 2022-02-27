@@ -1,8 +1,8 @@
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
 import { GOOGLE_CLIENT_ID } from '../constants';
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { FULL_USER_FIELDS } from '../fragments';
 import { colVar, focusVar, userVar } from '../cache';
 import { Col } from '../types/Col';
@@ -23,11 +23,13 @@ interface GoogleButtonProps {
 }
 export default function GoogleButton(props: GoogleButtonProps) {
   const colDetail = useReactiveVar(colVar);
-  const { changeCol } = useChangeCol();
+
+  const [message, setMessage] = useState('');
   
   const [loginGoogleUser] = useMutation(REGISTER_USER, {
     onError: error => {
       console.error(error);
+      setMessage(error.message);
     },
     onCompleted: data => {
       console.log(data);
@@ -52,9 +54,11 @@ export default function GoogleButton(props: GoogleButtonProps) {
 
   const handleFailure = (response: any) => {
     console.error(response);
+    setMessage(response.message);
   }
 
   return (
+    <Box>
     <GoogleLogin
       clientId={GOOGLE_CLIENT_ID}
       render={renderProps => (
@@ -69,5 +73,7 @@ export default function GoogleButton(props: GoogleButtonProps) {
       onSuccess={handleSuccess}
       onFailure={handleFailure}
     />
+    { message }    
+    </Box>
   );
 }

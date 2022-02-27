@@ -55,11 +55,14 @@ export default function Register(props: RegisterProps) {
   const [getUserByEmail] = useLazyQuery(GET_USER_BY_EMAIL, {
     onCompleted: data => {
       console.log(data);
-      setEmailError(data.userByEmail ? 'Email is already in use' : '');
+      setEmailError(data.getUserByEmail ? 'Email is already in use' : '');
     }
   });
 
   const [registerUser] = useMutation(REGISTER_USER, {
+    onError: error => {
+      setMessage(error.message);
+    },
     onCompleted: data => {
       if (data.registerUser) {
         if (tokenDetail.interval) {
@@ -116,6 +119,7 @@ export default function Register(props: RegisterProps) {
   };
 
   const handleSubmit = (event: React.MouseEvent) => {
+    setMessage('')
     registerUser({
       variables: {
         email,
@@ -131,11 +135,6 @@ export default function Register(props: RegisterProps) {
     changeCol(props.col, '/login')
   };
 
-  const handleOptionsClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    setShowOptions(!showOptions);
-  }
-
   const isFormValid = email.length && !emailError && pass.length;
 
   const color = getColor(paletteDetail.mode);
@@ -144,8 +143,6 @@ export default function Register(props: RegisterProps) {
     <Box>
       <ColBar col={props.col} />
       <Card elevation={5} sx={{padding: 1, margin: 1}}>
-
-        {message}
         <FormControl margin='dense' sx={{width: '100%'}}>
           <TextField
             label='Email'
@@ -164,7 +161,7 @@ export default function Register(props: RegisterProps) {
             type={showPass ? 'text' : 'password'}
             value={pass}
             onChange={handlePassChange}
-            label='Pass'
+            label='Password'
             endAdornment={
               <InputAdornment position='end'>
                 <IconButton
@@ -185,33 +182,36 @@ export default function Register(props: RegisterProps) {
             }
           />
         </FormControl>
-          <Button
-            disabled={!isFormValid}
-            variant='contained' 
-            onClick={handleSubmit} 
-            sx={{width: '100%', marginTop:1}}
-          >
-            register with email
-          </Button>
-          <Box sx={{
-            marginTop:1,
-            paddingTop:1,
-            borderTop: '1px solid dimgrey',
-          }}>
-            <GoogleButton isRegistration={true} col={props.col}/>
-          </Box>
-          <Box sx={{
-            marginTop: 2,
-            marginBottom: 1,
-            color,
-            textAlign: 'center',
-          }}>
-            Already registered?&nbsp;
-            <Link onClick={handleLoginClick} sx={{cursor: 'pointer'}}>
-              Log in
-            </Link>
-          </Box>
-        </Card>
+        <Box sx={{margin: 1}}>
+          {message}
+        </Box>
+        <Button
+          disabled={!isFormValid}
+          variant='contained' 
+          onClick={handleSubmit} 
+          sx={{width: '100%', marginTop:1}}
+        >
+          register with email
+        </Button>
+        <Box sx={{
+          marginTop:1,
+          paddingTop:1,
+          borderTop: '1px solid dimgrey',
+        }}>
+          <GoogleButton isRegistration={true} col={props.col}/>
+        </Box>
+        <Box sx={{
+          marginTop: 2,
+          marginBottom: 1,
+          color,
+          textAlign: 'center',
+        }}>
+          Already registered?&nbsp;
+          <Link onClick={handleLoginClick} sx={{cursor: 'pointer'}}>
+            Log in
+          </Link>
+        </Box>
+      </Card>
 
 
     </Box>

@@ -39,14 +39,15 @@ export default function Login(props: LoginProps) {
   const tokenDetail = useReactiveVar(tokenVar);
   const paletteDetail = useReactiveVar(paletteVar);
 
-  const [showOptions, setShowOptions] = useState(false);
-
+  const [message, setMessage] = useState('');
+  
   const { changeCol } = useChangeCol();
   const { refreshTokenInterval } = useToken();
 
   const [loginUser] = useMutation(LOGIN_USER, {
     onError: error => {
       console.error(error);
+      setMessage(error.message);
     },
     onCompleted: data => {
       console.log(data);
@@ -96,11 +97,6 @@ export default function Login(props: LoginProps) {
     changeCol(props.col, '/register');
   };
 
-  const handleOptionsClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    setShowOptions(!showOptions);
-  };
-
   const isFormValid = email.length && pass.length;
 
   const color = getColor(paletteDetail.mode)
@@ -145,6 +141,9 @@ export default function Login(props: LoginProps) {
             }
           />
         </FormControl>
+        <Box sx={{margin: 1}}>
+        { message }
+        </Box>
         <Button
           disabled={!isFormValid}
           variant='contained' 

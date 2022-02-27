@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { adjectives, animals, NumberDictionary, uniqueNamesGenerator } from 'unique-names-generator';
@@ -53,6 +53,10 @@ export class UsersService {
   }
 
   async registerUser(email: string, pass: string | null, isGoogle: boolean): Promise<User> {
+    const user = this.getUserByEmail(email);
+    if (user) {
+      throw new BadRequestException('Email is already in use');
+    }
     let name = '';
     let existingUser = null;
 
