@@ -114,6 +114,7 @@ type Post {
 type Query {
   getJamByName(name: String!): Jam
   getJamsByLocation(lat: Float!, lng: Float!, zoom: Float!): [Jam!]!
+  getPost(postId: String!): Post!
   getUser: User!
   getUserByEmail(email: String!): User
   getUserByName(name: String!): User

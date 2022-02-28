@@ -38,7 +38,10 @@ export default function useChangeCol() {
             });
             return {
               ...colState_i,
-              col: data.saveCol,
+              col: {
+                ...colState_i.col,
+                ...data.saveCol
+              },
               stack,
               index: colState_i.index + 1,
             } as ColState;

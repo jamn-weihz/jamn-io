@@ -10,6 +10,7 @@ import MapIcon from '@mui/icons-material/Map';
 import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
 import BoltIcon from '@mui/icons-material/Bolt';
+import ChatBubbleTwoToneIcon from '@mui/icons-material/ChatBubbleTwoTone';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { Col, ColState } from './types/Col';
 import { DEFAULT_COLOR, MOBILE_WIDTH } from './constants';
@@ -29,6 +30,7 @@ export default function AppBar(props: AppbarProps) {
   const paletteDetail = useReactiveVar(paletteVar);
 
   const handleItemClick = (col: Col) => (event: React.MouseEvent) => {
+    console.log(col);
     event.stopPropagation();
     colVar({
       ...colDetail,
@@ -58,6 +60,9 @@ export default function AppBar(props: AppbarProps) {
     else if (path[1] === 'j') {
       return <BoltIcon fontSize='inherit' />
     }
+    else if (path[1] === 'p') {
+      return <ChatBubbleTwoToneIcon fontSize='inherit' />
+    }
     else if (path[1] === 'map') {
       return <MapIcon fontSize='inherit'/>;
     }
@@ -68,6 +73,7 @@ export default function AppBar(props: AppbarProps) {
   }
 
   const mapColStateToItem = (colState: ColState, i: number) => {
+    console.log(i, colDetail.i)
     return (
       <Box key={'appbar-col-'+i} sx={{
         padding: '5px',
@@ -95,7 +101,7 @@ export default function AppBar(props: AppbarProps) {
     })
   }
   
-  const handleClick =  (event: React.MouseEvent) => {
+  const handleClick = (event: React.MouseEvent) => {
     colVar({
       ...colDetail,
       isAdding: false,

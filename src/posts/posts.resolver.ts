@@ -1,5 +1,5 @@
-import { forwardRef, Inject, Query, UseGuards, UseInterceptors } from '@nestjs/common';
-import { Args, Context, Mutation, Parent, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
+import { forwardRef, Inject, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Args, Context, Query, Mutation, Parent, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
 import { CurrentUser, GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { Jam } from 'src/jams/jam.model';
 import { JamsService } from 'src/jams/jams.service';
@@ -72,6 +72,15 @@ export class PostsResolver {
     @Context() context: any,
     @Args('postIds', {type: () => [String]}) postIds: string[],
   ) {
-    return this.postsService.getPostsByIdsWithPrivacy(context.req.userId, postIds);
+    return this.postsService.getPostsByIdsWithPrivacy(context.req.user.id, postIds);
+  }
+
+  @UseInterceptors(GqlAuthInterceptor)
+  @Query(() => Post, {name: 'getPost'})
+  async getPost(
+    @Context() context: any,
+    @Args('postId') postId: string,
+  ) {
+    return this.postsService.getPostByIdWithPrivacy(context.req.user.id, postId);
   }
 }

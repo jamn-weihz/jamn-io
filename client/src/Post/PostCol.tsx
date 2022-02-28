@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 const GET_POST = gql`
   query GetPost($postId: String!) {
     getPost(postId: $postId) {
-      ...FullPostFieds
+      ...FullPostFields
     }
   }
   ${FULL_POST_FIELDS}

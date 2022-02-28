@@ -1,9 +1,13 @@
-import { Box, Button, Card, Card as MUICard, fabClasses, IconButton, Stack } from '@mui/material';
+import { Box, Button, Card, IconButton, Menu, MenuItem } from '@mui/material';
 import NorthIcon from '@mui/icons-material/North';
 import ReplyIcon from '@mui/icons-material/Reply';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import LinkIcon from '@mui/icons-material/Link';
+import AddCircleTwoToneIcon from '@mui/icons-material/AddCircleTwoTone';
+import ChatBubbleTwoToneIcon from '@mui/icons-material/ChatBubbleTwoTone';
 import FilterAltTwoToneIcon from '@mui/icons-material/FilterAltTwoTone';
 import NotificationsTwoToneIcon from '@mui/icons-material/NotificationsTwoTone';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
@@ -27,9 +31,10 @@ import { getColor } from '../utils';
 import { Vote } from '../types/Vote';
 import { DEFAULT_COLOR } from '../constants';
 import useVotePosts from '../Post/useVotePosts';
-import { Item, ItemState } from '../types/Item';
+import { Item } from '../types/Item';
 import { ItemContext } from '../App';
 import promoteItem from './promoteItem';
+import useChangeCol from '../Col/useChangeCol';
 
 interface SurveyorEntryProps {
   jam?: Jam;
@@ -50,6 +55,8 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
 
   const { state, dispatch } = useContext(ItemContext);
 
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null as Element | null);
+
   const [isVoting, setIsVoting] = useState(false);
   const { votePosts } = useVotePosts(setIsVoting)
 
@@ -59,6 +66,8 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
   const { getNext } = useGetNext(props.item.id, props.item.postId);
 
   const { replyPost } = useReplyPost(props.item.id, props.item.postId, props.jam?.id);
+
+  const { changeCol } = useChangeCol();
 
   useEffect(() => {
     if (props.item.refresh) {
@@ -124,29 +133,6 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
       });
     }
   }
-  
-  const handlePromoteClick = (event: React.MouseEvent) => { 
-    event.stopPropagation();
-    const { idToItem, rootItem } = promoteItem(state, props.item);
-
-    dispatch({
-      type: 'ADD_ITEMS',
-      idToItem,
-    });
-
-    const stack = props.surveyorState.stack.slice();
-    stack.push({
-      originalQuery: '',
-      query: '',
-      itemIds: [rootItem.id],
-    });
-    props.setSurveyorState({
-      ...props.surveyorState,
-      stack,
-      index: props.surveyorState.index + 1,
-      triggerRefinement: false,
-    });
-  }
 
   const handleReplyClick = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -206,6 +192,47 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
     }
   }
 
+  const handleMenuOpenClick = (event: React.MouseEvent) => {
+    setMenuAnchorEl(event.currentTarget);
+  }
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null)
+  }
+
+  const handleCopyClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    navigator.clipboard.writeText(`https://jamn.io/p/${props.item.postId}`);
+    handleMenuClose();
+  }
+
+  const handleOpenClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    changeCol(props.col, `/p/${props.item.postId}`)
+  }
+
+  const handlePromoteClick = (event: React.MouseEvent) => { 
+    event.stopPropagation();
+    const { idToItem, rootItem } = promoteItem(state, props.item);
+
+    dispatch({
+      type: 'ADD_ITEMS',
+      idToItem,
+    });
+
+    const stack = props.surveyorState.stack.slice();
+    stack.push({
+      originalQuery: '',
+      query: '',
+      itemIds: [rootItem.id],
+    });
+    props.setSurveyorState({
+      ...props.surveyorState,
+      stack,
+      index: props.surveyorState.index + 1,
+      triggerRefinement: false,
+    });
+  }
+
   const post = client.cache.readFragment({
     id: client.cache.identify({
       id: props.item.postId,
@@ -260,7 +287,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
 
   const slice = props.surveyorState.stack[props.surveyorState.index];
   return (
-    <MUICard elevation={5} 
+    <Card elevation={5} 
       onMouseEnter={handleMouseEnter} 
       onMouseLeave={handleMouseLeave} 
       onClick={handleClick}
@@ -355,45 +382,102 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
         }
         <Box sx={{ 
           padding: '5px', 
-          marginTop: '-4px', 
+          marginTop: '-2px',
           whiteSpace: 'nowrap',
         }}>
-          <IconButton
-            disabled={props.depth === 0 && slice.itemIds.length === 1}
-            size='small'
-            onClick={handlePromoteClick}
-            sx={{
-              fontSize: 12,
-              color,
-            }}
-          >
-            <NorthIcon fontSize='inherit' />
-          </IconButton>
           <Box component='span' sx={{whiteSpace: 'nowrap'}}>
+            &nbsp;&nbsp;
             <IconButton
               disabled={!userDetail?.verifyEmailDate}
               size='small'
               color='inherit'
               onClick={handleReplyClick}
               sx={{
-                fontSize: 12,
+                fontSize: 14,
                 color,
+                padding: 0,
               }}
             >
               <ReplyIcon fontSize='inherit'/>
             </IconButton>
+            &nbsp;&nbsp;
             <IconButton
               disabled={!userDetail?.verifyEmailDate}
               size='small'
               color='inherit'
               onClick={handleLinkClick}
               sx={{
-                fontSize: 12,
+                fontSize: 14,
                 color,
+                padding: 0,
               }}
             >
               <DoubleArrowIcon fontSize='inherit'/>
             </IconButton>
+            &nbsp;&nbsp;
+            <IconButton
+              onClick={handleMenuOpenClick}
+              size='small'
+              color='inherit'
+              sx={{
+                fontSize: 14,
+                color,
+                padding: 0,
+              }}
+            >
+              <MoreVertIcon fontSize='inherit' />
+            </IconButton>
+            <Menu
+              open={!!menuAnchorEl}
+              onClose={handleMenuClose}
+              anchorEl={menuAnchorEl}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+            >
+              <MenuItem onClick={handleCopyClick} sx={{
+                fontSize: 14,
+              }}>
+                <Box sx={{
+                  marginLeft: '-5px',
+                  marginBottom: '-5px',
+                  fontSize: 14,
+                }}>
+                  <LinkIcon fontSize='inherit'/>
+                </Box>
+                &nbsp; Copy hyperlink
+              </MenuItem>
+              <MenuItem onClick={handleOpenClick} sx={{
+                fontSize: 14,
+              }}>
+                <Box sx={{
+                  marginLeft: '-5px',
+                  marginBottom: '-5px',
+                  fontSize: 14,
+                }}>
+                  <ChatBubbleTwoToneIcon fontSize='inherit'/>
+                </Box>
+                &nbsp; Open post
+              </MenuItem>
+              {
+                props.depth !== 0 || slice.itemIds.length !== 1
+                  ? <MenuItem onClick={handlePromoteClick} sx={{
+                      fontSize: 14,
+                    }}>
+                      <Box sx={{
+                        marginLeft: '-5px',
+                        marginBottom: '-5px',
+                        fontSize: 14,
+                      }}>
+                        <NorthIcon fontSize='inherit' />
+                      </Box>
+                      &nbsp; Move to top
+                    </MenuItem>
+                  : null
+              }
+            </Menu>
+            &nbsp;
           </Box>
         </Box>
         <Box>
@@ -401,6 +485,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
         <Box sx={{
           color,
           paddingBottom: '5px',
+          marginTop: '2px',
           whiteSpace: 'nowrap',
         }}>
           <Button 
@@ -431,6 +516,6 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
           </Button>
         </Box>
       </Box>
-    </MUICard>
+    </Card>
   )
 }
