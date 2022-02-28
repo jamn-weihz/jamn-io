@@ -46,17 +46,19 @@ export default function ColBar(props: ColBarProps) {
     return false;
   });
 
-
   const handleOptionsClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    const colStates = colDetail.colStates.slice();
-    colStates.splice(colState.col.i, 1, {
-      ...colState,
-      showOptions: !colState.showOptions,
-    });
     colVar({
       ...colDetail,
-      colStates,
+      colStates: colDetail.colStates.map(colState_i => {
+        if (colState_i.col.id === props.col.id) {
+          return {
+            ...colState_i,
+            showOptions: !colState_i.showOptions,
+          };
+        }
+        return colState_i;
+      }),
     });
   };
 
@@ -84,35 +86,41 @@ export default function ColBar(props: ColBarProps) {
 
   const handleBackClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    const colStates = colDetail.colStates.slice();
-    colStates.splice(colState.col.i, 1, {
-      ...colState,
-      col: {
-        ...colState.col,
-        pathname: colState.stack[colState.index - 1].pathname,
-      },
-      index: colState.index - 1,
-    })
     colVar({
       ...colDetail,
-      colStates,
+      colStates: colDetail.colStates.map(colState_i => {
+        if (colState_i.col.id === props.col.id) {
+          return {
+            ...colState_i,
+            col: {
+              ...colState_i.col,
+              pathname: colState_i.stack[colState_i.index - 1].pathname,
+            },
+            index: colState.index - 1,
+          }
+        }
+        return colState_i;
+      }),
     });
   }
   
   const handleForwardClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    const colStates = colDetail.colStates.slice();
-    colStates.splice(colState.col.i, 1, {
-      ...colState,
-      col: {
-        ...colState.col,
-        pathname: colState.stack[colState.index + 1].pathname,
-      },
-      index: colState.index + 1,
-    })
     colVar({
       ...colDetail,
-      colStates,
+      colStates: colDetail.colStates.map(colState_i => {
+        if (colState_i.col.id === props.col.id) {
+          return {
+            ...colState_i,
+            col: {
+              ...colState.col,
+              pathname: colState.stack[colState.index + 1].pathname,
+            },
+            index: colState.index + 1,
+          };
+        }
+        return colState_i;
+      }),
     });
   }
 
@@ -128,6 +136,8 @@ export default function ColBar(props: ColBarProps) {
 
   let color = getColor(paletteDetail.mode);
 
+  if (!colState) return null;
+
   return (
     <Card elevation={5}>
       <Box sx={{
@@ -140,6 +150,7 @@ export default function ColBar(props: ColBarProps) {
             ? '150px'
             : '220px',
           color:  props.user?.color || props.jam?.color,
+          fontWeight: 'bold',
         }}>
           {props.col.pathname.split('/').slice(0, 3).join('/')}
         </Box>

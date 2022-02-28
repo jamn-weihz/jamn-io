@@ -15,7 +15,7 @@ import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from
 import { Link } from '../types/Link';
 import { useSearchParams } from 'react-router-dom';
 import { SurveyorState } from '../types/Surveyor';
-import PostComponent from '../Post/Post';
+import PostComponent from '../Post/PostComponent';
 import useReplyPost from '../Post/useReplyPost';
 import { Jam } from '../types/Jam';
 import { FULL_POST_FIELDS, LINK_FIELDS, VOTE_FIELDS } from '../fragments';

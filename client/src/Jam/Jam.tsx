@@ -16,6 +16,7 @@ import { getColor } from '../utils'
 import ColBar from '../Col/ColBar';
 import useJamRoleSubscription from '../Role/useJamRoleSubscription';
 import useSetJamSubscription from './useSetJamSubscription';
+import NotFound from '../NotFound';
 
 const GET_JAM_BY_NAME = gql`
   query GetJamByName($name: String!) {
@@ -156,7 +157,7 @@ export default function JamComponent(props: JamComponentProps) {
                 }
               </Box>
             </Box>
-          : null
+          : <NotFound />
       }
     </Box>
   )

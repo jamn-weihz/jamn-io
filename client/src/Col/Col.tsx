@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { getColor, getColWidth } from '../utils';
 import ColBar from './ColBar';
 import NotFound from '../NotFound';
+import PostCol from '../Post/PostCol';
 
 interface ColComponentProps {
   col: Col;
@@ -65,6 +66,14 @@ export default function ColComponent(props: ColComponentProps) {
         />
       );
     }
+    else if (path[1] === 'p') {
+      return (
+        <PostCol
+          col={col}
+          id={path[2]}
+        />
+      )
+    }
     else {
       return (
         <Box>
@@ -86,7 +95,7 @@ export default function ColComponent(props: ColComponentProps) {
       backgroundColor: colDetail.i === props.col.i
         ? paletteDetail.mode === 'dark'
           ? 'black'
-          : 'aliceblue'
+          : 'azure'
         : 'none',
     }}>
       { mapColToComponent(props.col) }
