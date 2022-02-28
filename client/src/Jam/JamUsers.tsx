@@ -70,15 +70,13 @@ export default function JamUsers(props: JamUsersProps) {
               </Box>
             : <Box>
                 {
-                  userDetail?.id
-                    ? !props.jam.isClosed || (role && role.isInvited)
-                      ? <Button variant='contained' onClick={handleJoinClick}>
-                          Join
-                        </Button>
-                      : <Button onClick={handleJoinClick}>
-                          Request membership
-                        </Button>
-                    : null
+                  !props.jam.isClosed || (role && role.isInvited)
+                    ? <Button disabled={!userDetail} variant='contained' onClick={handleJoinClick}>
+                        Join
+                      </Button>
+                    : <Button disabled={!userDetail} onClick={handleJoinClick}>
+                        Request membership
+                      </Button>
                 }
               </Box>
         }
