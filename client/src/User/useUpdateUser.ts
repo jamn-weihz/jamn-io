@@ -1,5 +1,5 @@
 import { gql, useMutation, useReactiveVar } from "@apollo/client";
-import { userVar } from "../cache";
+import { snackbarVar, userVar } from "../cache";
 
 const UPDATE_USER_MAP = gql`
   mutation UpdateUserMap($lng: Float!, $lat: Float!, $zoom: Float!) {
@@ -18,6 +18,12 @@ export default function useUpdateUser() {
   const [updateMap] = useMutation(UPDATE_USER_MAP, {
     onError: error => {
       console.error(error);
+      if (error.message === 'Unauthorized') {
+        snackbarVar({
+          isUnauthorized: true,
+          isSessionExpired: false,
+        });
+      }
     },
     onCompleted: data => {
       console.log(data);

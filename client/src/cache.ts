@@ -51,4 +51,9 @@ export const sessionVar = makeVar({
 
 export const startJamVar = makeVar({
   jam: null as Jam | null,
+});
+
+export const snackbarVar = makeVar({
+  isUnauthorized: false,
+  isSessionExpired: false,
 })

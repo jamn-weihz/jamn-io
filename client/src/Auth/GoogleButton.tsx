@@ -7,6 +7,7 @@ import { FULL_USER_FIELDS } from '../fragments';
 import { colVar, focusVar, userVar } from '../cache';
 import { Col } from '../types/Col';
 import useChangeCol from '../Col/useChangeCol';
+import useToken from './useToken';
  
 const REGISTER_USER = gql`
   mutation LoginGoogleUser($token: String!, $pathnames: [String!]!) {
@@ -25,6 +26,8 @@ export default function GoogleButton(props: GoogleButtonProps) {
   const colDetail = useReactiveVar(colVar);
 
   const [message, setMessage] = useState('');
+
+  const { refreshTokenInterval } = useToken();
   
   const [loginGoogleUser] = useMutation(REGISTER_USER, {
     onError: error => {
@@ -33,6 +36,7 @@ export default function GoogleButton(props: GoogleButtonProps) {
     },
     onCompleted: data => {
       console.log(data);
+      refreshTokenInterval();
       userVar(data.loginGoogleUser);
       focusVar({
         postId: data.loginGoogleUser.focusId,

@@ -1,5 +1,5 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { tokenVar, userVar } from '../cache';
+import { snackbarVar, tokenVar, userVar } from '../cache';
 import { REFRESH_ACCESS_TOKEN_TIME } from '../constants';
 import useLogout from './useLogout';
 
@@ -23,6 +23,10 @@ export default function useToken() {
       if (error.message === 'Unauthorized') {
         if (userDetail?.id) {
           logoutUser();
+          snackbarVar({
+            isSessionExpired: true,
+            isUnauthorized: false,
+          })
         }
         tokenVar({
           ...tokenDetail,

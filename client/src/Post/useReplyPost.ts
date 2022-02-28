@@ -1,5 +1,5 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { focusVar, sessionVar } from '../cache';
+import { snackbarVar, focusVar, sessionVar } from '../cache';
 import { FULL_POST_FIELDS, LINK_FIELDS, VOTE_FIELDS } from '../fragments';
 import { v4 as uuidv4 } from 'uuid';
 import { useContext } from 'react';
@@ -32,6 +32,12 @@ export default function useReplyPost(itemId: string, sourcePostId: string, jamId
   const [reply] = useMutation(REPLY_POST, {
     onError: error => {
       console.error(error);
+      if (error.message === 'Unauthorized') {
+        snackbarVar({
+          isUnauthorized: true,
+          isSessionExpired: false,
+        });
+      } 
     },
     onCompleted: data => {
       console.log(data);

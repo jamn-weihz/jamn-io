@@ -21,6 +21,7 @@ import reduceAddPrev from './Surveyor/reduceAddPrev';
 import reduceAddNext from './Surveyor/reduceAddNext';
 import reduceAddLink from './Surveyor/reduceAddLink';
 import reduceRemoveLink from './Surveyor/reduceRemoveLink';
+import SnackBar from './Auth/SnackBar';
 
 const GET_USER = gql`
   query GetUser {
@@ -254,6 +255,7 @@ function App() {
             </Box>
           </Paper>
           <ColAdder containerEl={containerEl}/>
+          <SnackBar />
         </Paper>
       </ThemeProvider>
     </ItemContext.Provider>

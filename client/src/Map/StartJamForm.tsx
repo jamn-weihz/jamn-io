@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { palette } from '@mui/system';
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
-import { colVar, paletteVar, startJamVar } from '../cache';
+import { snackbarVar, colVar, paletteVar, startJamVar } from '../cache';
 import useChangeCol from '../Col/useChangeCol';
 import { FULL_JAM_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
@@ -68,6 +68,12 @@ export default function StartJamForm(props: StartJamModalProps) {
   const [startJam] = useMutation(START_JAM, {
     onError: error => {
       console.error(error);
+      if (error.message === 'Unauthorized') {
+        snackbarVar({
+          isUnauthorized: true,
+          isSessionExpired: false,
+        });
+      }
     },
     onCompleted: data => {
       console.log(data);

@@ -1,7 +1,7 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { useContext } from 'react';
 import { ItemContext } from '../App';
-import { linkVar, sessionVar } from '../cache';
+import { snackbarVar, linkVar, sessionVar } from '../cache';
 import { LINK_FIELDS, VOTE_FIELDS } from '../fragments';
 
 const LINK_POSTS = gql`
@@ -32,6 +32,12 @@ export default function useLinkPosts() {
   const [link] = useMutation(LINK_POSTS, {
     onError: error => {
       console.error(error);
+      if (error.message === 'Unauthorized') {
+        snackbarVar({
+          isUnauthorized: true,
+          isSessionExpired: false,
+        })
+      }
     },
     onCompleted: data => {
       console.log(data);

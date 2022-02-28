@@ -1,5 +1,5 @@
 import { gql, Reference, useMutation, useReactiveVar } from '@apollo/client';
-import { sessionVar, userVar } from '../cache';
+import { snackbarVar, sessionVar, userVar } from '../cache';
 import { ROLE_FIELDS } from '../fragments';
 import { Jam } from '../types/Jam';
 
@@ -29,6 +29,12 @@ export default function useRequestRole() {
   const [request] = useMutation(REQUEST_ROLE, {
     onError: error => {
       console.error(error);
+      if (error.message === 'Unauthorized') {
+        snackbarVar({
+          isUnauthorized: true,
+          isSessionExpired: false,
+        });
+      }
     },
     update: (cache, {data: {requestRole}}) => {
       const newRef = cache.writeFragment({

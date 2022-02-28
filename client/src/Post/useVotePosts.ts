@@ -1,7 +1,7 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { Dispatch, SetStateAction, useContext } from 'react';
 import { ItemContext } from '../App';
-import { sessionVar } from '../cache';
+import { snackbarVar, sessionVar } from '../cache';
 import { LINK_FIELDS, VOTE_FIELDS } from '../fragments';
 
 const VOTE_POSTS = gql`
@@ -32,6 +32,12 @@ export default function useVotePosts(setIsVoting: Dispatch<SetStateAction<boolea
   const [vote] = useMutation(VOTE_POSTS, {
     onError: error => {
       console.error(error);
+      if (error.message === 'Unauthorized') {
+        snackbarVar({
+          isUnauthorized: true,
+          isSessionExpired: false,
+        });
+      }
     },
     onCompleted: data => {
       console.log(data);

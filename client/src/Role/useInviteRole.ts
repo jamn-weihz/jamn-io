@@ -1,5 +1,5 @@
 import { gql, Reference, useMutation, useReactiveVar } from '@apollo/client';
-import { sessionVar } from '../cache';
+import { snackbarVar, sessionVar } from '../cache';
 import { ROLE_FIELDS } from '../fragments';
 import { Jam } from '../types/Jam';
 
@@ -28,6 +28,12 @@ export default function useInviteRole(jamId: string, handleError: any) {
   const [invite] = useMutation(INVITE_ROLE, {
     onError: error => {
       console.error(error);
+      if (error.message === 'Unauthorized') {
+        snackbarVar({
+          isUnauthorized: true,
+          isSessionExpired: false,
+        })
+      }
       handleError(error.message)
     },
     update: (cache, {data: {inviteRole}}) => {
