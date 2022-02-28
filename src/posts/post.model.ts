@@ -46,6 +46,9 @@ export class Post {
 
   @Field()
   saveDate: Date;
+
+  @Field({ nullable: true })
+  isOpaque: boolean;
   
   @Field({ nullable: true })
   commitDate: Date;

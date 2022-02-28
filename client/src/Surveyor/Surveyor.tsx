@@ -3,9 +3,10 @@ import { useRef, Dispatch, SetStateAction, useEffect } from 'react';
 import { SurveyorState } from '../types/Surveyor';
 import SurveyorTree from './SurveyorTree';
 import { Col } from '../types/Col';
-import { PostAction } from '../types/Post';
+import { Jam } from '../types/Jam';
 
 interface SurveyorProps {
+  jam?: Jam;
   col: Col;
   surveyorState: SurveyorState;
   setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
@@ -39,6 +40,7 @@ export default function Surveyor(props: SurveyorProps) {
               col={props.col}
               surveyorState={props.surveyorState}
               setSurveyorState={props.setSurveyorState}
+              jam={props.jam}
             />
           );
         })

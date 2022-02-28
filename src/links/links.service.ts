@@ -1,6 +1,7 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostsService } from 'src/posts/posts.service';
+import { RolesService } from 'src/roles/roles.service';
 import { findDefaultWeight } from 'src/utils';
 import { VotesService } from 'src/votes/votes.service';
 import { Repository } from 'typeorm';
@@ -14,6 +15,7 @@ export class LinksService {
     @Inject(forwardRef(() => PostsService))
     private readonly postsService: PostsService,
     private readonly votesService: VotesService,
+    private readonly rolesService: RolesService,
   ) {}
 
   async getLinkById(id: string) {
@@ -61,6 +63,13 @@ export class LinksService {
   }
 
   async replyPost(userId: string, sourcePostId: string, jamId?: string): Promise<Link> {
+    if (jamId) {
+      const role = await this.rolesService.getRoleByUserIdAndJamId(userId, jamId);
+      const isMember = role && role.isInvited && role.isRequested;
+      if (!isMember) {
+        jamId = null;
+      }
+    }
     this.postsService.incrementPostNextCount(sourcePostId, 1);
     const targetPost = await this.postsService.createPost(userId, jamId, '', '');
     const link = await this.createLink(sourcePostId, targetPost.id, 1, 0);

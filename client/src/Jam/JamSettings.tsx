@@ -1,13 +1,14 @@
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { Box, Card, Checkbox } from '@mui/material';
 import React, { useState } from 'react';
 import { ChromePicker } from 'react-color';
+import { sessionVar, snackbarVar } from '../cache';
 import { Col } from '../types/Col';
 import { Jam } from '../types/Jam';
 
 const SET_JAM_COLOR = gql`
-  mutation SetJamColor($jamId: String!, $color: String!) {
-    setJamColor(jamId: $jamId, color: $color) {
+  mutation SetJamColor($sessionId: String!, $jamId: String!, $color: String!) {
+    setJamColor(sessionId: $sessionId, jamId: $jamId, color: $color) {
       id
       color
     }
@@ -15,10 +16,19 @@ const SET_JAM_COLOR = gql`
 `;
 
 const SET_JAM_ISCLOSED = gql`
-  mutation SetJamIsClosed($jamId: String!, $isClosed: Boolean!) {
-    setJamIsClosed(jamId: $jamId, isClosed: $isClosed) {
+  mutation SetJamIsClosed($sessionId: String!, $jamId: String!, $isClosed: Boolean!) {
+    setJamIsClosed(sessionId: $sessionId, jamId: $jamId, isClosed: $isClosed) {
       id
       isClosed
+    }
+  }
+`;
+
+const SET_JAM_ISPRIVATE = gql`
+  mutation SetJamIsPrivate($sessionId: String!, $jamId: String!, $isPrivate: Boolean!) {
+    setJamIsPrivate(sessionId: $sessionId, jamId: $jamId, isPrivate: $isPrivate) {
+      id
+      isPrivate
     }
   }
 `;
@@ -29,15 +39,24 @@ interface JamSettingsProps {
 }
 
 export default function JamSettings(props: JamSettingsProps) {
+  const sessionDetail = useReactiveVar(sessionVar);
+  
   const [color, setColor] = useState(props.jam.color);
 
   const [isClosed, setIsClosed] = useState(props.jam.isClosed);
+  const [isPrivate, setIsPrivate] = useState(props.jam.isPrivate);
 
   const [colorTimeout, setColorTimeout] = useState(null as ReturnType<typeof setTimeout> | null);
 
   const [setJamColor] = useMutation(SET_JAM_COLOR, {
     onError: error => {
       console.error(error);
+      if (error.message === 'Unauthorized') {
+        snackbarVar({
+          isUnauthorized: true,
+          isSessionExpired: false,
+        });
+      }
     },
     onCompleted: data => {
       console.log(data);
@@ -47,11 +66,32 @@ export default function JamSettings(props: JamSettingsProps) {
   const [setJamIsClosed] = useMutation(SET_JAM_ISCLOSED, {
     onError: error => {
       console.error(error);
+      if (error.message === 'Unauthorized') {
+        snackbarVar({
+          isUnauthorized: true,
+          isSessionExpired: false,
+        });
+      }
     },
     onCompleted: data => {
       console.log(data);
     },
-  })
+  });
+
+  const [setJamIsPrivate] = useMutation(SET_JAM_ISPRIVATE, {
+    onError: error => {
+      console.error(error);
+      if (error.message === 'Unauthorized') {
+        snackbarVar({
+          isUnauthorized: true,
+          isSessionExpired: false,
+        });
+      }
+    },
+    onCompleted: data => {
+      console.log(data);
+    },
+  });
 
   const handleColorChange = (color: any) => {
     setColor(color.hex);
@@ -64,6 +104,7 @@ export default function JamSettings(props: JamSettingsProps) {
     const timeout = setTimeout(() => {
       setJamColor({
         variables: {
+          sessionId: sessionDetail.id,
           jamId: props.jam.id,
           color: color.hex,
         },
@@ -76,11 +117,23 @@ export default function JamSettings(props: JamSettingsProps) {
   const handleCloseChange = () => {
     setJamIsClosed({
       variables: {
+        sessionId: sessionDetail.id,
         jamId: props.jam.id,
         isClosed: !isClosed,
       }
     });
     setIsClosed(!isClosed);
+  }
+
+  const handlePrivateChange = () => {
+    setJamIsPrivate({
+      variables: {
+        sessionId: sessionDetail.id,
+        jamId: props.jam.id,
+        isPrivate: !isPrivate,
+      }
+    })
+    setIsPrivate(!isPrivate);
   }
 
   return (
@@ -99,10 +152,10 @@ export default function JamSettings(props: JamSettingsProps) {
         </Box>
         <Box sx={{
           margin: 1,
-          display: 'none',
+          display: 'flex',
           flexDirection: 'row',
         }}>
-          <Checkbox />
+          <Checkbox checked={isPrivate} onChange={handlePrivateChange}/>
           Private (posts visible only to members)
         </Box>
         <Box sx={{

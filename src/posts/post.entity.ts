@@ -51,6 +51,9 @@ export class Post {
     default: Enums.PostPrivacy.ALL,
   })
   privacy: Enums.PostPrivacy;
+  
+  @Column({nullable: true})
+  isOpaque: boolean;
 
   @Column({ nullable: true })
   startI: number; // non null if this is a Start Post 

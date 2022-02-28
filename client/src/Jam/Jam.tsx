@@ -15,6 +15,7 @@ import { userVar, paletteVar, startJamVar } from '../cache';
 import { getColor } from '../utils'
 import ColBar from '../Col/ColBar';
 import useJamRoleSubscription from '../Role/useJamRoleSubscription';
+import useSetJamSubscription from './useSetJamSubscription';
 
 const GET_JAM_BY_NAME = gql`
   query GetJamByName($name: String!) {
@@ -39,6 +40,7 @@ export default function JamComponent(props: JamComponentProps) {
   const [jam, setJam] = useState(null as Jam | null);
   const [isLoading, setIsLoading] = useState(false);
 
+  useSetJamSubscription(jam?.id || '');
   useJamRoleSubscription(jam?.id || '');
 
   const [getJamByName] = useLazyQuery(GET_JAM_BY_NAME, {

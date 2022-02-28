@@ -72,8 +72,9 @@ type Mutation {
   resendUserVerification: User!
   saveCol(colId: String!, pathname: String!): Col!
   savePost(draft: String!, postId: String!, sessionId: String!): Post!
-  setJamColor(color: String!, jamId: String!): Jam!
-  setJamIsClosed(isClosed: Boolean!, jamId: String!): Jam!
+  setJamColor(color: String!, jamId: String!, sessionId: String!): Jam!
+  setJamIsClosed(isClosed: Boolean!, jamId: String!, sessionId: String!): Jam!
+  setJamIsPrivate(isPrivate: Boolean!, jamId: String!, sessionId: String!): Jam!
   setUserColor(color: String!): User!
   setUserName(name: String!): User!
   shiftCol(colId: String!, di: Int!): [Col!]!
@@ -92,6 +93,7 @@ type Post {
   draft: String!
   id: String!
   inLinks: [Link!]!
+  isOpaque: Boolean
   jam: Jam
   jamI: Int
   jamId: String
@@ -135,6 +137,7 @@ type Subscription {
   jamRole(jamId: String!, sessionId: String!): Role!
   linkPosts(postIds: [String!]!, sessionId: String!): Link!
   savePost(cardIds: [String!]!, sessionId: String!): Post!
+  setJam(jamId: String!, sessionId: String!): Jam!
   startJam: Jam!
   userRole(sessionId: String!, userId: String!): Role!
 }

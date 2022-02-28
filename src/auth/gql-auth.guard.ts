@@ -14,8 +14,6 @@ export class GqlAuthGuard extends AuthGuard('jwt-auth') {
   }
   canActivate(context: ExecutionContext) {
     const req = this.getRequest(context);
-    //console.log('canActivate', req.headers)
-    
     return super.canActivate(context);
   }
 }

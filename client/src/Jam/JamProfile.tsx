@@ -63,6 +63,7 @@ export default function JamProfile(props: JamProfileProps) {
         col={props.col}
         surveyorState={surveyorState}
         setSurveyorState={setSurveyorState}
+        jam={props.jam}
       />
     </Box>
   )

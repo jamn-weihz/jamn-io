@@ -9,10 +9,24 @@ export const START_POST_DRAFT = JSON.stringify({
       type: 'unstyled',
       depth: 0,
       entityRanges: [],
-      inlinStyleRanges: [],
+      inlineStyleRanges: [],
     }
   ],
   entityMap: {}
 });
+
+export const PRIVATE_POST_DRAFT = JSON.stringify({
+  blocks: [
+    {
+      key: 'privatePost',
+      text: '<private>',
+      type: 'unstyled',
+      depth: 0,
+      entityRanges: [],
+      inlineStyleRanges: [],
+    }
+  ],
+  entityMap: {},
+})
 
 export const START_POST_I = 1;

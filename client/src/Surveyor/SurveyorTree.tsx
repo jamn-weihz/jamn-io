@@ -12,8 +12,10 @@ import useGetPrev from '../Post/useGetPrev';
 import useGetNext from '../Post/useGetNext';
 import { LOAD_LIMIT } from '../constants';
 import { ItemContext } from '../App';
+import { Jam } from '../types/Jam';
 
 interface SurveyorTreeProps {
+  jam?: Jam;
   col: Col;
   itemId: string;
   depth: number;
@@ -66,6 +68,8 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
 
   if (!post) return null;
 
+  if (post.isOpaque) return null;
+
   return (
     <Box>
       <Box sx={{
@@ -79,6 +83,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
           depth={props.depth}
           surveyorState={props.surveyorState}
           setSurveyorState={props.setSurveyorState}
+          jam={props.jam}
         />
       </Box>
       <Box sx={{
@@ -95,6 +100,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
                 col={props.col}
                 surveyorState={props.surveyorState}
                 setSurveyorState={props.setSurveyorState}
+                jam={props.jam}
               />
             )
           })

@@ -1,5 +1,5 @@
-import { Inject, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Parent, ResolveField, Resolver, Int, Subscription } from '@nestjs/graphql';
+import { Inject, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Args, Mutation, Parent, ResolveField, Resolver, Int, Subscription, Context } from '@nestjs/graphql';
 import { CurrentUser, GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { Post } from 'src/posts/post.model';
 import { PostsService } from 'src/posts/posts.service';
@@ -10,6 +10,7 @@ import { VotesService } from 'src/votes/votes.service';
 import { Link } from './link.model';
 import { LinksService } from './links.service';
 import { RedisPubSub } from 'graphql-redis-subscriptions';
+import { GqlAuthInterceptor } from 'src/auth/gql-auth.interceptor';
 
 @Resolver(() => Link)
 export class LinksResolver {
@@ -24,15 +25,17 @@ export class LinksResolver {
   @ResolveField(() => Post, {name: 'sourcePost'})
   async getLinkSourcePost(
     @Parent() link: Link,
+    @CurrentUser() user: User,
   ) {
-    return this.postsService.getPostById(link.sourcePostId);
+    return this.postsService.getPostByIdWithPrivacy(user.id, link.sourcePostId);
   }
 
   @ResolveField(() => Post, {name: 'targetPost'})
   async getLinkTargetPost(
     @Parent() link: Link,
+    @CurrentUser() user: User,
   ) {
-    return this.postsService.getPostById(link.targetPostId);
+    return this.postsService.getPostByIdWithPrivacy(user.id, link.targetPostId);
   }
 
   @ResolveField(() => [Vote], {name: 'votes'})
@@ -134,6 +137,7 @@ export class LinksResolver {
     return link;
   }
 
+  @UseInterceptors(GqlAuthInterceptor)
   @Mutation(() => [Link], {name: 'getPrev'})
   async getPrev(
     @Args('postId') postId: string,
@@ -142,6 +146,7 @@ export class LinksResolver {
     return this.linksService.getLinksByTargetPostId(postId, offset)
   }
 
+  @UseInterceptors(GqlAuthInterceptor)
   @Mutation(() => [Link], {name: 'getNext'})
   async getNext(
     @Args('postId') postId: string,

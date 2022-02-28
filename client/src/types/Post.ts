@@ -11,6 +11,7 @@ export type Post = {
   inLinks: Link[];
   outLinks: Link[];
   privacy: string;
+  isOpaque: boolean | null;
   draft: string;
   name: string;
   description: string;

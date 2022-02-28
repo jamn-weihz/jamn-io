@@ -7,6 +7,7 @@ import { FULL_POST_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
 import { Item, ItemState } from '../types/Item';
 import { ItemContext } from '../App';
+import { Post } from '../types/Post';
 
 
 const GET_POSTS = gql`

@@ -68,7 +68,7 @@ export class JamsService {
       type: 'Point',
       coordinates: [lng, lat],
     };
-    jam0.postI = 1;
+    jam0.postI = 0;
     const jam1 = await this.jamsRepository.save(jam0);
 
     const role = await this.rolesService.createRole(user.id, jam1.id, Enums.RoleType.ADMIN);
@@ -101,7 +101,8 @@ export class JamsService {
     const jam0 = new Jam();
     jam0.id = jamId;
     jam0.color = color;
-    return this.jamsRepository.save(jam0);
+    await this.jamsRepository.save(jam0);
+    return this.getJamById(jamId);
   }
 
   async setJamIsClosed(userId: string, jamId: string, isClosed: boolean) {
@@ -116,7 +117,24 @@ export class JamsService {
     const jam0 = new Jam();
     jam0.id = jamId;
     jam0.isClosed = isClosed;
-    return this.jamsRepository.save(jam0);
+    await this.jamsRepository.save(jam0);
+    return this.getJamById(jamId);
+  }
+
+  async setJamIsPrivate(userId: string, jamId: string, isPrivate: boolean) {
+    const jam = await this.getJamById(jamId);
+    if (!jam) {
+      throw new BadRequestException('This jam does not exist');
+    }
+    const role = await this.rolesService.getRoleByUserIdAndJamId(userId, jamId);
+    if (role.type !== Enums.RoleType.ADMIN) {
+      throw new BadRequestException('Insufficient privileges');
+    };
+    const jam0 = new Jam();
+    jam0.id = jamId;
+    jam0.isPrivate = isPrivate;
+    await this.jamsRepository.save(jam0);
+    return this.getJamById(jamId);
   }
 
   incrementJamPostI(jamId: string) {

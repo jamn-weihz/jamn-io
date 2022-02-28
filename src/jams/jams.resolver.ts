@@ -80,19 +80,64 @@ export class JamsResolver {
   @Mutation(() => Jam, {name: 'setJamColor'})
   async setJamColor(
     @CurrentUser() user: User,
+    @Args('sessionId') sessionId: string,
     @Args('jamId') jamId: string,
     @Args('color') color: string,
   ) {
-    return this.jamsService.setJamColor(user.id, jamId, color);
+    const jam = await this.jamsService.setJamColor(user.id, jamId, color);
+    this.pubSub.publish('setJam', {
+      sessionId,
+      jamId,
+      setJam: jam,
+    });
+    return jam;
   }
-  
+
   @UseGuards(GqlAuthGuard)
   @Mutation(() => Jam, {name: 'setJamIsClosed'})
-  async setJam(
+  async setJamIsClosed(
     @CurrentUser() user: User,
+    @Args('sessionId') sessionId: string,
     @Args('jamId') jamId: string,
     @Args('isClosed') isClosed: boolean,
   ) {
-    return this.jamsService.setJamIsClosed(user.id, jamId, isClosed);
+    const jam = await this.jamsService.setJamIsClosed(user.id, jamId, isClosed);
+    this.pubSub.publish('setJam', {
+      sessionId,
+      jamId,
+      setJam: jam,
+    });
+    return jam;
+  }
+
+  @UseGuards(GqlAuthGuard)
+  @Mutation(() => Jam, {name: 'setJamIsPrivate'})
+  async setJamIsPrivate(
+    @CurrentUser() user: User,
+    @Args('sessionId') sessionId: string,
+    @Args('jamId') jamId: string,
+    @Args('isPrivate') isPrivate: boolean,
+  ) {
+    const jam = await this.jamsService.setJamIsPrivate(user.id, jamId, isPrivate);
+    this.pubSub.publish('setJam', {
+      sessionId,
+      jamId,
+      setJam: jam,
+    });
+    return jam;
+  }
+
+  @Subscription(() => Jam, {name: 'setJam', 
+    filter: (payload, variables) => {
+      if (payload.sessionId === variables.sessionId) return false;
+      return payload.jamId === variables.jamId
+    }
+  })
+  setJam(
+    @Args('sessionId') sessionId: string,
+    @Args('jamId') jamId: string,
+  ) {
+    console.log('setJamSub')
+    return this.pubSub.asyncIterator('setJam')
   }
 }

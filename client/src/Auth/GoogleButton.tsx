@@ -77,7 +77,11 @@ export default function GoogleButton(props: GoogleButtonProps) {
       onSuccess={handleSuccess}
       onFailure={handleFailure}
     />
-    { message }    
+    <Box sx={{
+      margin: 1,
+    }}>
+      { message } 
+    </Box>   
     </Box>
   );
 }

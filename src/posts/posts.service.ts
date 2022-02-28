@@ -1,6 +1,6 @@
 import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { START_POST_DESC, START_POST_DRAFT, START_POST_I, START_POST_NAME } from 'src/constants';
+import { PRIVATE_POST_DRAFT, START_POST_DESC, START_POST_DRAFT, START_POST_I, START_POST_NAME } from 'src/constants';
 import { In, Repository } from 'typeorm';
 import { Post } from './post.entity';
 import * as Enums from 'src/enums';
@@ -9,6 +9,7 @@ import { UsersService } from 'src/users/users.service';
 import { convertFromRaw } from 'draft-js';
 import { JamsService } from 'src/jams/jams.service';
 import { SearchService } from 'src/search/search.service';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class PostsService {
@@ -19,6 +20,7 @@ export class PostsService {
     @Inject(forwardRef(() => JamsService))
     private readonly jamsService: JamsService,
     private readonly searchService: SearchService,
+    private readonly rolesService: RolesService,
   ) {}
 
   async indexPosts() {
@@ -26,8 +28,69 @@ export class PostsService {
     this.searchService.savePosts(posts);
     return posts;
   }
+
+  async getPostByIdWithPrivacy(userId: string, id: string) {
+    const post = await this.postsRepository.findOne({ id });
+    if (post.jamId && post.jamI !== 1) {
+      const jam = await this.jamsService.getJamById(post.jamId);
+      if (jam.isPrivate) {
+        if (userId) {
+          const role = await this.rolesService.getRoleByUserIdAndJamId(userId, post.jamId);
+          if (!role || !role.isInvited || !role.isRequested) {
+            post.name = '';
+            post.description = '';
+            post.draft = PRIVATE_POST_DRAFT;
+            post.isOpaque = true;
+          }
+        }
+        else {
+          post.name = '';
+          post.description = '';
+          post.draft = PRIVATE_POST_DRAFT;
+          post.isOpaque = true;
+        }
+      }
+    }
+    return post;
+  }
+
   async getPostById(id: string) {
     return this.postsRepository.findOne({ id });
+  }
+
+  async getPostsByIdsWithPrivacy(userId: string, ids: string[]) {
+    let roles = [];
+    if (userId) {
+      roles = await this.rolesService.getRolesByUserId(userId);
+    }
+
+    const posts = await this.postsRepository.find({
+      where: {
+        id: In(ids),
+      },
+      relations: ['jam']
+    });
+
+    const posts1 = posts.map(post => {
+      if (post.jam?.isPrivate && post.jamI !== 1) {
+        const isMember = roles.some(role => {
+          return role.jamId === post.jamId && role.isInvited && role.isRequested
+        });
+        if (isMember) {
+          return post;
+        }
+        return {
+          ...post,
+          name: '',
+          description: '',
+          draft: PRIVATE_POST_DRAFT,
+          isOpaque: true,
+        };
+      }
+      return post;
+    });
+
+    return posts1;
   }
 
   async getPostsByIds(ids: string[]) {
@@ -67,13 +130,13 @@ export class PostsService {
 
   async createPost(userId: string, jamId: string | null, name: string, desc: string): Promise<Post> {
     const user = await this.usersService.getUserById(userId);
-    this.usersService.incrementUserPostI(userId);
+    await this.usersService.incrementUserPostI(userId);
 
     let jamI = null;
     if (jamId) {
       const jam = await this.jamsService.getJamById(jamId);
-      this.jamsService.incrementJamPostI(jamId);
-      jamI = jam.postI;
+      await this.jamsService.incrementJamPostI(jamId);
+      jamI = jam.postI + 1;
     }
 
     const blocks = [{

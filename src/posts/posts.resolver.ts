@@ -1,5 +1,5 @@
-import { forwardRef, Inject, Query, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Parent, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
+import { forwardRef, Inject, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Args, Context, Mutation, Parent, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
 import { CurrentUser, GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { Jam } from 'src/jams/jam.model';
 import { JamsService } from 'src/jams/jams.service';
@@ -9,6 +9,7 @@ import { UsersService } from 'src/users/users.service';
 import { Post } from './post.model';
 import { PostsService } from './posts.service';
 import { RedisPubSub } from 'graphql-redis-subscriptions';
+import { GqlAuthInterceptor } from 'src/auth/gql-auth.interceptor';
 
 @Resolver(() => Post)
 export class PostsResolver {
@@ -65,10 +66,12 @@ export class PostsResolver {
     return this.pubSub.asyncIterator('savePost')
   }
 
+  @UseInterceptors(GqlAuthInterceptor)
   @Mutation(() => [Post], {name: 'getPosts'})
   async getPosts(
+    @Context() context: any,
     @Args('postIds', {type: () => [String]}) postIds: string[],
   ) {
-    return this.postsService.getPostsByIds(postIds);
+    return this.postsService.getPostsByIdsWithPrivacy(context.req.userId, postIds);
   }
 }

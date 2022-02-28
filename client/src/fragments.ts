@@ -71,6 +71,7 @@ export const POST_FIELDS = gql`
     description
     draft
     privacy
+    isOpaque
     prevCount
     nextCount
     saveDate
