@@ -27,7 +27,7 @@ export class LinksResolver {
     @Parent() link: Link,
     @CurrentUser() user: User,
   ) {
-    return this.postsService.getPostByIdWithPrivacy(user.id, link.sourcePostId);
+    return this.postsService.getPostByIdWithPrivacy(user?.id, link.sourcePostId);
   }
 
   @ResolveField(() => Post, {name: 'targetPost'})
@@ -35,7 +35,7 @@ export class LinksResolver {
     @Parent() link: Link,
     @CurrentUser() user: User,
   ) {
-    return this.postsService.getPostByIdWithPrivacy(user.id, link.targetPostId);
+    return this.postsService.getPostByIdWithPrivacy(user?.id, link.targetPostId);
   }
 
   @ResolveField(() => [Vote], {name: 'votes'})

@@ -69,18 +69,18 @@ export class PostsResolver {
   @UseInterceptors(GqlAuthInterceptor)
   @Mutation(() => [Post], {name: 'getPosts'})
   async getPosts(
-    @Context() context: any,
+    @CurrentUser() user: User,
     @Args('postIds', {type: () => [String]}) postIds: string[],
   ) {
-    return this.postsService.getPostsByIdsWithPrivacy(context.req.user.id, postIds);
+    return this.postsService.getPostsByIdsWithPrivacy(user?.id, postIds);
   }
 
   @UseInterceptors(GqlAuthInterceptor)
   @Query(() => Post, {name: 'getPost'})
   async getPost(
-    @Context() context: any,
+    @CurrentUser() user: User,
     @Args('postId') postId: string,
   ) {
-    return this.postsService.getPostByIdWithPrivacy(context.req.user.id, postId);
+    return this.postsService.getPostByIdWithPrivacy(user?.id, postId);
   }
 }

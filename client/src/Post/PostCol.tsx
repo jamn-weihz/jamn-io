@@ -1,5 +1,5 @@
 import { gql, useLazyQuery } from '@apollo/client';
-import { Box } from '@mui/material';
+import { Box, Card } from '@mui/material';
 import { useEffect, useState } from 'react';
 import ColBar from '../Col/ColBar';
 import { FULL_POST_FIELDS } from '../fragments';
@@ -9,6 +9,7 @@ import { Col } from '../types/Col';
 import { Post } from '../types/Post';
 import PostComponent from './PostComponent';
 import { v4 as uuidv4 } from 'uuid'; 
+import Surveyor from '../Surveyor/Surveyor';
 
 const GET_POST = gql`
   query GetPost($postId: String!) {
@@ -60,7 +61,13 @@ export default function PostCol(props: PostColProps) {
       <ColBar col={props.col} />
       {
         post?.id
-          ? <PostComponent post={post} col={props.col} itemId={itemId} />
+          ? <Box>
+              <Card elevation={5} sx={{
+                margin: 1,
+              }}>
+                <PostComponent post={post} col={props.col} itemId={itemId} />
+              </Card>
+            </Box>
           : <NotFound />
       }
     </Box>
