@@ -23,7 +23,7 @@ export default function ColComponent(props: ColComponentProps) {
   const sizeDetail = useReactiveVar(sizeVar);
   const paletteDetail = useReactiveVar(paletteVar);
 
-  const [colState, setColState] = useState()
+  const [colState, setColState] = useState();
   
   const handleClick = (event: React.MouseEvent) => {
     colVar({

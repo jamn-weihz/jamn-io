@@ -52,14 +52,23 @@ export default function useAddCol(containerEl: React.MutableRefObject<HTMLElemen
         fragmentName: 'FullUserFields',
       }) as User;
       userVar(user);
-      const i = user.cols.filter(col => !col.deleteDate).length - 1;
       colVar({
         ...colDetail,
-        i,
+        colStates: [
+          ...colDetail.colStates,
+          {
+            col: data.addCol,
+            stack: [{
+              pathname: data.addCol.pathname,
+            }],
+            index: 0,
+          }
+        ],
+        i: colDetail.colStates.length,
         isAdding: false,
       });
       containerEl.current?.scrollTo({
-        left: i * getColWidth(sizeDetail.width),
+        left: colDetail.colStates.length * getColWidth(sizeDetail.width),
         behavior: 'smooth',
       });
       navigate(data.addCol.pathname);
@@ -76,16 +85,22 @@ export default function useAddCol(containerEl: React.MutableRefObject<HTMLElemen
     }
     else {
       colVar({
-        cols: [
-          ...colDetail.cols, 
+        colStates: [
+          ...colDetail.colStates, 
           { 
-            i: colDetail.cols.length,
-            id: uuidv4(),
-            pathname,
-            __typename: 'Col',
+            col: {
+              i: colDetail.colStates.length,
+              id: uuidv4(),
+              pathname,
+              __typename: 'Col',
+            },
+            stack: [{
+              pathname
+            }],
+            index: 0,
           }
         ],
-        i:  colDetail.cols.length,
+        i:  colDetail.colStates.length,
         isAdding: false,
         scroll: true,
       });

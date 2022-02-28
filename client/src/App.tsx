@@ -22,6 +22,8 @@ import reduceAddNext from './Surveyor/reduceAddNext';
 import reduceAddLink from './Surveyor/reduceAddLink';
 import reduceRemoveLink from './Surveyor/reduceRemoveLink';
 import SnackBar from './Auth/SnackBar';
+import { Col, ColState } from './types/Col';
+import mapColsToColStates from './Col/mapColsToColStates';
 
 const GET_USER = gql`
   query GetUser {
@@ -83,7 +85,7 @@ function App() {
           userVar(data.getUser);
           colVar({
             ...colDetail,
-            cols: data.getUser.cols,
+            colStates: mapColsToColStates(data.getUser.cols),
           });
           setIsLoading(false);
         }
@@ -230,27 +232,14 @@ function App() {
               backgroundColor: 'inherit',
             }}>
               {
-                userDetail?.id
-                  ? userDetail.cols
-                      .filter(col => !col.deleteDate)
-                      .sort((a, b) => a.i < b.i ? -1 : 1)
-                      .map(col => {
-                        return (
-                          <ColComponent 
-                            key={`col-${col.id}`}
-                            col={col} 
-                          />
-                        );
-                      })
-                  : colDetail.cols.map(col => {
-                      console.log(col);
-                      return (
-                        <ColComponent 
-                          key={`col-${col.id}`}
-                          col={col} 
-                        />
-                      );
-                    })
+                colDetail.colStates.map(colState => {
+                  return (
+                    <ColComponent 
+                      key={`col-${colState.col.id}`}
+                      col={colState.col} 
+                    />
+                  );
+                })
               }
             </Box>
           </Paper>

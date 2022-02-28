@@ -8,3 +8,13 @@ export type Col = {
   deleteDate?: Date | null;
   __typename: string;
 }
+
+export type ColSlice = {
+  pathname: string;
+}
+
+export type ColState = {
+  col: Col;
+  stack: ColSlice[];
+  index: number;
+}

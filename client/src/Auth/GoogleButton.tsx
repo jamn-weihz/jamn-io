@@ -5,9 +5,10 @@ import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { FULL_USER_FIELDS } from '../fragments';
 import { colVar, focusVar, userVar } from '../cache';
-import { Col } from '../types/Col';
+import { Col, ColState } from '../types/Col';
 import useChangeCol from '../Col/useChangeCol';
 import useToken from './useToken';
+import mapColsToColStates from '../Col/mapColsToColStates';
  
 const REGISTER_USER = gql`
   mutation LoginGoogleUser($token: String!, $pathnames: [String!]!) {
@@ -40,7 +41,11 @@ export default function GoogleButton(props: GoogleButtonProps) {
       userVar(data.loginGoogleUser);
       focusVar({
         postId: data.loginGoogleUser.focusId,
-      })
+      });
+      colVar({
+        ...colDetail,
+        colStates: mapColsToColStates(data.loginGoogleUser.cols),
+      });
     },
   });
 
@@ -50,7 +55,7 @@ export default function GoogleButton(props: GoogleButtonProps) {
       loginGoogleUser({
         variables: {
           token: response.accessToken,
-          pathnames: colDetail.cols.map(col => col.pathname),
+          pathnames: colDetail.colStates.map(colState => colState.col.pathname),
         }
       });
     }

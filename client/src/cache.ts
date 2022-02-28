@@ -1,5 +1,5 @@
 import { makeVar } from '@apollo/client';
-import { Col } from './types/Col';
+import { ColState } from './types/Col';
 import { User } from './types/User';
 import { PaletteMode } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,7 +24,7 @@ export const sizeVar = makeVar({
 
 export const colVar = makeVar({
   isAdding: false,
-  cols: [] as Col[],
+  colStates: [] as ColState[],
   i: 0,
   scroll: false,
 });

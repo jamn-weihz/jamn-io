@@ -17,12 +17,13 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { FULL_USER_FIELDS } from '../fragments';
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { focusVar, paletteVar, tokenVar, userVar } from '../cache';
+import { colVar, focusVar, paletteVar, tokenVar, userVar } from '../cache';
 import useToken from './useToken';
-import { Col } from '../types/Col';
+import { Col, ColState } from '../types/Col';
 import useChangeCol from '../Col/useChangeCol';
 import { getColor } from '../utils';
 import ColBar from '../Col/ColBar';
+import mapColsToColStates from '../Col/mapColsToColStates';
 const LOGIN_USER = gql`
   mutation LoginUser($email: String!, $pass: String!) {
     loginUser(email: $email, pass: $pass) {
@@ -38,7 +39,7 @@ interface LoginProps {
 export default function Login(props: LoginProps) {
   const tokenDetail = useReactiveVar(tokenVar);
   const paletteDetail = useReactiveVar(paletteVar);
-
+  const colDetail = useReactiveVar(colVar);
   const [message, setMessage] = useState('');
   
   const { changeCol } = useChangeCol();
@@ -57,7 +58,10 @@ export default function Login(props: LoginProps) {
       }
       refreshTokenInterval();
       userVar(data.loginUser);
-      changeCol(props.col, `/u/${data.loginUser.name}`);
+      colVar({
+        ...colDetail,
+        colStates: mapColsToColStates(data.loginUser.cols)
+      });
       focusVar({
         postId: data.loginUser.focusId,
       })

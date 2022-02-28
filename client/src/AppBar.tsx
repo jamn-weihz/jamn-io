@@ -11,7 +11,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
 import BoltIcon from '@mui/icons-material/Bolt';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import { Col } from './types/Col';
+import { Col, ColState } from './types/Col';
 import { DEFAULT_COLOR, MOBILE_WIDTH } from './constants';
 import { useNavigate } from 'react-router-dom';
 import { getAppbarWidth, getColor, getColWidth } from './utils';
@@ -67,12 +67,12 @@ export default function AppBar(props: AppbarProps) {
     return <QuestionMarkIcon fontSize='inherit'/>;
   }
 
-  const mapColsToItems = (col: Col, i: number) => {
+  const mapColStateToItem = (colState: ColState, i: number) => {
     return (
       <Box key={'appbar-col-'+i} sx={{
         padding: '5px',
       }}>
-        <IconButton size='small' onClick={handleItemClick(col)} sx={{
+        <IconButton size='small' onClick={handleItemClick(colState.col)} sx={{
           fontSize: sizeDetail.width < MOBILE_WIDTH ? 16 : 32,
           color: i === colDetail.i
             ? userDetail?.color || DEFAULT_COLOR
@@ -81,7 +81,7 @@ export default function AppBar(props: AppbarProps) {
             ? `1px solid ${userDetail?.color || DEFAULT_COLOR}`
             : 'none',
         }}>
-          { mapPathnameToIcon(col.pathname) }
+          { mapPathnameToIcon(colState.col.pathname) }
         </IconButton>
       </Box>
     )
@@ -129,14 +129,11 @@ export default function AppBar(props: AppbarProps) {
             <img src={sizeDetail.width < MOBILE_WIDTH ? icon16 : icon32}/>
           </IconButton>
         </Box>
-        {
-          userDetail?.id
-            ? userDetail.cols
-                .filter(col => !col.deleteDate)
-                .sort((a,b) => a.i < b.i ? -1 :1 )
-                .map(mapColsToItems)
-            : colDetail.cols.map(mapColsToItems)
-        }
+        <Box>
+          {
+            colDetail.colStates.map(mapColStateToItem)
+          }
+        </Box>
         <Box sx={{
           borderTop: '1px solid',
           borderColor: getColor(paletteDetail.mode, true),

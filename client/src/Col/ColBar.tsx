@@ -33,7 +33,7 @@ export default function ColBar(props: ColBarProps) {
   const sizeDetail = useReactiveVar(sizeVar);
 
   const [showOptions, setShowOptions] = useState(false);
-  const { removeCol } = useRemoveCol();
+  const { removeCol } = useRemoveCol(props.col);
   const { changeCol } = useChangeCol();
   const { shiftCol: shiftColLeft } = useShiftCol(props.col, -1);
   const { shiftCol: shiftColRight } = useShiftCol(props.col, 1);
@@ -43,7 +43,7 @@ export default function ColBar(props: ColBarProps) {
   };
 
   const handleCloseClick = (event:React.MouseEvent) => {
-    removeCol(props.col);
+    removeCol();
   };
 
   const handleAccountClick = (event: React.MouseEvent) => {
@@ -83,10 +83,6 @@ export default function ColBar(props: ColBarProps) {
   }
 
   let color = getColor(paletteDetail.mode);
-
-  let n = userDetail?.id
-    ? userDetail.cols.filter(col => !col.deleteDate).length
-    : colDetail.cols.length;
 
   return (
     <Card elevation={5}>
@@ -180,7 +176,7 @@ export default function ColBar(props: ColBarProps) {
           </IconButton>
         </Box>
         <Box>
-          <IconButton disabled={props.col.i === n - 1} size='small' onClick={handleRightClick} sx={{
+          <IconButton disabled={props.col.i === colDetail.colStates.length - 1} size='small' onClick={handleRightClick} sx={{
             fontSize: 20,
             padding:0
           }}>

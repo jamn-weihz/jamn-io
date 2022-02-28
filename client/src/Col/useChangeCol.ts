@@ -8,10 +8,10 @@ import { User } from '../types/User';
 const SAVE_COL = gql`
   mutation SaveCol($colId: String!, $pathname: String!) {
     saveCol(colId: $colId, pathname: $pathname) {
-      id
-      pathname
+      ...ColFields
     }
   }
+  ${COL_FIELDS}
 `;
 
 export default function useChangeCol() {
@@ -28,6 +28,23 @@ export default function useChangeCol() {
     },
     onCompleted: data => {
       console.log(data);
+      colVar({
+        ...colDetail, 
+        colStates: colDetail.colStates.map(colState_i => {
+          if (colState_i.col.id === data.saveCol.id) {
+            const stack = colState_i.stack.slice(0, colState_i.index + 1);
+            stack.push({ 
+              pathname: data.saveCol.pathname,
+            });
+            return {
+              col: data.saveCol,
+              stack,
+              index: colState_i.index + 1
+            }
+          }
+          return colState_i;
+        }),
+      })
     },
   });
 
@@ -60,14 +77,20 @@ export default function useChangeCol() {
     else {
       colVar({
         ...colDetail,
-        cols: colDetail.cols.map(col_i => {
-          if (col_i.id === col.id) {
+        colStates: colDetail.colStates.map(colState_i => {
+          if (colState_i.col.id === col.id) {
+            const stack = colState_i.stack.slice(0, colState_i.index + 1)
+            stack.push({ pathname });
             return {
-              ...col_i,
-              pathname,
+              col: {
+                ...col,
+                pathname,
+              },
+              stack,
+              index: colState_i.index + 1,
             }
           }
-          return col_i;
+          return colState_i;
         }),
         i: col.i
       });

@@ -25,9 +25,7 @@ export default function ColAdder(props: ColAdderProps) {
     addCol(pathname);
   };
 
-  const colCount = 
-    userDetail?.cols.filter(col => !col.deleteDate).length || 
-    colDetail.cols.filter(col => !col.deleteDate).length
+  const colCount = colDetail.colStates.length
 
   const left = sizeDetail.width < MOBILE_WIDTH
     ? 40

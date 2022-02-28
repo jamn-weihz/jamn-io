@@ -3,7 +3,7 @@ import { colVar, userVar } from '../cache';
 import { v4 as uuidv4 } from 'uuid';
 import { COL_FIELDS, FULL_USER_FIELDS } from '../fragments';
 import { User } from '../types/User';
-import { Col } from '../types/Col';
+import { Col, ColState } from '../types/Col';
 
 const REMOVE_COL = gql`
   mutation RemoveCol($colId: String!) {
@@ -15,7 +15,7 @@ const REMOVE_COL = gql`
   }
 `;
 
-export default function useRemoveCol() {
+export default function useRemoveCol(col: Col) {
   const client = useApolloClient();
 
   const userDetail = useReactiveVar(userVar);
@@ -33,10 +33,29 @@ export default function useRemoveCol() {
         fragmentName: 'FullUserFields',
       }) as User;
       userVar(user);
+      const colStates = [] as ColState[];
+      colDetail.colStates.forEach(colState_i => {
+        if (colState_i.col.i < col.i) {
+          colStates.push(colState_i);
+        }
+        else if (colState_i.col.i > col.i) {
+          colStates.push({
+            ...colState_i,
+            col: {
+              ...colState_i.col,
+              i: colState_i.col.i - 1,
+            },
+          });
+        }
+      })
+      colVar({
+        ...colDetail,
+        colStates,
+      });
     }
   });
 
-  const removeCol = (col: Col) => {
+  const removeCol = () => {
     if (userDetail?.id) {
       remove({
         variables: {
@@ -45,9 +64,24 @@ export default function useRemoveCol() {
       })
     }
     else {
+      const colStates = [] as ColState[];
+      colDetail.colStates.forEach(colState_i => {
+        if (colState_i.col.i < col.i) {
+          colStates.push(colState_i);
+        }
+        else if (colState_i.col.i > col.i) {
+          colStates.push({
+            ...colState_i,
+            col: {
+              ...colState_i.col,
+              i: colState_i.col.i - 1,
+            },
+          });
+        }
+      })
       colVar({
         ...colDetail,
-        cols: colDetail.cols.splice(col.i, 1)
+        colStates,
       });
     }
   }

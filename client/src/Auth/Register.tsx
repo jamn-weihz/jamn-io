@@ -8,10 +8,11 @@ import GoogleButton from './GoogleButton';
 import { FULL_USER_FIELDS } from '../fragments';
 import { colVar, focusVar, paletteVar, tokenVar, userVar } from '../cache';
 import useToken from './useToken';
-import { Col } from '../types/Col';
+import { Col, ColState } from '../types/Col';
 import useChangeCol from '../Col/useChangeCol';
 import { getColor } from '../utils';
 import ColBar from '../Col/ColBar';
+import mapColsToColStates from '../Col/mapColsToColStates';
 const GET_USER_BY_EMAIL = gql`
   query GetUserByEmail($email: String!) {
     getUserByEmail(email: $email) {
@@ -70,7 +71,10 @@ export default function Register(props: RegisterProps) {
         }
         refreshTokenInterval();
         userVar(data.registerUser);
-        changeCol(props.col, `/u/${data.loginUser.name}`);
+        colVar({
+          ...colDetail,
+          colStates: mapColsToColStates(data.registerUser.cols)
+        });
         focusVar({
           postId: data.registerUser.focusId,
         })
@@ -125,7 +129,7 @@ export default function Register(props: RegisterProps) {
         email,
         pass,
         isGoogle: false,
-        pathnames: colDetail.cols.map(col => col.pathname)
+        pathnames: colDetail.colStates.map(colState => colState.col.pathname)
       }
     });
   };

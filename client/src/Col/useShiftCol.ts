@@ -1,7 +1,7 @@
 import { gql, useApolloClient, useMutation, useReactiveVar } from '@apollo/client';
 import { colVar, sizeVar, userVar } from '../cache';
 import { MOBILE_WIDTH } from '../constants';
-import { FULL_USER_FIELDS } from '../fragments';
+import { COL_FIELDS, FULL_USER_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
 import { User } from '../types/User';
 
@@ -33,8 +33,22 @@ export default function useShiftCol(col: Col, di: number) {
         fragmentName: 'FullUserFields',
       }) as User;
       userVar(user);
+      const colStates = colDetail.colStates.slice();
+      const colState = colStates[col.i];
+      colState.col = {
+        ...colState.col,
+        i: col.i + di,
+      }
+      const adjacentColState = colStates[col.i + di];
+      adjacentColState.col = {
+        ...adjacentColState.col,
+        i: col.i - di,
+      }
+      colStates.splice(col.i, 1, adjacentColState);
+      colStates.splice(col.i + di, 1, colState);
       colVar({
         ...colDetail,
+        colStates,
         i: col.i + di,
         scroll: sizeDetail.width < MOBILE_WIDTH
           ? true
@@ -77,18 +91,29 @@ export default function useShiftCol(col: Col, di: number) {
       })
     }
     else {
-      const cols = colDetail.cols.slice();
-      cols.splice(col.i, 1, cols[col.i + di]);
-      cols.splice(col.i + di, 1, col);
+      const colStates = colDetail.colStates.slice();
+      const colState = colStates[col.i];
+      colState.col = {
+        ...colState.col,
+        i: col.i + di,
+      }
+      const adjacentColState = colStates[col.i + di];
+      adjacentColState.col = {
+        ...adjacentColState.col,
+        i: col.i - di,
+      }
+      colStates.splice(col.i, 1, adjacentColState);
+      colStates.splice(col.i + di, 1, colState);
       colVar({
         ...colDetail,
-        cols,
+        colStates,
         i: col.i + di,
         scroll: sizeDetail.width < MOBILE_WIDTH
           ? true
           : false,
       });
     }
+
   }
   return { shiftCol }
 }

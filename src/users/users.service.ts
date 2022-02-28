@@ -53,7 +53,7 @@ export class UsersService {
   }
 
   async registerUser(email: string, pass: string | null, isGoogle: boolean): Promise<User> {
-    const user = this.getUserByEmail(email);
+    const user = await this.getUserByEmail(email);
     if (user) {
       throw new BadRequestException('Email is already in use');
     }

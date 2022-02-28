@@ -59,6 +59,7 @@ export class AuthService {
   async loginGoogleUser(token: string, pathnames: string[]) {
     const email = await this.googleAuthenticate(token);
     let user = await this.usersService.getUserByEmail(email);
+    console.log('user', user)
     if (!user) {
       user = await this.usersService.registerUser(email, null, true);
       await this.colsService.registerCols(user.id, user.name, pathnames);
