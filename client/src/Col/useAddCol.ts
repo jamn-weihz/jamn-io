@@ -62,6 +62,7 @@ export default function useAddCol(containerEl: React.MutableRefObject<HTMLElemen
               pathname: data.addCol.pathname,
             }],
             index: 0,
+            showOptions: false,
           }
         ],
         i: colDetail.colStates.length,
@@ -98,6 +99,7 @@ export default function useAddCol(containerEl: React.MutableRefObject<HTMLElemen
               pathname
             }],
             index: 0,
+            showOptions: false,
           }
         ],
         i:  colDetail.colStates.length,

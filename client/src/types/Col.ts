@@ -17,4 +17,5 @@ export type ColState = {
   col: Col;
   stack: ColSlice[];
   index: number;
+  showOptions: boolean;
 }

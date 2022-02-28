@@ -16,6 +16,7 @@ export default function resetCols() {
           pathname: '/register'
         }],
         index: 0,
+        showOptions: false,
       },
       {
         col: { 
@@ -28,6 +29,7 @@ export default function resetCols() {
           pathname: '/map'
         }],
         index: 0,
+        showOptions: false,
       },
       {
         col: {
@@ -40,6 +42,7 @@ export default function resetCols() {
           pathname: '/search',
         }],
         index: 0,
+        showOptions: false,
       }
     ],
     i: 0,

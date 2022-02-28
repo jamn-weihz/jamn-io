@@ -1,7 +1,7 @@
 import { useReactiveVar } from '@apollo/client';
 import { Box, Card, IconButton } from '@mui/material';
 import { colVar, paletteVar, sizeVar, userVar } from '../cache';
-import { Col } from '../types/Col';
+import { Col, ColState } from '../types/Col';
 import { getColor } from '../utils';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import React, { useState } from 'react';
@@ -32,14 +32,32 @@ export default function ColBar(props: ColBarProps) {
   const colDetail = useReactiveVar(colVar);
   const sizeDetail = useReactiveVar(sizeVar);
 
-  const [showOptions, setShowOptions] = useState(false);
   const { removeCol } = useRemoveCol(props.col);
   const { changeCol } = useChangeCol();
   const { shiftCol: shiftColLeft } = useShiftCol(props.col, -1);
   const { shiftCol: shiftColRight } = useShiftCol(props.col, 1);
 
+  let colState = null as unknown as ColState;
+  colDetail.colStates.some(colState_i => {
+    if (colState_i.col.id === props.col.id) {
+      colState = colState_i;
+      return true;
+    }
+    return false;
+  });
+
+
   const handleOptionsClick = (event: React.MouseEvent) => {
-    setShowOptions(!showOptions);
+    event.stopPropagation();
+    const colStates = colDetail.colStates.slice();
+    colStates.splice(colState.col.i, 1, {
+      ...colState,
+      showOptions: !colState.showOptions,
+    });
+    colVar({
+      ...colDetail,
+      colStates,
+    });
   };
 
   const handleCloseClick = (event:React.MouseEvent) => {
@@ -66,10 +84,36 @@ export default function ColBar(props: ColBarProps) {
 
   const handleBackClick = (event: React.MouseEvent) => {
     event.stopPropagation();
+    const colStates = colDetail.colStates.slice();
+    colStates.splice(colState.col.i, 1, {
+      ...colState,
+      col: {
+        ...colState.col,
+        pathname: colState.stack[colState.index - 1].pathname,
+      },
+      index: colState.index - 1,
+    })
+    colVar({
+      ...colDetail,
+      colStates,
+    });
   }
   
   const handleForwardClick = (event: React.MouseEvent) => {
     event.stopPropagation();
+    const colStates = colDetail.colStates.slice();
+    colStates.splice(colState.col.i, 1, {
+      ...colState,
+      col: {
+        ...colState.col,
+        pathname: colState.stack[colState.index + 1].pathname,
+      },
+      index: colState.index + 1,
+    })
+    colVar({
+      ...colDetail,
+      colStates,
+    });
   }
 
   const handleLeftClick = (event: React.MouseEvent) => {
@@ -137,7 +181,7 @@ export default function ColBar(props: ColBarProps) {
     
       </Box>
       <Box sx={{
-        display: showOptions ? 'flex' : 'none',
+        display: colState.showOptions ? 'flex' : 'none',
         flexDirection: 'row',
         justifyContent: 'space-between',
         color,
@@ -161,14 +205,14 @@ export default function ColBar(props: ColBarProps) {
             <CloseIcon fontSize='inherit'/>
           </IconButton>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <IconButton size='small' onClick={handleBackClick} sx={{
+          <IconButton disabled={colState.index <= 0} size='small' onClick={handleBackClick} sx={{
             fontSize: 20,
             padding: 0,
           }}>
             <ArrowBackIcon fontSize='inherit'/>
           </IconButton>
           &nbsp;&nbsp;&nbsp;
-          <IconButton size='small' onClick={handleForwardClick} sx={{
+          <IconButton disabled={colState.index >= colState.stack.length - 1} size='small' onClick={handleForwardClick} sx={{
             fontSize: 20,
             padding: 0,
           }}>

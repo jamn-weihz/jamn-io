@@ -2,16 +2,16 @@ import { gql, useApolloClient, useMutation, useReactiveVar } from '@apollo/clien
 import { useNavigate } from 'react-router-dom';
 import { colVar, userVar } from '../cache';
 import { COL_FIELDS, FULL_USER_FIELDS } from '../fragments';
-import { Col } from '../types/Col';
+import { Col, ColState } from '../types/Col';
 import { User } from '../types/User';
 
 const SAVE_COL = gql`
   mutation SaveCol($colId: String!, $pathname: String!) {
     saveCol(colId: $colId, pathname: $pathname) {
-      ...ColFields
+      id
+      pathname
     }
   }
-  ${COL_FIELDS}
 `;
 
 export default function useChangeCol() {
@@ -37,10 +37,11 @@ export default function useChangeCol() {
               pathname: data.saveCol.pathname,
             });
             return {
+              ...colState_i,
               col: data.saveCol,
               stack,
-              index: colState_i.index + 1
-            }
+              index: colState_i.index + 1,
+            } as ColState;
           }
           return colState_i;
         }),
@@ -49,6 +50,8 @@ export default function useChangeCol() {
   });
 
   const changeCol = (col: Col, pathname: string) => {
+    if (col.pathname === pathname) return;
+    
     navigate(pathname);
     if (userDetail?.id) {
       save({
@@ -82,13 +85,14 @@ export default function useChangeCol() {
             const stack = colState_i.stack.slice(0, colState_i.index + 1)
             stack.push({ pathname });
             return {
+              ...colState_i,
               col: {
                 ...col,
                 pathname,
               },
               stack,
               index: colState_i.index + 1,
-            }
+            } as ColState;
           }
           return colState_i;
         }),
