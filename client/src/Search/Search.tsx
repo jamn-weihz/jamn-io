@@ -1,7 +1,7 @@
 import Surveyor from '../Surveyor/Surveyor';
 import React, { useEffect, useState } from 'react';
 import { Box, Card, IconButton } from '@mui/material';
-import { Col } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
 import { paletteVar } from '../cache';
 import { useReactiveVar } from '@apollo/client';
@@ -17,7 +17,7 @@ import { getColor } from '../utils';
 import ColBar from '../Col/ColBar';
 
 interface SearchProps {
-  col: Col;
+  colUnit: ColUnit;
 }
 export default function Search(props: SearchProps) {
   const paletteDetail = useReactiveVar(paletteVar);
@@ -86,7 +86,7 @@ export default function Search(props: SearchProps) {
     <Box sx={{
       height: '100%',
     }}>
-      <ColBar col={props.col} />
+      <ColBar colUnit={props.colUnit} />
       {
         searchClient
           ? <InstantSearch searchClient={searchClient} indexName={ALGOLIA_INDEX_NAME}>
@@ -119,13 +119,13 @@ export default function Search(props: SearchProps) {
                 </Box>
                 <Box> 
                   <SearchBox
-                    col={props.col} 
+                    col={props.colUnit.col} 
                     defaultRefinement='JAMN.IO'
                     surveyorState={surveyorState}
                     setSurveyorState={setSurveyorState}
                   />
                   <Hits
-                    col={props.col}
+                    col={props.colUnit.col}
                     surveyorState={surveyorState}
                     setSurveyorState={setSurveyorState}
                     setReload={setReload}
@@ -137,8 +137,8 @@ export default function Search(props: SearchProps) {
                 overflow: 'scroll',
               }}>
                 <Surveyor 
-                  key={`surveyor-${props.col.id}`} 
-                  col={props.col}
+                  key={`surveyor-${props.colUnit.col.id}`} 
+                  colUnit={props.colUnit}
                   surveyorState={surveyorState}
                   setSurveyorState={setSurveyorState}
                 />

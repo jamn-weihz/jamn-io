@@ -1,24 +1,24 @@
-import { gql, useApolloClient, useMutation, useReactiveVar } from '@apollo/client';
-import { colVar, sizeVar, userVar } from '../cache';
+import { gql, useMutation, useReactiveVar } from '@apollo/client';
+import { useContext } from 'react';
+import { ColContext } from '../App';
+import { sizeVar, userVar } from '../cache';
 import { MOBILE_WIDTH } from '../constants';
-import { COL_FIELDS, FULL_USER_FIELDS } from '../fragments';
+import { COL_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
-import { User } from '../types/User';
 
 const SHIFT_COL = gql`
   mutation ShiftCol($colId: String!, $di: Int!) {
     shiftCol(colId: $colId, di: $di) {
-      id
-      i
+      ...ColFields
     }
   }
+  ${COL_FIELDS}
 `;
 
 export default function useShiftCol(col: Col, di: number) {
-  const client = useApolloClient();
+  const { state, dispatch } = useContext(ColContext);
 
   const userDetail = useReactiveVar(userVar);
-  const colDetail = useReactiveVar(colVar);
   const sizeDetail = useReactiveVar(sizeVar);
 
   const [shift] = useMutation(SHIFT_COL, {
@@ -27,33 +27,12 @@ export default function useShiftCol(col: Col, di: number) {
     },
     onCompleted: data => {
       console.log(data);
-      const user = client.cache.readFragment({
-        id: client.cache.identify(userDetail || {}),
-        fragment: FULL_USER_FIELDS,
-        fragmentName: 'FullUserFields',
-      }) as User;
-      userVar(user);
-      const colStates = colDetail.colStates.slice();
-      const colState = colStates[col.i];
-      colState.col = {
-        ...colState.col,
-        i: col.i + di,
-      }
-      const adjacentColState = colStates[col.i + di];
-      adjacentColState.col = {
-        ...adjacentColState.col,
-        i: col.i - di,
-      }
-      colStates.splice(col.i, 1, adjacentColState);
-      colStates.splice(col.i + di, 1, colState);
-      colVar({
-        ...colDetail,
-        colStates,
+      dispatch({
+        type: 'SHIFT_COLS',
+        cols: data.shiftCol,
         i: col.i + di,
         scroll: sizeDetail.width < MOBILE_WIDTH
-          ? true
-          : false,
-      });
+      })
     }
   })
 
@@ -65,55 +44,37 @@ export default function useShiftCol(col: Col, di: number) {
           di,
         }
       });
-
-      let targetCol;
-      userDetail.cols.some(col_i => {
-        if (col_i.i === col.i + di) {
-          targetCol = col_i
+    }
+    else {
+      let col1 = null as Col | null;
+      state.colUnits.some(colUnit => {
+        if (colUnit.col.i === col.i + di) {
+          col1 = colUnit.col;
           return true;
         }
         return false;
       });
 
-      if (!targetCol) return;
+      if (!col1) {
+        throw new Error('Missing col')
+      }
 
-      client.cache.modify({
-        id: client.cache.identify(col),
-        fields: {
-          i: cachedVal => cachedVal + di,
-        },
-      });
-      client.cache.modify({
-        id: client.cache.identify(targetCol),
-        fields: {
-          i: cachedVal => cachedVal - di,
-        }
+      dispatch({
+        type: 'SHIFT_COLS',
+        cols: [
+          {
+            ...col,
+            i: col.i + di,
+          },
+          {
+            ...col1,
+            i: col.i,
+          },
+        ],
+        i: col.i + di,
+        scroll: sizeDetail.width < MOBILE_WIDTH,
       })
     }
-    else {
-      const colStates = colDetail.colStates.slice();
-      const colState = colStates[col.i];
-      colState.col = {
-        ...colState.col,
-        i: col.i + di,
-      }
-      const adjacentColState = colStates[col.i + di];
-      adjacentColState.col = {
-        ...adjacentColState.col,
-        i: col.i - di,
-      }
-      colStates.splice(col.i, 1, adjacentColState);
-      colStates.splice(col.i + di, 1, colState);
-      colVar({
-        ...colDetail,
-        colStates,
-        i: col.i + di,
-        scroll: sizeDetail.width < MOBILE_WIDTH
-          ? true
-          : false,
-      });
-    }
-
   }
   return { shiftCol }
 }

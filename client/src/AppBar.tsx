@@ -1,7 +1,7 @@
 import { Box, IconButton } from '@mui/material';
-import React from 'react';
+import React, { useContext } from 'react';
 import { useReactiveVar } from '@apollo/client';
-import { colVar, paletteVar, sizeVar, userVar } from './cache';
+import { paletteVar, sizeVar, userVar } from './cache';
 import icon32 from './favicon-32x32.png';
 import icon16 from './favicon-16x16.png';
 import AddIcon from '@mui/icons-material/Add';
@@ -12,11 +12,12 @@ import PersonIcon from '@mui/icons-material/Person';
 import BoltIcon from '@mui/icons-material/Bolt';
 import ChatBubbleTwoToneIcon from '@mui/icons-material/ChatBubbleTwoTone';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import { Col, ColState } from './types/Col';
+import { Col, ColUnit } from './types/Col';
 import { DEFAULT_COLOR, MOBILE_WIDTH } from './constants';
 import { useNavigate } from 'react-router-dom';
-import { getAppbarWidth, getColor, getColWidth } from './utils';
+import { getAppbarWidth, getColor } from './utils';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
+import { ColContext } from './App';
 
 interface AppbarProps {
   containerEl: React.MutableRefObject<HTMLElement | undefined>;
@@ -24,24 +25,25 @@ interface AppbarProps {
 export default function AppBar(props: AppbarProps) {
   const navigate = useNavigate();
 
+  const { state, dispatch } = useContext(ColContext);
+
   const userDetail = useReactiveVar(userVar);
-  const colDetail = useReactiveVar(colVar);
   const sizeDetail = useReactiveVar(sizeVar);
   const paletteDetail = useReactiveVar(paletteVar);
 
   const handleItemClick = (col: Col) => (event: React.MouseEvent) => {
     console.log(col);
     event.stopPropagation();
-    colVar({
-      ...colDetail,
-      i: col.i,
-      isAdding: false
-    });
-    navigate(col.pathname);
-    props.containerEl.current?.scrollTo({
-      left: col.i * (getColWidth(sizeDetail.width) + 2),
-      behavior: 'smooth',
-    })
+
+    if (state.i !== col.i) {
+      dispatch({
+        type: 'SELECT_COL',
+        i: col.i,
+        scroll: true,
+        navigate: true,
+      })
+    }
+
   };
 
   const mapPathnameToIcon = (pathname: string) => {
@@ -72,21 +74,21 @@ export default function AppBar(props: AppbarProps) {
     return <QuestionMarkIcon fontSize='inherit'/>;
   }
 
-  const mapColStateToItem = (colState: ColState, i: number) => {
+  const mapColUnitToButton = (colUnit: ColUnit) => {
     return (
-      <Box key={'appbar-col-'+i} sx={{
+      <Box key={'appbar-col-'+colUnit.col.id} sx={{
         padding: '5px',
       }}>
-        <IconButton size='small' onClick={handleItemClick(colState.col)} sx={{
+        <IconButton size='small' onClick={handleItemClick(colUnit.col)} sx={{
           fontSize: sizeDetail.width < MOBILE_WIDTH ? 16 : 32,
-          color: i === colDetail.i
+          color: colUnit.col.i === state.i
             ? userDetail?.color || DEFAULT_COLOR
             : getColor(paletteDetail.mode),
-          border: i === colDetail.i
+          border: colUnit.col.i === state.i
             ? `1px solid ${userDetail?.color || DEFAULT_COLOR}`
             : 'none',
         }}>
-          { mapPathnameToIcon(colState.col.pathname) }
+          { mapPathnameToIcon(colUnit.col.pathname) }
         </IconButton>
       </Box>
     )
@@ -94,17 +96,15 @@ export default function AppBar(props: AppbarProps) {
 
   const handleAddClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    colVar({
-      ...colDetail,
-      isAdding: !colDetail.isAdding,
-    })
+    dispatch({
+      type: 'SHOW_ADDER',
+    });
   }
   
   const handleClick = (event: React.MouseEvent) => {
-    colVar({
-      ...colDetail,
-      isAdding: false,
-    })
+    dispatch({
+      type: 'HIDE_ADDER'
+    });
   }
   const handlePaletteClick = (event:React.MouseEvent) => {
     paletteVar({
@@ -119,7 +119,7 @@ export default function AppBar(props: AppbarProps) {
       flexDirection: 'column',
       justifyContent: 'space-between',
       textAlign: 'center',
-      height: '100%',
+      minHeight: '100%',
       width: getAppbarWidth(sizeDetail.width),
       backgroundColor: paletteDetail.mode === 'dark'
         ? '#202020'
@@ -136,7 +136,7 @@ export default function AppBar(props: AppbarProps) {
         </Box>
         <Box>
           {
-            colDetail.colStates.map(mapColStateToItem)
+            state.colUnits.map(mapColUnitToButton)
           }
         </Box>
         <Box sx={{
@@ -147,10 +147,10 @@ export default function AppBar(props: AppbarProps) {
         }}>
           <IconButton size='small' onClick={handleAddClick} sx={{
             fontSize: sizeDetail.width < MOBILE_WIDTH ? 16 : 32,
-            color: colDetail.isAdding
+            color: state.showAdder
               ? userDetail?.color || DEFAULT_COLOR
               : getColor(paletteDetail.mode),
-              border: colDetail.isAdding
+              border: state.showAdder
               ? `1px solid ${userDetail?.color || DEFAULT_COLOR}`
               : 'none',
           }}>

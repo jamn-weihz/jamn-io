@@ -1,10 +1,10 @@
 import { useReactiveVar } from '@apollo/client';
 import { Box, Card, IconButton } from '@mui/material';
-import { colVar, paletteVar, sizeVar, userVar } from '../cache';
-import { Col, ColState } from '../types/Col';
+import { paletteVar, sizeVar, userVar } from '../cache';
+import { ColUnit } from '../types/Col';
 import { getColor, getColWidth } from '../utils';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { User } from '../types/User';
 import { Jam } from '../types/Jam';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -19,52 +19,38 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import useChangeCol from './useChangeCol';
 import useShiftCol from './useShiftCol';
 import { MOBILE_WIDTH } from '../constants';
+import { ColContext } from '../App';
 
 interface ColBarProps {
-  col: Col;
+  colUnit: ColUnit;
   user?: User | null;
   jam?: Jam | null;
 }
 
 export default function ColBar(props: ColBarProps) {
+  const { state, dispatch } = useContext(ColContext);
+
   const paletteDetail = useReactiveVar(paletteVar);
   const userDetail = useReactiveVar(userVar);
-  const colDetail = useReactiveVar(colVar);
   const sizeDetail = useReactiveVar(sizeVar);
 
-  const { removeCol } = useRemoveCol(props.col);
-  const { changeCol } = useChangeCol();
-  const { changeCol: changeColBack } = useChangeCol(-1);
-  const { changeCol: changeColForward } = useChangeCol(1);
-  const { shiftCol: shiftColLeft } = useShiftCol(props.col, -1);
-  const { shiftCol: shiftColRight } = useShiftCol(props.col, 1);
-
-  let colState = null as unknown as ColState;
-  colDetail.colStates.some(colState_i => {
-    if (colState_i.col.id === props.col.id) {
-      colState = colState_i;
-      return true;
-    }
-    return false;
-  });
+  const { removeCol } = useRemoveCol(props.colUnit.col);
+  const { changeCol } = useChangeCol(0, true);
+  const { changeCol: changeColBack } = useChangeCol(-1, true);
+  const { changeCol: changeColForward } = useChangeCol(1, true);
+  const { shiftCol: shiftColLeft } = useShiftCol(props.colUnit.col, -1);
+  const { shiftCol: shiftColRight } = useShiftCol(props.colUnit.col, 1);
 
   const handleOptionsClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    colVar({
-      ...colDetail,
-      colStates: colDetail.colStates.map(colState_i => {
-        if (colState_i.col.id === props.col.id) {
-          return {
-            ...colState_i,
-            showOptions: !colState_i.showOptions,
-          };
-        }
-        return colState_i;
-      }),
-    });
+    dispatch({
+      type: 'TOGGLE_COL_OPTIONS',
+      col: props.colUnit.col,
+    })
   };
 
   const handleCloseClick = (event:React.MouseEvent) => {
+    event.stopPropagation();
     removeCol();
   };
 
@@ -73,43 +59,29 @@ export default function ColBar(props: ColBarProps) {
     const pathname = userDetail?.name
       ? `/u/${userDetail.name}`
       : '/register';
-    changeCol(props.col, pathname)
+    changeCol(props.colUnit.col, pathname)
   };
 
   const handleMapClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    changeCol(props.col, '/map');
+    changeCol(props.colUnit.col, '/map');
   }
 
   const handleSearchClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    changeCol(props.col, '/search');
+    changeCol(props.colUnit.col, '/search');
   }
 
   const handleBackClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    let pathname = '';
-    colDetail.colStates.some(colState => {
-      if (colState.col.id === props.col.id) {
-        pathname = colState.stack[colState.index - 1].pathname;
-        return true;
-      }
-      return false;
-    });
-    changeColBack(props.col, pathname)
+    const pathname = props.colUnit.stack[props.colUnit.index - 1].pathname;
+    changeColBack(props.colUnit.col, pathname)
   }
   
   const handleForwardClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    let pathname = '';
-    colDetail.colStates.some(colState => {
-      if (colState.col.id === props.col.id) {
-        pathname = colState.stack[colState.index + 1].pathname;
-        return true;
-      }
-      return false;
-    });
-    changeCol(props.col, pathname)
+    const pathname = props.colUnit.stack[props.colUnit.index + 1].pathname;
+    changeColForward(props.colUnit.col, pathname)
   }
 
   const handleLeftClick = (event: React.MouseEvent) => {
@@ -123,8 +95,6 @@ export default function ColBar(props: ColBarProps) {
   }
 
   let color = getColor(paletteDetail.mode);
-
-  if (!colState) return null;
 
   return (
     <Card elevation={5}>
@@ -140,7 +110,7 @@ export default function ColBar(props: ColBarProps) {
           color:  props.user?.color || props.jam?.color,
           fontWeight: 'bold',
         }}>
-          {props.col.pathname.split('/').slice(0, 3).join('/')}
+          {props.colUnit.col.pathname.split('/').slice(0, 3).join('/')}
         </Box>
         <Box sx={{
           whiteSpace: 'nowrap',
@@ -180,7 +150,7 @@ export default function ColBar(props: ColBarProps) {
     
       </Box>
       <Box sx={{
-        display: colState.showOptions ? 'flex' : 'none',
+        display: props.colUnit.showOptions ? 'flex' : 'none',
         flexDirection: 'row',
         justifyContent: 'space-between',
         color,
@@ -189,7 +159,7 @@ export default function ColBar(props: ColBarProps) {
         padding: 1,
       }}>
         <Box>
-          <IconButton disabled={props.col.i === 0} size='small' onClick={handleLeftClick} sx={{
+          <IconButton disabled={props.colUnit.col.i === 0} size='small' onClick={handleLeftClick} sx={{
             fontSize: 20,
             padding:0
           }}>
@@ -204,14 +174,14 @@ export default function ColBar(props: ColBarProps) {
             <CloseIcon fontSize='inherit'/>
           </IconButton>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <IconButton disabled={colState.index <= 0} size='small' onClick={handleBackClick} sx={{
+          <IconButton disabled={props.colUnit.index <= 0} size='small' onClick={handleBackClick} sx={{
             fontSize: 20,
             padding: 0,
           }}>
             <ArrowBackIcon fontSize='inherit'/>
           </IconButton>
           &nbsp;&nbsp;&nbsp;
-          <IconButton disabled={colState.index >= colState.stack.length - 1} size='small' onClick={handleForwardClick} sx={{
+          <IconButton disabled={props.colUnit.index >= props.colUnit.stack.length - 1} size='small' onClick={handleForwardClick} sx={{
             fontSize: 20,
             padding: 0,
           }}>
@@ -219,7 +189,7 @@ export default function ColBar(props: ColBarProps) {
           </IconButton>
         </Box>
         <Box>
-          <IconButton disabled={props.col.i === colDetail.colStates.length - 1} size='small' onClick={handleRightClick} sx={{
+          <IconButton disabled={props.colUnit.col.i === state.colUnits.length - 1} size='small' onClick={handleRightClick} sx={{
             fontSize: 20,
             padding:0
           }}>

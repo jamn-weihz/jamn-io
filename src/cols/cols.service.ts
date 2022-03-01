@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Col } from './col.entity';
 
 @Injectable()
@@ -14,6 +14,14 @@ export class ColsService {
     return this.colsRepository.find({
       where: {
         userId,
+      },
+    });
+  }
+
+  async getColsById(colIds: string[]): Promise<Col[]> {
+    return this.colsRepository.find({
+      where: {
+        id: In(colIds),
       },
     });
   }
@@ -84,7 +92,8 @@ export class ColsService {
     targetCol0.id = cols[col.i + di].id;
     targetCol0.i = col.i;
     
-    return this.colsRepository.save([col0, targetCol0]);
+    const cols1 = await this.colsRepository.save([col0, targetCol0]);
+    return this.getColsById(cols1.map(col => col.id));
   }
 
   async removeCol(userId: string, colId: string): Promise<Col[]> {

@@ -1,13 +1,12 @@
 import { gql, useLazyQuery } from '@apollo/client';
-import { Box, Card } from '@mui/material';
+import { Box } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import ColBar from '../Col/ColBar';
 import { FULL_POST_FIELDS } from '../fragments';
 import Loading from '../Loading';
 import NotFound from '../NotFound';
-import { Col } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import { Post } from '../types/Post';
-import PostComponent from './PostComponent';
 import { v4 as uuidv4 } from 'uuid'; 
 import Surveyor from '../Surveyor/Surveyor';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
@@ -24,7 +23,7 @@ const GET_POST = gql`
 `;
 
 interface PostColProps {
-  col: Col;
+  colUnit: ColUnit;
   id: string;
 }
 export default function PostCol(props: PostColProps) {
@@ -101,13 +100,13 @@ export default function PostCol(props: PostColProps) {
     <Box sx={{
       height: '100%'
     }}>
-      <ColBar col={props.col} />
+      <ColBar colUnit={props.colUnit} />
       {
         post?.id
           ? <Box>
               <Surveyor 
                 post={post}
-                col={props.col} 
+                colUnit={props.colUnit} 
                 surveyorState={surveyorState}
                 setSurveyorState={setSurveyorState}
               />

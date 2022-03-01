@@ -1,9 +1,12 @@
 import { gql, useApolloClient, useMutation, useReactiveVar } from '@apollo/client';
-import { colVar, userVar } from '../cache';
+import { userVar } from '../cache';
 import { v4 as uuidv4 } from 'uuid';
-import { COL_FIELDS, FULL_USER_FIELDS } from '../fragments';
+import { FULL_USER_FIELDS } from '../fragments';
 import { User } from '../types/User';
 import { Col, ColState } from '../types/Col';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { ColContext } from '../App';
 
 const REMOVE_COL = gql`
   mutation RemoveCol($colId: String!) {
@@ -16,10 +19,9 @@ const REMOVE_COL = gql`
 `;
 
 export default function useRemoveCol(col: Col) {
-  const client = useApolloClient();
+  const { state, dispatch } = useContext(ColContext);
 
   const userDetail = useReactiveVar(userVar);
-  const colDetail = useReactiveVar(colVar);
 
   const [remove] = useMutation(REMOVE_COL, {
     onError: error => {
@@ -27,31 +29,10 @@ export default function useRemoveCol(col: Col) {
     },
     onCompleted: data => {
       console.log(data);
-      const user = client.cache.readFragment({
-        id: client.cache.identify(userDetail || {}),
-        fragment: FULL_USER_FIELDS,
-        fragmentName: 'FullUserFields',
-      }) as User;
-      userVar(user);
-      const colStates = [] as ColState[];
-      colDetail.colStates.forEach(colState_i => {
-        if (colState_i.col.i < col.i) {
-          colStates.push(colState_i);
-        }
-        else if (colState_i.col.i > col.i) {
-          colStates.push({
-            ...colState_i,
-            col: {
-              ...colState_i.col,
-              i: colState_i.col.i - 1,
-            },
-          });
-        }
+      dispatch({
+        type: 'REMOVE_COL',
+        col,
       })
-      colVar({
-        ...colDetail,
-        colStates,
-      });
     }
   });
 
@@ -64,25 +45,10 @@ export default function useRemoveCol(col: Col) {
       })
     }
     else {
-      const colStates = [] as ColState[];
-      colDetail.colStates.forEach(colState_i => {
-        if (colState_i.col.i < col.i) {
-          colStates.push(colState_i);
-        }
-        else if (colState_i.col.i > col.i) {
-          colStates.push({
-            ...colState_i,
-            col: {
-              ...colState_i.col,
-              i: colState_i.col.i - 1,
-            },
-          });
-        }
+      dispatch({
+        type: 'REMOVE_COL',
+        col: col,
       })
-      colVar({
-        ...colDetail,
-        colStates,
-      });
     }
   }
 

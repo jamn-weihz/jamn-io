@@ -11,7 +11,7 @@ import { Jam } from '../types/Jam';
 import StartJamForm from './StartJamForm';
 import { useNavigate } from 'react-router-dom';
 import useChangeCol from '../Col/useChangeCol';
-import { Col } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import { getColor } from '../utils';
 import ColBar from '../Col/ColBar';
 import useStartJamSubscription from './useStartJamSubscription';
@@ -30,11 +30,11 @@ const GET_JAMS_BY_LOCATION = gql`
 `;
 
 interface MapProps {
-  col: Col;
+  colUnit: ColUnit;
 }
 export default function Map(props: MapProps) {
   const navigate = useNavigate();
-  const { changeCol } = useChangeCol();
+  const { changeCol } = useChangeCol(0, true);
   const paletteDetail = useReactiveVar(paletteVar);
 
   const userDetail = useReactiveVar(userVar);
@@ -251,7 +251,7 @@ export default function Map(props: MapProps) {
       const features = event.features as any[];
       const jam = JSON.parse(features[0].properties?.jam) as Jam;
       const pathname = `/j/${jam.name}`
-      changeCol(props.col, pathname);
+      changeCol(props.colUnit.col, pathname);
       navigate(pathname)
     });
     map.current.on('mouseenter', 'clusters', () => {
@@ -334,7 +334,7 @@ export default function Map(props: MapProps) {
     <Box sx={{
       height: '100%'
     }}>
-      <ColBar col={props.col} />
+      <ColBar colUnit={props.colUnit} />
       <Card elevation={5} sx={{
         position: 'relative',
         height: isStartingJam
@@ -363,7 +363,7 @@ export default function Map(props: MapProps) {
         {
           isStartingJam
             ? <StartJamForm
-                col={props.col}
+                col={props.colUnit.col}
                 lng={pinLng}
                 lat={pinLat}
                 isOpen={isStartingJam} 

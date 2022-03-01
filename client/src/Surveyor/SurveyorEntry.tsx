@@ -67,7 +67,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
 
   const { replyPost } = useReplyPost(props.item.id, props.item.postId, props.jam?.id);
 
-  const { changeCol } = useChangeCol();
+  const { changeCol } = useChangeCol(0, true);
 
   useEffect(() => {
     if (props.item.refresh) {

@@ -1,12 +1,10 @@
-import { gql, useApolloClient, useMutation, useReactiveVar } from '@apollo/client';
-import { colVar, sizeVar, userVar } from '../cache';
+import { gql, useMutation, useReactiveVar } from '@apollo/client';
+import { addColVar, userVar } from '../cache';
 import { v4 as uuidv4 } from 'uuid';
-import { COL_FIELDS, FULL_USER_FIELDS } from '../fragments';
-import { User } from '../types/User';
-import React from 'react';
-import { getColWidth } from '../utils';
+import { COL_FIELDS } from '../fragments';
+import { useContext, useState } from 'react';
+import { ColContext, ColContextType } from '../App';
 import { useNavigate } from 'react-router-dom';
-import { ColState } from '../types/Col';
 
 const ADD_COL = gql`
   mutation AddCol($pathname: String!) {
@@ -17,68 +15,35 @@ const ADD_COL = gql`
   ${COL_FIELDS}
 `;
 
-export default function useAddCol(containerEl: React.MutableRefObject<HTMLElement | undefined>) {
+export default function useAddCol(context?: ColContextType) {
   const navigate = useNavigate();
 
-  const client = useApolloClient();
+  let { state, dispatch } = useContext(ColContext);
+  if (!state && !dispatch && context) {
+    state = context.state;
+    dispatch = context.dispatch;
+  }
 
   const userDetail = useReactiveVar(userVar);
-  const colDetail = useReactiveVar(colVar);
-  const sizeDetail = useReactiveVar(sizeVar);
+  const addColDetail = useReactiveVar(addColVar);
 
   const [add] = useMutation(ADD_COL, {
     onError: error => {
       console.error(error);
     },
-    update: (cache, {data: {addCol}}) => {
-      cache.modify({
-        id: cache.identify(userDetail || {}),
-        fields: {
-          cols: (cachedRefs = []) => {
-            const newRef = cache.writeFragment({
-              id: cache.identify(addCol),
-              fragment: COL_FIELDS,
-              data: addCol,
-            });
-            return [...cachedRefs, newRef];
-          }
-        }
-      });
-    },
     onCompleted: data => {
       console.log(data);
-      const user = client.cache.readFragment({
-        id: client.cache.identify(userDetail || {}),
-        fragment: FULL_USER_FIELDS,
-        fragmentName: 'FullUserFields',
-      }) as User;
-      userVar(user);
-      colVar({
-        ...colDetail,
-        colStates: [
-          ...colDetail.colStates,
-          {
-            col: data.addCol,
-            stack: [{
-              pathname: data.addCol.pathname,
-              id: uuidv4(),
-            }],
-            index: 0,
-            showOptions: false,
-          }
-        ],
-        i: colDetail.colStates.length,
-        isAdding: false,
+      dispatch({
+        type: 'ADD_COL',
+        col: data.addCol,
+        id: uuidv4(),
+        navigate: true,
       });
-      containerEl.current?.scrollTo({
-        left: colDetail.colStates.length * getColWidth(sizeDetail.width),
-        behavior: 'smooth',
-      });
-      navigate(data.addCol.pathname);
     }
   });
 
-  const addCol = (pathname: string, colStates?: ColState[]) => {
+  const addCol = (pathname: string) => {
+
     if (userDetail?.id) {
       add({
         variables: {
@@ -87,27 +52,16 @@ export default function useAddCol(containerEl: React.MutableRefObject<HTMLElemen
       })
     }
     else {
-      colVar({
-        colStates: [
-          ...(colStates || colDetail.colStates),
-          { 
-            col: {
-              i: colStates?.length || colDetail.colStates.length,
-              id: uuidv4(),
-              pathname,
-              __typename: 'Col',
-            },
-            stack: [{
-              pathname,
-              id: uuidv4(),
-            }],
-            index: 0,
-            showOptions: false,
-          }
-        ],
-        i: colStates?.length || colDetail.colStates.length,
-        isAdding: false,
-        scroll: true,
+      dispatch({
+        type: 'ADD_COL',
+        col: {
+          i: state.colUnits.length,
+          id: uuidv4(),
+          pathname,
+          __typename: 'Col',
+        },
+        id: uuidv4(),
+        navigate: true,
       });
     }
   }

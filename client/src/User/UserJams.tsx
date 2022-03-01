@@ -5,12 +5,12 @@ import { paletteVar } from '../cache';
 import ColLink from '../Col/ColLink';
 import useRemoveRole from '../Role/useRemoveRole';
 import useRequestRole from '../Role/useRequestRole';
-import { Col } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import { User } from '../types/User'
 import { getColor } from '../utils';
 
 interface UserJamsProps {
-  col: Col;
+  colUnit: ColUnit;
   user: User;
 }
 export default function UserJams(props: UserJamsProps) {
@@ -38,7 +38,7 @@ export default function UserJams(props: UserJamsProps) {
               justifyContent: 'space-between',
             }}>
               <Box>
-                <ColLink col={props.col} pathname={`/j/${role.jam.name}`} sx={{
+                <ColLink col={props.colUnit.col} pathname={`/j/${role.jam.name}`} sx={{
                   color: role.jam.color,
                 }}>
                   {`j/${role.jam.name}`}

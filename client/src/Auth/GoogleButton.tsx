@@ -1,14 +1,14 @@
 import { Box, Button } from '@mui/material';
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
 import { GOOGLE_CLIENT_ID } from '../constants';
-import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { gql, useMutation } from '@apollo/client';
+import { useContext, useState } from 'react';
 import { FULL_USER_FIELDS } from '../fragments';
-import { colVar, focusVar, userVar } from '../cache';
-import { Col, ColState } from '../types/Col';
-import useChangeCol from '../Col/useChangeCol';
+import { focusVar, userVar } from '../cache';
+import { Col } from '../types/Col';
 import useToken from './useToken';
-import mapColsToColStates from '../Col/mapColsToColStates';
+import { useNavigate } from 'react-router-dom';
+import { ColContext } from '../App';
  
 const REGISTER_USER = gql`
   mutation LoginGoogleUser($token: String!, $pathnames: [String!]!) {
@@ -24,7 +24,7 @@ interface GoogleButtonProps {
   col: Col;
 }
 export default function GoogleButton(props: GoogleButtonProps) {
-  const colDetail = useReactiveVar(colVar);
+  const { state, dispatch } = useContext(ColContext);
 
   const [message, setMessage] = useState('');
 
@@ -42,9 +42,9 @@ export default function GoogleButton(props: GoogleButtonProps) {
       focusVar({
         postId: data.loginGoogleUser.focusId,
       });
-      colVar({
-        ...colDetail,
-        colStates: mapColsToColStates(data.loginGoogleUser.cols),
+      dispatch({
+        type: 'INIT_COLS',
+        cols: data.loginGoogleUser.cols,
       });
     },
   });
@@ -55,7 +55,7 @@ export default function GoogleButton(props: GoogleButtonProps) {
       loginGoogleUser({
         variables: {
           token: response.accessToken,
-          pathnames: colDetail.colStates.map(colState => colState.col.pathname),
+          pathnames: state.colUnits.map(colUnit => colUnit.col.pathname),
         }
       });
     }

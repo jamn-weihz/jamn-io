@@ -1,9 +1,7 @@
-import { useReactiveVar } from "@apollo/client";
-import { Box, SxProps } from "@mui/material";
-import React from "react";
-import { colVar } from "../cache";
-import { Col } from "../types/Col";
-import useChangeCol from "./useChangeCol";
+import { Box, SxProps } from '@mui/material';
+import React from 'react';
+import { Col } from '../types/Col';
+import useChangeCol from './useChangeCol';
 
 interface ColLinkProps {
   pathname: string;
@@ -13,7 +11,7 @@ interface ColLinkProps {
   onClick?: any;
 }
 export default function ColLink(props: ColLinkProps) {
-  const { changeCol } = useChangeCol();
+  const { changeCol } = useChangeCol(0, true);
 
   const handleClick = (event: React.MouseEvent) => {
     event.stopPropagation();

@@ -1,10 +1,10 @@
-import { colVar } from '../cache';
-import { v4 as uuidv4 } from 'uuid'
+import { ColState, ResetColsAction } from '../types/Col';
+import { v4 as uuidv4 } from 'uuid';
 
-export default function resetCols() {
-  colVar({
-    isAdding: false,
-    colStates: [
+export default function reduceResetCols(state: ColState, action: ResetColsAction): ColState {
+  return {
+    ...state,
+    colUnits: [
       {
         col: { 
           id: uuidv4(),
@@ -48,7 +48,11 @@ export default function resetCols() {
         showOptions: false,
       }
     ],
+    showAdder: false,
     i: 0,
-    scroll: true
-  });
+    scroll: true,
+    navigate: true,
+    isInit: true,
+    addedCol: null,
+  };
 }

@@ -3,7 +3,7 @@ import { Box, Card, Checkbox } from '@mui/material';
 import React, { useState } from 'react';
 import { ChromePicker } from 'react-color';
 import { sessionVar, snackbarVar } from '../cache';
-import { Col } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import { Jam } from '../types/Jam';
 
 const SET_JAM_COLOR = gql`
@@ -35,7 +35,7 @@ const SET_JAM_ISPRIVATE = gql`
 
 interface JamSettingsProps {
   jam: Jam;
-  col: Col;
+  colUnit: ColUnit;
 }
 
 export default function JamSettings(props: JamSettingsProps) {

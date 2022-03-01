@@ -1,23 +1,25 @@
 import { useReactiveVar } from '@apollo/client';
 import { Card, IconButton } from '@mui/material';
-import React from 'react';
-import { colVar, userVar } from '../cache';
+import React, { useContext } from 'react';
+import { userVar } from '../cache';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MapIcon from '@mui/icons-material/Map';
 import SearchIcon from '@mui/icons-material/Search';
 import useAddCol from './useAddCol';
 import { sizeVar } from '../cache';
 import { MOBILE_WIDTH } from '../constants';
+import { ColContext } from '../App';
 
 interface ColAdderProps {
-  containerEl: React.MutableRefObject<HTMLElement | undefined>;
+  
 }
 export default function ColAdder(props: ColAdderProps) {
+  const { state } = useContext(ColContext);
+
   const userDetail = useReactiveVar(userVar);
-  const colDetail = useReactiveVar(colVar);
   const sizeDetail = useReactiveVar(sizeVar);
 
-  const { addCol } = useAddCol(props.containerEl);
+  const { addCol } = useAddCol();
 
   const handleAddClick = (pathname: string) => (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -25,7 +27,7 @@ export default function ColAdder(props: ColAdderProps) {
     addCol(pathname);
   };
 
-  const colCount = colDetail.colStates.length
+  const colCount = state.colUnits.length
 
   const left = sizeDetail.width < MOBILE_WIDTH
     ? 40
@@ -36,7 +38,7 @@ export default function ColAdder(props: ColAdderProps) {
   return (
     <Card elevation={10} sx={{
       position: 'fixed',
-      display: colDetail.isAdding ? 'flex' : 'none',
+      display: state.showAdder ? 'flex' : 'none',
       left, 
       top,
       padding: 1,

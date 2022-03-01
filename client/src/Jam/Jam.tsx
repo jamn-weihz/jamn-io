@@ -3,7 +3,7 @@ import { Box, Card } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { FULL_JAM_FIELDS } from '../fragments';
 import Loading from '../Loading';
-import { Col } from '../types/Col';
+import { Col, ColUnit } from '../types/Col';
 import { Jam } from '../types/Jam';
 import { Role } from '../types/Role';
 import JamProfile from './JamProfile';
@@ -28,7 +28,7 @@ const GET_JAM_BY_NAME = gql`
 `;
 
 interface JamComponentProps {
-  col: Col;
+  colUnit: ColUnit;
   name: string;
 }
 export default function JamComponent(props: JamComponentProps) {
@@ -93,14 +93,14 @@ export default function JamComponent(props: JamComponentProps) {
     return false;
   })
 
-  const path = props.col.pathname.split('/');
+  const path = props.colUnit.col.pathname.split('/');
 
   const color = getColor(paletteDetail.mode);
   return (
     <Box sx={{
       height: '100%'
     }}>
-      <ColBar col={props.col} jam={jam1} />
+      <ColBar colUnit={props.colUnit} jam={jam1} />
       {
         jam1.id
           ? <Box sx={{
@@ -112,25 +112,25 @@ export default function JamComponent(props: JamComponentProps) {
                 marginBottom: 0,
                 borderBottom: '1px solid dimgrey',
               }}>
-                <ColLink col={props.col} pathname={`/j/${jam1.name}/u`} sx={{
+                <ColLink col={props.colUnit.col} pathname={`/j/${jam1.name}/u`} sx={{
                   color: path[3] === 'u' ? jam1.color : color,
                 }}>
                   Users
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/j/${jam1.name}`} sx={{
+                <ColLink col={props.colUnit.col} pathname={`/j/${jam1.name}`} sx={{
                   color: !path[3] || path[3] === '' ? jam1.color : color,
                 }}>
                   Profile
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/j/${jam1.name}/r`} sx={{
+                <ColLink col={props.colUnit.col} pathname={`/j/${jam1.name}/r`} sx={{
                   color: path[3] === 'r' ? jam1.color : color,
                 }}>
                   Recent
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/j/${jam1.name}/s`} sx={{
+                <ColLink col={props.colUnit.col} pathname={`/j/${jam1.name}/s`} sx={{
                   display: role && role.type === 'ADMIN'
                     ? 'initial'
                     : 'none',
@@ -145,14 +145,14 @@ export default function JamComponent(props: JamComponentProps) {
               }}>
                 {
                   path[3] === 'u'
-                    ? <JamUsers jam={jam1} col={props.col}/>
+                    ? <JamUsers jam={jam1} colUnit={props.colUnit}/>
                     : path[3] === 'r'
-                      ? <JamRecent jam={jam1} col={props.col} />
+                      ? <JamRecent jam={jam1} colUnit={props.colUnit} />
                       : path[3] === 's'
-                        ? <JamSettings jam={jam1} col={props.col}/>
+                        ? <JamSettings jam={jam1} colUnit={props.colUnit}/>
                         : <JamProfile 
                             jam={jam1} 
-                            col={props.col} 
+                            colUnit={props.colUnit} 
                           />
                 }
               </Box>

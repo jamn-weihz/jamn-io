@@ -1,18 +1,19 @@
 import { gql, useLazyQuery, useMutation, useReactiveVar } from '@apollo/client';
 import { Box, Button, Card, FormControl, IconButton, InputAdornment, InputLabel, Link, OutlinedInput, TextField } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { EMAIL_REGEX } from '../constants';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import GoogleButton from './GoogleButton';
 import { FULL_USER_FIELDS } from '../fragments';
-import { colVar, focusVar, paletteVar, tokenVar, userVar } from '../cache';
+import { focusVar, paletteVar, tokenVar, userVar } from '../cache';
 import useToken from './useToken';
-import { Col, ColState } from '../types/Col';
+import { Col, ColUnit } from '../types/Col';
 import useChangeCol from '../Col/useChangeCol';
 import { getColor } from '../utils';
 import ColBar from '../Col/ColBar';
-import mapColsToColStates from '../Col/mapColsToColStates';
+import { useNavigate } from 'react-router-dom';
+import { ColContext } from '../App';
 const GET_USER_BY_EMAIL = gql`
   query GetUserByEmail($email: String!) {
     getUserByEmail(email: $email) {
@@ -31,16 +32,15 @@ const REGISTER_USER = gql`
 `;
 
 interface RegisterProps {
-  col: Col;
+  colUnit: ColUnit;
 }
 export default function Register(props: RegisterProps) {
+  const { state, dispatch } = useContext(ColContext);
+
   const tokenDetail = useReactiveVar(tokenVar);
-  const colDetail = useReactiveVar(colVar);
   const paletteDetail = useReactiveVar(paletteVar);
 
   const { refreshTokenInterval } = useToken();
-
-  const [showOptions, setShowOptions] = useState(false);
 
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -51,7 +51,7 @@ export default function Register(props: RegisterProps) {
 
   const [message, setMessage] = useState('');
 
-  const { changeCol } = useChangeCol(); 
+  const { changeCol } = useChangeCol(0, true); 
 
   const [getUserByEmail] = useLazyQuery(GET_USER_BY_EMAIL, {
     onCompleted: data => {
@@ -71,13 +71,13 @@ export default function Register(props: RegisterProps) {
         }
         refreshTokenInterval();
         userVar(data.registerUser);
-        colVar({
-          ...colDetail,
-          colStates: mapColsToColStates(data.registerUser.cols)
-        });
         focusVar({
           postId: data.registerUser.focusId,
-        })
+        });
+        dispatch({
+          type: 'INIT_COLS',
+          cols: data.registerUser.cols,
+        });
       }
     }
   })
@@ -129,14 +129,14 @@ export default function Register(props: RegisterProps) {
         email,
         pass,
         isGoogle: false,
-        pathnames: colDetail.colStates.map(colState => colState.col.pathname)
+        pathnames: state.colUnits.map(colUnit => colUnit.col.pathname)
       }
     });
   };
 
   const handleLoginClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    changeCol(props.col, '/login')
+    changeCol(props.colUnit.col, '/login')
   };
 
   const isFormValid = email.length && !emailError && pass.length;
@@ -145,7 +145,7 @@ export default function Register(props: RegisterProps) {
 
   return (
     <Box>
-      <ColBar col={props.col} />
+      <ColBar colUnit={props.colUnit} />
       <Card elevation={5} sx={{padding: 1, margin: 1}}>
         <FormControl margin='dense' sx={{width: '100%'}}>
           <TextField
@@ -202,7 +202,7 @@ export default function Register(props: RegisterProps) {
           paddingTop:1,
           borderTop: '1px solid dimgrey',
         }}>
-          <GoogleButton isRegistration={true} col={props.col}/>
+          <GoogleButton isRegistration={true} col={props.colUnit.col}/>
         </Box>
         <Box sx={{
           marginTop: 2,

@@ -22,13 +22,6 @@ export const sizeVar = makeVar({
   height: window.innerHeight,
 });
 
-export const colVar = makeVar({
-  isAdding: false,
-  colStates: [] as ColState[],
-  i: 0,
-  scroll: false,
-});
-
 export const focusVar = makeVar({
   postId: '',
 });
@@ -56,4 +49,8 @@ export const startJamVar = makeVar({
 export const snackbarVar = makeVar({
   isUnauthorized: false,
   isSessionExpired: false,
+})
+
+export const addColVar = makeVar({
+  id: '',
 })

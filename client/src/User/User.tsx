@@ -1,7 +1,7 @@
 import { gql, useApolloClient, useLazyQuery, useReactiveVar } from '@apollo/client'
 import { Box, Card } from '@mui/material';
 import { paletteVar, userVar } from '../cache'
-import { FULL_POST_FIELDS, FULL_USER_FIELDS, JAM_FIELDS, ROLE_FIELDS, USER_FIELDS } from '../fragments';
+import { FULL_USER_FIELDS } from '../fragments';
 import { useEffect, useState } from 'react';
 import NotFound from '../NotFound';
 import Logout from '../Auth/Logout';
@@ -11,7 +11,7 @@ import Loading from '../Loading';
 import UserJams from './UserJams';
 import UserProfile from './UserProfile';
 import UserSettings from './UserSettings';
-import { Col } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import ColLink from '../Col/ColLink';
 import { getColor } from '../utils';
 import ColBar from '../Col/ColBar';
@@ -26,7 +26,7 @@ const GET_USER_BY_NAME = gql`
   ${FULL_USER_FIELDS}
 `;
 interface UserProps {
-  col: Col;
+  colUnit: ColUnit;
   name: string;
 }
 export default function UserComponent(props: UserProps) {
@@ -65,7 +65,7 @@ export default function UserComponent(props: UserProps) {
 
   if (isLoading) return <Loading />
 
-  const path = props.col.pathname.split('/');
+  const path = props.colUnit.col.pathname.split('/');
 
   const color = getColor(paletteDetail.mode);
 
@@ -79,7 +79,7 @@ export default function UserComponent(props: UserProps) {
     <Box sx={{
       height: '100%'
     }}>
-      <ColBar col={props.col} user={user1} />
+      <ColBar colUnit={props.colUnit} user={user1} />
       {
         user1?.id && user1.id === userDetail?.id
           ? <Box>
@@ -103,7 +103,7 @@ export default function UserComponent(props: UserProps) {
                 marginBottom: 0,
                 borderBottom: '1px solid dimgrey',
               }}>
-                <ColLink col={props.col} pathname={`/u/${user1.name}/j`} sx={{
+                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/j`} sx={{
                   color: path[3] === 'j' 
                     ? user1.color 
                     : color,
@@ -111,7 +111,7 @@ export default function UserComponent(props: UserProps) {
                   Jams
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/u/${user1.name}`} sx={{
+                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}`} sx={{
                   color: !path[3] || path[3] === '' 
                     ? user1.color 
                     : color,
@@ -119,7 +119,7 @@ export default function UserComponent(props: UserProps) {
                   Profile
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/u/${user1.name}/r`} sx={{
+                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/r`} sx={{
                   color: path[3] === 'r' 
                     ? user1.color 
                     : color,
@@ -127,7 +127,7 @@ export default function UserComponent(props: UserProps) {
                   Recent
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.col} pathname={`/u/${user1.name}/s`} sx={{
+                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/s`} sx={{
                   display: user1.id === userDetail?.id
                     ? 'initial'
                     : 'none',
@@ -144,14 +144,14 @@ export default function UserComponent(props: UserProps) {
               }}>
                 {
                   path[3] === 'j'
-                    ? <UserJams user={user1} col={props.col} />
+                    ? <UserJams user={user1} colUnit={props.colUnit} />
                     : path[3] === 'r'
                       ? null
                       : path[3] === 's'
-                        ? <UserSettings col={props.col} user={user1} />
+                        ? <UserSettings colUnit={props.colUnit} user={user1} />
                         : <UserProfile 
                             user={user1} 
-                            col={props.col} 
+                            colUnit={props.colUnit} 
                           />
                 }
               </Box>

@@ -1,7 +1,7 @@
 import { Box, Button, Card } from '@mui/material'
 import { Jam } from '../types/Jam'
 import ColLink from '../Col/ColLink';
-import { Col } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import { useReactiveVar } from '@apollo/client';
 import { paletteVar, userVar } from '../cache';
 import { getColor } from '../utils';
@@ -14,7 +14,7 @@ import useRemoveRole from '../Role/useRemoveRole';
 
 interface JamUsersProps {
   jam: Jam;
-  col: Col;
+  colUnit: ColUnit;
 }
 
 export default function JamUsers(props: JamUsersProps) {
@@ -93,7 +93,7 @@ export default function JamUsers(props: JamUsersProps) {
               justifyContent: 'space-between'
             }}>
               <Box>
-                <ColLink col={props.col} pathname={`/u/${role_i.user.name}`} sx={{
+                <ColLink col={props.colUnit.col} pathname={`/u/${role_i.user.name}`} sx={{
                   color: role_i.user.color,
                 }}>
                   { `u/${role_i.user.name}` }

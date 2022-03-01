@@ -19,7 +19,7 @@ interface PostComponentProps {
   itemId: string;
 }
 export default function PostComponent(props: PostComponentProps) {
-  const { changeCol } = useChangeCol();
+  const { changeCol } = useChangeCol(0, true);
   const { dispatch } = useContext(PostContext);
   const client = useApolloClient();
   const userDetail = useReactiveVar(userVar);

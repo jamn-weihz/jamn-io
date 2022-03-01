@@ -1,17 +1,16 @@
-import { ReactiveVar, useReactiveVar } from '@apollo/client';
 import { Box } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import Surveyor from '../Surveyor/Surveyor';
 import { User } from '../types/User';
 import { v4 as uuidv4 } from 'uuid';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
-import { Col } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import { Item } from '../types/Item';
 import { ItemContext } from '../App';
 
 interface UserProfileProps {
   user: User;
-  col: Col;
+  colUnit: ColUnit;
 }
 
 export default function UserProfile(props: UserProfileProps) {
@@ -59,8 +58,8 @@ export default function UserProfile(props: UserProfileProps) {
       height: 'calc(100% - 110px)'
     }}>
       <Surveyor 
-        key={`surveyor-${props.col.id}`}
-        col={props.col}
+        key={`surveyor-${props.colUnit.col.id}`}
+        colUnit={props.colUnit}
         surveyorState={surveyorState}
         setSurveyorState={setSurveyorState}
       />

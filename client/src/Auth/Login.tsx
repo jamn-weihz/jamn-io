@@ -10,20 +10,21 @@ import {
   OutlinedInput,
   TextField
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import GoogleButton from './GoogleButton';
-
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { FULL_USER_FIELDS } from '../fragments';
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
-import { colVar, focusVar, paletteVar, tokenVar, userVar } from '../cache';
+import { focusVar, paletteVar, tokenVar, userVar } from '../cache';
 import useToken from './useToken';
-import { Col, ColState } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import useChangeCol from '../Col/useChangeCol';
 import { getColor } from '../utils';
 import ColBar from '../Col/ColBar';
-import mapColsToColStates from '../Col/mapColsToColStates';
+import { useNavigate } from 'react-router-dom';
+import { ColContext } from '../App';
+
 const LOGIN_USER = gql`
   mutation LoginUser($email: String!, $pass: String!) {
     loginUser(email: $email, pass: $pass) {
@@ -34,15 +35,18 @@ const LOGIN_USER = gql`
 `;
 
 interface LoginProps {
-  col: Col;
+  colUnit: ColUnit;
 }
 export default function Login(props: LoginProps) {
+  const navigate = useNavigate();
+
+  const { dispatch } = useContext(ColContext);
+
   const tokenDetail = useReactiveVar(tokenVar);
   const paletteDetail = useReactiveVar(paletteVar);
-  const colDetail = useReactiveVar(colVar);
   const [message, setMessage] = useState('');
   
-  const { changeCol } = useChangeCol();
+  const { changeCol } = useChangeCol(0, true);
   const { refreshTokenInterval } = useToken();
 
   const [loginUser] = useMutation(LOGIN_USER, {
@@ -58,13 +62,13 @@ export default function Login(props: LoginProps) {
       }
       refreshTokenInterval();
       userVar(data.loginUser);
-      colVar({
-        ...colDetail,
-        colStates: mapColsToColStates(data.loginUser.cols)
-      });
       focusVar({
         postId: data.loginUser.focusId,
-      })
+      });
+      dispatch({
+        type: 'INIT_COLS',
+        cols: data.loginUser.cols,
+      });
     }
   });
 
@@ -98,7 +102,7 @@ export default function Login(props: LoginProps) {
 
   const handleRegisterClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    changeCol(props.col, '/register');
+    changeCol(props.colUnit.col, '/register');
   };
 
   const isFormValid = email.length && pass.length;
@@ -106,7 +110,7 @@ export default function Login(props: LoginProps) {
   const color = getColor(paletteDetail.mode)
   return (
     <Box>
-      <ColBar col={props.col}/>
+      <ColBar colUnit={props.colUnit}/>
       <Card elevation={5} sx={{margin:1, padding:1}}>
         <FormControl margin='dense' sx={{width: '100%'}}>
           <TextField
@@ -161,7 +165,7 @@ export default function Login(props: LoginProps) {
           paddingTop: 1,
           borderTop: '1px solid dimgrey',
         }}>
-          <GoogleButton isRegistration={false} col={props.col}/>
+          <GoogleButton isRegistration={false} col={props.colUnit.col}/>
 
         </Box>
         <Box sx={{

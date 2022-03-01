@@ -7,9 +7,8 @@ import {
   FormHelperText,
   Button,
 } from '@mui/material';
-import { palette } from '@mui/system';
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
-import { snackbarVar, colVar, paletteVar, startJamVar } from '../cache';
+import { snackbarVar, paletteVar, startJamVar } from '../cache';
 import useChangeCol from '../Col/useChangeCol';
 import { FULL_JAM_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
@@ -40,7 +39,7 @@ interface StartJamModalProps {
   col: Col;
 }
 export default function StartJamForm(props: StartJamModalProps) {
-  const { changeCol } = useChangeCol()
+  const { changeCol } = useChangeCol(0, true)
   const paletteDetail = useReactiveVar(paletteVar);
 
   const [name, setName] = useState('');
