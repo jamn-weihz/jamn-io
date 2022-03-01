@@ -4,12 +4,10 @@ import {
   useReactiveVar,
   useSubscription,
 } from '@apollo/client';
-import { Dispatch, useContext } from 'react';
-import { ItemContext } from '../App';
+import { Dispatch } from 'react';
 import { sessionVar } from '../cache';
 import { FULL_POST_FIELDS, LINK_FIELDS, VOTE_FIELDS } from '../fragments';
 import { ItemAction } from '../types/Item';
-import { PostAction } from '../types/Post';
 
 const LINK_POSTS = gql`
   subscription LinkPosts($sessionId: String!, $postIds: [String!]!) {

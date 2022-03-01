@@ -1,8 +1,7 @@
-import { gql, useMutation, useReactiveVar } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useContext } from 'react';
 import { ItemContext } from '../App';
 import { LINK_FIELDS, VOTE_FIELDS, FULL_POST_FIELDS } from '../fragments';
-import { Link } from '../types/Link';
 
 const GET_NEXT = gql`
   mutation GetNext($postId: String!, $offset: Int!) {

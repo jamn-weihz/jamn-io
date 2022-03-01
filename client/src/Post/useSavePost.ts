@@ -1,7 +1,5 @@
-import { gql, useMutation, useReactiveVar } from "@apollo/client";
-import { Post } from "../types/Post";
-import { ContentState, convertToRaw } from 'draft-js';
-import { snackbarVar, sessionVar } from "../cache";
+import { gql, useMutation, useReactiveVar } from '@apollo/client';
+import { snackbarVar, sessionVar } from '../cache';
 
 const SAVE_POST = gql`
   mutation SavePost($sessionId: String!, $postId: String!, $draft: String!) {

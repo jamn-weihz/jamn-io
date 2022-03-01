@@ -2,7 +2,7 @@ import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { addColVar, userVar } from '../cache';
 import { v4 as uuidv4 } from 'uuid';
 import { COL_FIELDS } from '../fragments';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { ColContext, ColContextType } from '../App';
 import { useNavigate } from 'react-router-dom';
 

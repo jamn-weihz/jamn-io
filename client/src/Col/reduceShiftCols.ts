@@ -1,4 +1,4 @@
-import { ColState, ColUnit, ShiftColsAction } from "../types/Col";
+import { ColState, ColUnit, ShiftColsAction } from '../types/Col';
 
 
 export default function reduceShiftCols(state: ColState, action: ShiftColsAction): ColState {

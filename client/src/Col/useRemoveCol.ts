@@ -1,10 +1,6 @@
-import { gql, useApolloClient, useMutation, useReactiveVar } from '@apollo/client';
+import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { userVar } from '../cache';
-import { v4 as uuidv4 } from 'uuid';
-import { FULL_USER_FIELDS } from '../fragments';
-import { User } from '../types/User';
-import { Col, ColState } from '../types/Col';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Col } from '../types/Col';
 import { useContext } from 'react';
 import { ColContext } from '../App';
 

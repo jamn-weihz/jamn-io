@@ -1,4 +1,4 @@
-import { gql, ReactiveVar, useMutation, useReactiveVar } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { connectHits } from 'react-instantsearch-dom';
 import { SurveyorState } from '../types/Surveyor';
 import { v4 as uuidv4 } from 'uuid'; 
@@ -7,7 +7,6 @@ import { FULL_POST_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
 import { Item, ItemState } from '../types/Item';
 import { ItemContext } from '../App';
-import { Post } from '../types/Post';
 
 
 const GET_POSTS = gql`

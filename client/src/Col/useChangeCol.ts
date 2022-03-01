@@ -1,5 +1,4 @@
-import { gql, useApolloClient, useMutation, useReactiveVar } from '@apollo/client';
-import { useNavigate } from 'react-router-dom';
+import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { userVar } from '../cache';
 import { Col, ColUnit } from '../types/Col';
 import { v4 as uuidv4 } from 'uuid';

@@ -2,7 +2,6 @@ import { gql, useMutation, useReactiveVar } from '@apollo/client'
 import { useContext } from 'react';
 import { ColContext } from '../App';
 import { tokenVar, userVar } from '../cache';
-import resetCols from '../Col/reduceResetCols';
 
 const LOGOUT_USER = gql`
   mutation LogoutUser {
@@ -33,6 +32,12 @@ export default function useLogout() {
     dispatch({
       type: 'RESET_COLS',
     });
+    dispatch({
+      type: 'SELECT_COL',
+      i: 0,
+      navigate: true,
+      scroll: true,
+    })
     if (tokenDetail.interval) {
       clearInterval(tokenDetail.interval);
     }

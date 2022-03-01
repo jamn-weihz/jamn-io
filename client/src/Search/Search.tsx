@@ -10,7 +10,6 @@ import algoliasearch, { SearchClient } from 'algoliasearch/lite';
 import { ALGOLIA_APP_ID, ALGOLIA_APP_KEY, ALGOLIA_INDEX_NAME } from '../constants';
 import SearchBox from './SearchBox';
 import Hits from './Hits';
-
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { getColor } from '../utils';

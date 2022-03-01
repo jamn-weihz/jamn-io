@@ -1,7 +1,6 @@
 import { gql, Reference, useMutation, useReactiveVar } from '@apollo/client';
 import { snackbarVar, sessionVar, userVar } from '../cache';
 import { ROLE_FIELDS } from '../fragments';
-import { Jam } from '../types/Jam';
 
 const REQUEST_ROLE = gql`
   mutation RequestRole($sessionId: String!, $jamId: String!) {

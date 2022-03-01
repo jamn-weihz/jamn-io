@@ -21,7 +21,7 @@ export default function reduceInitCols(state: ColState, action: InitColsAction):
     i: 0,
     isInit: true,
     scroll: true,
-    navigate: false,
+    navigate: true,
     addedCol: null,
     showAdder: false,
   };

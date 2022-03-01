@@ -8,11 +8,10 @@ import GoogleButton from './GoogleButton';
 import { FULL_USER_FIELDS } from '../fragments';
 import { focusVar, paletteVar, tokenVar, userVar } from '../cache';
 import useToken from './useToken';
-import { Col, ColUnit } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import useChangeCol from '../Col/useChangeCol';
 import { getColor } from '../utils';
 import ColBar from '../Col/ColBar';
-import { useNavigate } from 'react-router-dom';
 import { ColContext } from '../App';
 const GET_USER_BY_EMAIL = gql`
   query GetUserByEmail($email: String!) {

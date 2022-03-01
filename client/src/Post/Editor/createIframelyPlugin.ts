@@ -1,6 +1,6 @@
-import React, { ComponentType, ReactElement } from 'react';
+import { ComponentType } from 'react';
 import { EditorPlugin } from '@draft-js-plugins/editor';
-import { AtomicBlockUtils, EditorState, RichUtils, convertToRaw } from 'draft-js';
+import { AtomicBlockUtils, EditorState, RichUtils } from 'draft-js';
 import IframelyComponent, { IframelyComponentProps } from './IframelyComponent';
 
 export const types = {

@@ -5,7 +5,6 @@ import { ChromePicker } from 'react-color';
 import { userVar } from '../cache';
 import { FULL_USER_FIELDS } from '../fragments';
 import { User } from '../types/User';
-
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from '@mui/icons-material/Send';
 import useChangeCol from '../Col/useChangeCol';

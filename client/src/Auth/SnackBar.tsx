@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { snackbarVar } from '../cache';
 import useLogout from './useLogout';
 
-
 export default function UnauthorizedSnackBar() {
   const authDetail = useReactiveVar(snackbarVar);
   const { logoutUser } = useLogout();

@@ -6,7 +6,6 @@ import {
   convertFromRaw,
   ContentBlock,
   ContentState,
-  SelectionState,
 } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import Editor from '@draft-js-plugins/editor';

@@ -1,4 +1,4 @@
-import React, { Dispatch, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import React, { Dispatch, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import './App.css';
 import AppBar from './AppBar';
 import { gql, useLazyQuery, useReactiveVar } from '@apollo/client';
@@ -23,13 +23,10 @@ import reduceRemoveLink from './Surveyor/reduceRemoveLink';
 import SnackBar from './Auth/SnackBar';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useAddCol from './Col/useAddCol';
-import { Col, ColAction, ColState, ColUnit } from './types/Col';
-import reduceResetCols from './Col/reduceResetCols';
-import reduceInitCols from './Col/reduceInitCols';
-import reduceRemoveCol from './Col/reduceRemoveCol';
-import reduceShiftCols from './Col/reduceShiftCols';
+import { ColAction, ColState, ColUnit } from './types/Col';
 import useChangeCol from './Col/useChangeCol';
 import { v4 as uuidv4 } from 'uuid';
+import useColStore from './Col/useColStore';
 
 const GET_USER = gql`
   query GetUser {
@@ -118,105 +115,7 @@ function App() {
     }
   }, []);
 
-  const colReducer = (state: ColState, action: ColAction) => {
-    console.log(action);
-    switch (action.type) {
-      case 'RESET_COLS':
-        return reduceResetCols(state, action);
-      case 'INIT_COLS':
-        return reduceInitCols(state, action);
-      case 'ADD_COL':
-        return {
-          ...state,
-          colUnits: [...state.colUnits, {
-            col: action.col,
-            stack: [{
-              pathname: action.col.pathname,
-              id: addColDetail.id || action.id,
-            }],
-            index: 0,
-          } as ColUnit],
-          i: state.colUnits.length,
-          showAdder: false,
-          navigate: addColDetail.id 
-            ? false
-            : action.navigate,
-          scroll: true,
-          addedCol: addColDetail.id
-            ? action.col
-            : null,
-        };
-      case 'REMOVE_COL':
-        return reduceRemoveCol(state, action);
-      case 'UPDATE_COL':
-        const colUnits = state.colUnits.slice();
-        colUnits.splice(action.colUnit.col.i, 1, action.colUnit);
-        return {
-          ...state,
-          colUnits,
-          navigate: action.navigate,
-        };
-      case 'SHIFT_COLS':
-        return reduceShiftCols(state, action);
-      case 'SELECT_COL':
-        return {
-          ...state,
-          i: action.i,
-          showAdder: false,
-          scroll: action.scroll,
-          navigate: action.navigate,
-        };
-      case 'SHOW_ADDER':
-        return {
-          ...state,
-          showAdder: true,
-        };
-      case 'HIDE_ADDER':
-        return {
-          ...state,
-          showAdder: false,
-        };
-      case 'TOGGLE_COL_OPTIONS':
-        return {
-          ...state,
-          colUnits: state.colUnits.map(colUnit => {
-            if (colUnit.col.id === action.col.id) {
-              return {
-                ...colUnit,
-                showOptions: !colUnit.showOptions,
-              };
-            }
-            return colUnit;
-          }),
-        };
-      case 'SCROLL_COMPLETE':
-        return {
-          ...state,
-          scroll: false,
-        };
-      case 'NAVIGATE_COMPLETE':
-        return {
-          ...state,
-          navigate: false,
-        }
-      case 'CLEAR_ADDED_COL_COMPLETE':
-        return {
-          ...state,
-          addedCol: null,
-        };
-      default:
-        throw new Error('Invalid action type')
-    }
-  }
-  const [colState, colDispatch] = useReducer(colReducer, {
-    isInit: false,
-    showAdder: false,
-    colUnits: [],
-    i: 0,
-    scroll: false,
-    navigate: false,
-    addedCol: null,
-  });
+  const [colState, colDispatch] = useColStore();
 
   const { addCol } = useAddCol({
     state: colState,
@@ -262,22 +161,14 @@ function App() {
           type: 'RESET_COLS',
         });
         setIsLoading(false);
-        console.log('hello')
       }
     }
   }, [tokenDetail.isInit, tokenDetail.isValid]);
 
   useEffect(() => {
     if (!colState.isInit) return;
-  
-    console.log(location)
+
     if (location.pathname === '/') {
-      colDispatch({
-        type: 'SELECT_COL',
-        i: 0,
-        scroll: true,
-        navigate: false,
-      });
       if (colState.colUnits.length) {
         navigate(colState.colUnits[0].col.pathname, {
           state: {
@@ -290,9 +181,9 @@ function App() {
     }
     else {
       const pathname = decodeURIComponent(location.pathname);
-      if ((location.state as any).id) {
+      if ((location.state as any)?.id) {
         const { id, colId } = location.state as any;
-        const found = colState.colUnits.some(colUnit => {
+        const foundCol = colState.colUnits.some(colUnit => {
           if (colUnit.col.id === colId) {
             if (colUnit.stack[colUnit.index].id === id) {
               colDispatch({
@@ -301,15 +192,17 @@ function App() {
                 scroll: true,
                 navigate: false,
               });
+              return true;
             }
             else if (colUnit.stack[colUnit.index - 1]?.id === id) {
               changeColBack(colUnit.col);
+              return true;
             }
             else if (colUnit.stack[colUnit.index + 1]?.id === id) {
               changeColForward(colUnit.col);
+              return true;
             }
             else if (colUnit.stack[colUnit.index].pathname === pathname) {
-              console.log('yolo')
               navigate(pathname, {
                 state: {
                   id: colUnit.stack[colUnit.index].id,
@@ -317,43 +210,59 @@ function App() {
                 },
                 replace: true,
               })
+              return true;
             }
-            else {
-              return false;
-            }
-            return true;
           }
           return false;
         });
-        if (!found) {
-          console.log('has state', id, colId);
-          addColVar({
-            id,
-          })
-          addCol(pathname);
+        if (!foundCol) {
+          let colUnit = null as ColUnit | null; 
+          colState.colUnits.some(colUnit_i => {
+            if (colUnit_i.col.pathname === pathname) {
+              colUnit = colUnit_i;
+              return true;
+            }
+            return false;
+          });
+
+          if (colUnit) {
+            navigate(colUnit.col.pathname, {
+              state: {
+                id: colUnit.stack[colUnit.index].id,
+                colId: colUnit.col.id,
+              },
+              replace: true,
+            });
+          }
+          else {
+            addColVar({
+              id: uuidv4(),
+            })
+            addCol(pathname);
+          }
         }
       }
       else {
-        let col = null as Col | null; 
-        colState.colUnits.some(colUnit => {
-          if (colUnit.col.pathname === pathname) {
-            col = colUnit.col;
+        let colUnit = null as ColUnit | null; 
+        colState.colUnits.some(colUnit_i => {
+          if (colUnit_i.col.pathname === pathname) {
+            colUnit = colUnit_i;
             return true;
           }
           return false;
         });
 
-        if (col) {
-          console.log('selectme')
-          colDispatch({
-            type: 'SELECT_COL',
-            i: col.i,
-            scroll: true,
-            navigate: false,
-          });
+        if (colUnit) {
+          navigate(colUnit.col.pathname, {
+            state: {
+              id: colUnit.stack[colUnit.index].id,
+              colId: colUnit.col.id,
+            },
+            replace: true,
+          })
+
         }
         else {
-          console.log('no state')
           addColVar({
             id: uuidv4(),
           })
@@ -366,7 +275,6 @@ function App() {
   useEffect(() => {
     if (!colState.navigate) return;
     const col = colState.colUnits[colState.i]?.col;
-    console.log(col);
     navigate(col?.pathname || '/', {
       state: {
         id: uuidv4(),
@@ -391,7 +299,6 @@ function App() {
 
   useEffect(() => {
     if (!colState.addedCol) return;
-    console.log(addColDetail);
     navigate(colState.addedCol.pathname,  {
       state: {
         id: addColDetail.id,
@@ -473,7 +380,7 @@ function App() {
           width: '100%',
           height: '100%',
         }}>
-          <AppBar containerEl={containerEl} />
+          <AppBar />
           <Paper sx={{
             position: 'fixed',
             left: getAppbarWidth(sizeDetail.width),

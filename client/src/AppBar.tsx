@@ -14,17 +14,13 @@ import ChatBubbleTwoToneIcon from '@mui/icons-material/ChatBubbleTwoTone';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { Col, ColUnit } from './types/Col';
 import { DEFAULT_COLOR, MOBILE_WIDTH } from './constants';
-import { useNavigate } from 'react-router-dom';
 import { getAppbarWidth, getColor } from './utils';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import { ColContext } from './App';
 
 interface AppbarProps {
-  containerEl: React.MutableRefObject<HTMLElement | undefined>;
 }
 export default function AppBar(props: AppbarProps) {
-  const navigate = useNavigate();
-
   const { state, dispatch } = useContext(ColContext);
 
   const userDetail = useReactiveVar(userVar);

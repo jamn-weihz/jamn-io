@@ -50,8 +50,8 @@ export default function reduceResetCols(state: ColState, action: ResetColsAction
     ],
     showAdder: false,
     i: 0,
-    scroll: true,
-    navigate: true,
+    scroll: false,
+    navigate: false,
     isInit: true,
     addedCol: null,
   };

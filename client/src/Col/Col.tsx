@@ -1,5 +1,5 @@
 import { Box, Paper, } from '@mui/material';
-import { Col, ColUnit } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import Login from '../Auth/Login';
 import Register from '../Auth/Register';
 import User from '../User/User';

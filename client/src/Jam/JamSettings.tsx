@@ -1,6 +1,6 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { Box, Card, Checkbox } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChromePicker } from 'react-color';
 import { sessionVar, snackbarVar } from '../cache';
 import { ColUnit } from '../types/Col';

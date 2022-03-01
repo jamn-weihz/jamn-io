@@ -3,7 +3,7 @@ import { Box, Card } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { FULL_JAM_FIELDS } from '../fragments';
 import Loading from '../Loading';
-import { Col, ColUnit } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import { Jam } from '../types/Jam';
 import { Role } from '../types/Role';
 import JamProfile from './JamProfile';

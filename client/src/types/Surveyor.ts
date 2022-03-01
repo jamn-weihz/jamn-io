@@ -1,5 +1,3 @@
-import { ReactiveVar } from '@apollo/client'
-
 export type SurveyorSlice = {
   originalQuery: string;
   query: string;
@@ -12,11 +10,6 @@ export type SurveyorState = {
   scrollToTop: boolean;
   reload: boolean;
   triggerRefinement: boolean;
-}
-
-export type SurveyorVarItem = {
-  colId: string;
-  var: ReactiveVar<SurveyorState>;
 }
 
 export type ChildrenState = {
