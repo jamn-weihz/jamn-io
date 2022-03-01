@@ -4,13 +4,15 @@ import { Col, ColUnit } from '../types/Col';
 import { v4 as uuidv4 } from 'uuid';
 import { useContext } from 'react';
 import { ColContext, ColContextType } from '../App';
+import { COL_FIELDS } from '../fragments';
+
 const SAVE_COL = gql`
   mutation SaveCol($colId: String!, $pathname: String!) {
     saveCol(colId: $colId, pathname: $pathname) {
-      id
-      pathname
+      ...ColFields
     }
   }
+  ${COL_FIELDS}
 `;
 
 export default function useChangeCol(di: number, navigate: boolean, context?: ColContextType) {

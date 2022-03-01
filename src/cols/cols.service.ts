@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Col } from './col.entity';
@@ -10,6 +10,18 @@ export class ColsService {
     private readonly colsRepository: Repository<Col>,
   ) {}
 
+  async getColById(id: string): Promise<Col> {
+    return this.colsRepository.findOne({ id });
+  }
+
+  async getColsById(ids: string[]): Promise<Col[]> {
+    return this.colsRepository.find({
+      where: {
+        id: In(ids),
+      },
+    });
+  }
+  
   async getColsByUserId(userId: string):Promise<Col[]> {
     return this.colsRepository.find({
       where: {
@@ -18,14 +30,6 @@ export class ColsService {
     });
   }
 
-  async getColsById(colIds: string[]): Promise<Col[]> {
-    return this.colsRepository.find({
-      where: {
-        id: In(colIds),
-      },
-    });
-  }
-  
   async registerCols(userId: string, userName: string, pathnames: string[]): Promise<Col[]> {
     const cols0 = pathnames.map((pathname, i) => {
       const col0 = new Col();
@@ -56,11 +60,14 @@ export class ColsService {
         userId,
       }
     });
-    if (!col) return null;
+    if (!col) {
+      throw new BadRequestException('This col does not exist')
+    };
     const col0 = new Col();
     col0.id = colId;
     col0.pathname = pathname
-    return this.colsRepository.save(col0);
+    await this.colsRepository.save(col0);
+    return this.getColById(colId);
   }
 
   async shiftCol(userId: string, colId: string, di: number): Promise<Col[]> {
