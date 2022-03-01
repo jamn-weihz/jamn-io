@@ -186,12 +186,14 @@ function App() {
         const foundCol = colState.colUnits.some(colUnit => {
           if (colUnit.col.id === colId) {
             if (colUnit.stack[colUnit.index].id === id) {
-              colDispatch({
-                type: 'SELECT_COL',
-                i: colUnit.col.i,
-                scroll: true,
-                navigate: false,
-              });
+              if (colState.i !== colUnit.col.i) {
+                colDispatch({
+                  type: 'SELECT_COL',
+                  i: colUnit.col.i,
+                  scroll: true,
+                  navigate: false,
+                });
+              }
               return true;
             }
             else if (colUnit.stack[colUnit.index - 1]?.id === id) {

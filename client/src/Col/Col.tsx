@@ -27,7 +27,6 @@ export default function ColComponent(props: ColComponentProps) {
 
   const handleClick = (event: React.MouseEvent) => {
     if (state.i !== props.colUnit.col.i) {
-      console.log('yo')
       dispatch({
         type: 'SELECT_COL',
         i: props.colUnit.col.i,
