@@ -13,7 +13,8 @@ export default function resetCols() {
           __typename: 'Col',
         },
         stack: [{
-          pathname: '/register'
+          pathname: '/register',
+          id: uuidv4(),
         }],
         index: 0,
         showOptions: false,
@@ -26,7 +27,8 @@ export default function resetCols() {
           __typename: 'Col',
         },
         stack: [{
-          pathname: '/map'
+          pathname: '/map',
+          id: uuidv4(),
         }],
         index: 0,
         showOptions: false,
@@ -40,6 +42,7 @@ export default function resetCols() {
         },
         stack: [{
           pathname: '/search',
+          id: uuidv4(),
         }],
         index: 0,
         showOptions: false,

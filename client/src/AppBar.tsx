@@ -73,7 +73,6 @@ export default function AppBar(props: AppbarProps) {
   }
 
   const mapColStateToItem = (colState: ColState, i: number) => {
-    console.log(i, colDetail.i)
     return (
       <Box key={'appbar-col-'+i} sx={{
         padding: '5px',

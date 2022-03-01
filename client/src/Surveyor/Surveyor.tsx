@@ -4,8 +4,10 @@ import { SurveyorState } from '../types/Surveyor';
 import SurveyorTree from './SurveyorTree';
 import { Col } from '../types/Col';
 import { Jam } from '../types/Jam';
+import { Post } from '../types/Post';
 
 interface SurveyorProps {
+  post?: Post;
   jam?: Jam;
   col: Col;
   surveyorState: SurveyorState;
@@ -41,6 +43,7 @@ export default function Surveyor(props: SurveyorProps) {
               surveyorState={props.surveyorState}
               setSurveyorState={props.setSurveyorState}
               jam={props.jam}
+              post={props.post}
             />
           );
         })

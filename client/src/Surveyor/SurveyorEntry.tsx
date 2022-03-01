@@ -6,7 +6,6 @@ import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import LinkIcon from '@mui/icons-material/Link';
-import AddCircleTwoToneIcon from '@mui/icons-material/AddCircleTwoTone';
 import ChatBubbleTwoToneIcon from '@mui/icons-material/ChatBubbleTwoTone';
 import FilterAltTwoToneIcon from '@mui/icons-material/FilterAltTwoTone';
 import NotificationsTwoToneIcon from '@mui/icons-material/NotificationsTwoTone';
@@ -37,6 +36,7 @@ import promoteItem from './promoteItem';
 import useChangeCol from '../Col/useChangeCol';
 
 interface SurveyorEntryProps {
+  post?: Post;
   jam?: Jam;
   col: Col;
   item: Item;
@@ -212,6 +212,10 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
 
   const handlePromoteClick = (event: React.MouseEvent) => { 
     event.stopPropagation();
+
+    if (props.post && props.post.id !== props.item.postId) {
+      changeCol(props.col, `/p/${props.item.postId}`)
+    }
     const { idToItem, rootItem } = promoteItem(state, props.item);
 
     dispatch({

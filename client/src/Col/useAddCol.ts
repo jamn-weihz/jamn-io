@@ -6,6 +6,7 @@ import { User } from '../types/User';
 import React from 'react';
 import { getColWidth } from '../utils';
 import { useNavigate } from 'react-router-dom';
+import { ColState } from '../types/Col';
 
 const ADD_COL = gql`
   mutation AddCol($pathname: String!) {
@@ -60,6 +61,7 @@ export default function useAddCol(containerEl: React.MutableRefObject<HTMLElemen
             col: data.addCol,
             stack: [{
               pathname: data.addCol.pathname,
+              id: uuidv4(),
             }],
             index: 0,
             showOptions: false,
@@ -76,7 +78,7 @@ export default function useAddCol(containerEl: React.MutableRefObject<HTMLElemen
     }
   });
 
-  const addCol = (pathname: string) => {
+  const addCol = (pathname: string, colStates?: ColState[]) => {
     if (userDetail?.id) {
       add({
         variables: {
@@ -87,22 +89,23 @@ export default function useAddCol(containerEl: React.MutableRefObject<HTMLElemen
     else {
       colVar({
         colStates: [
-          ...colDetail.colStates, 
+          ...(colStates || colDetail.colStates),
           { 
             col: {
-              i: colDetail.colStates.length,
+              i: colStates?.length || colDetail.colStates.length,
               id: uuidv4(),
               pathname,
               __typename: 'Col',
             },
             stack: [{
-              pathname
+              pathname,
+              id: uuidv4(),
             }],
             index: 0,
             showOptions: false,
           }
         ],
-        i:  colDetail.colStates.length,
+        i: colStates?.length || colDetail.colStates.length,
         isAdding: false,
         scroll: true,
       });

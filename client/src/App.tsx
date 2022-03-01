@@ -24,6 +24,8 @@ import reduceRemoveLink from './Surveyor/reduceRemoveLink';
 import SnackBar from './Auth/SnackBar';
 import { Col, ColState } from './types/Col';
 import mapColsToColStates from './Col/mapColsToColStates';
+import { useLocation, useNavigate } from 'react-router-dom';
+import useAddCol from './Col/useAddCol';
 
 const GET_USER = gql`
   query GetUser {
@@ -47,6 +49,9 @@ type PostContextType = {
 export const PostContext = React.createContext({} as PostContextType);
 
 function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const tokenDetail = useReactiveVar(tokenVar);
   const userDetail = useReactiveVar(userVar);
   const colDetail = useReactiveVar(colVar);
@@ -57,8 +62,9 @@ function App() {
 
   const [theme, setTheme] = useState(null as Theme | null);
   
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
+  const { addCol } = useAddCol(containerEl);
   useEffect(() => {
     setTheme(createTheme({
       palette: {
@@ -85,7 +91,7 @@ function App() {
           userVar(data.getUser);
           colVar({
             ...colDetail,
-            colStates: mapColsToColStates(data.getUser.cols),
+            colStates: mapColsToColStates(data.getUser.cols)
           });
           setIsLoading(false);
         }
@@ -95,21 +101,7 @@ function App() {
 
   useEffect(() => {
     refreshToken();
-  }, []);
 
-  useEffect(() => {
-    if (tokenDetail.isInit) {
-      if (tokenDetail.isValid) {
-        setIsLoading(true);
-        getUser();
-      }
-      else {
-        resetCols();
-      }
-    }
-  }, [tokenDetail.isInit, tokenDetail.isValid])
-
-  useEffect(() => {
     const handleResize = () => {
       sizeVar({
         width: window.innerWidth,
@@ -134,6 +126,61 @@ function App() {
         .removeEventListener('change', handlePaletteModeChange)
     }
   }, []);
+
+  useEffect(() => {
+    if (tokenDetail.isInit) {
+      if (tokenDetail.isValid) {
+        getUser();
+      }
+      else {
+        setIsLoading(false);
+        resetCols();
+      }
+    }
+  }, [tokenDetail.isInit, tokenDetail.isValid])
+
+  useEffect(() => {
+    if (!isLoading) {
+      let isPresent = true;
+      let i = 0;
+      if (location.pathname === '/') {
+        navigate(colDetail.colStates[0].col.pathname, {
+          state: {
+            id: colDetail.colStates[0].stack[0].id,
+          },
+          replace: true,
+        });
+      }
+      else {
+        const pathname = decodeURIComponent(location.pathname);
+        isPresent = colDetail.colStates.some(colState => {
+          if (colState.col.pathname === pathname) {
+            navigate(pathname, {
+              state: {
+                id: colState.stack[0].id,
+              },
+              replace: true,
+            });
+            i = colState.col.i;
+            return true;
+          }
+          return false;
+        });
+
+        console.log(isPresent)
+        if (!isPresent) {
+          addCol(pathname);
+        }
+      }
+      if (isPresent) {
+        colVar({
+          ...colDetail,
+          i,
+          scroll: true,
+        });
+      }
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     if (colDetail.scroll) {
@@ -236,7 +283,7 @@ function App() {
                   return (
                     <ColComponent 
                       key={`col-${colState.col.id}`}
-                      col={colState.col} 
+                      colState={colState}
                     />
                   );
                 })

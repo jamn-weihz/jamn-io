@@ -15,6 +15,7 @@ import { ItemContext } from '../App';
 import { Jam } from '../types/Jam';
 
 interface SurveyorTreeProps {
+  post?: Post;
   jam?: Jam;
   col: Col;
   itemId: string;
@@ -84,6 +85,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
           surveyorState={props.surveyorState}
           setSurveyorState={props.setSurveyorState}
           jam={props.jam}
+          post={props.post}
         />
       </Box>
       <Box sx={{
@@ -101,6 +103,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
                 surveyorState={props.surveyorState}
                 setSurveyorState={props.setSurveyorState}
                 jam={props.jam}
+                post={props.post}
               />
             )
           })

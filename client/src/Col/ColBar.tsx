@@ -2,7 +2,7 @@ import { useReactiveVar } from '@apollo/client';
 import { Box, Card, IconButton } from '@mui/material';
 import { colVar, paletteVar, sizeVar, userVar } from '../cache';
 import { Col, ColState } from '../types/Col';
-import { getColor } from '../utils';
+import { getColor, getColWidth } from '../utils';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import React, { useState } from 'react';
 import { User } from '../types/User';
@@ -34,6 +34,8 @@ export default function ColBar(props: ColBarProps) {
 
   const { removeCol } = useRemoveCol(props.col);
   const { changeCol } = useChangeCol();
+  const { changeCol: changeColBack } = useChangeCol(-1);
+  const { changeCol: changeColForward } = useChangeCol(1);
   const { shiftCol: shiftColLeft } = useShiftCol(props.col, -1);
   const { shiftCol: shiftColRight } = useShiftCol(props.col, 1);
 
@@ -86,42 +88,28 @@ export default function ColBar(props: ColBarProps) {
 
   const handleBackClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    colVar({
-      ...colDetail,
-      colStates: colDetail.colStates.map(colState_i => {
-        if (colState_i.col.id === props.col.id) {
-          return {
-            ...colState_i,
-            col: {
-              ...colState_i.col,
-              pathname: colState_i.stack[colState_i.index - 1].pathname,
-            },
-            index: colState.index - 1,
-          }
-        }
-        return colState_i;
-      }),
+    let pathname = '';
+    colDetail.colStates.some(colState => {
+      if (colState.col.id === props.col.id) {
+        pathname = colState.stack[colState.index - 1].pathname;
+        return true;
+      }
+      return false;
     });
+    changeColBack(props.col, pathname)
   }
   
   const handleForwardClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    colVar({
-      ...colDetail,
-      colStates: colDetail.colStates.map(colState_i => {
-        if (colState_i.col.id === props.col.id) {
-          return {
-            ...colState_i,
-            col: {
-              ...colState.col,
-              pathname: colState.stack[colState.index + 1].pathname,
-            },
-            index: colState.index + 1,
-          };
-        }
-        return colState_i;
-      }),
+    let pathname = '';
+    colDetail.colStates.some(colState => {
+      if (colState.col.id === props.col.id) {
+        pathname = colState.stack[colState.index + 1].pathname;
+        return true;
+      }
+      return false;
     });
+    changeCol(props.col, pathname)
   }
 
   const handleLeftClick = (event: React.MouseEvent) => {
@@ -147,7 +135,7 @@ export default function ColBar(props: ColBarProps) {
       }}>
         <Box sx={{
           maxWidth: sizeDetail.width < MOBILE_WIDTH
-            ? '150px'
+            ? getColWidth(sizeDetail.width) - 120
             : '220px',
           color:  props.user?.color || props.jam?.color,
           fontWeight: 'bold',

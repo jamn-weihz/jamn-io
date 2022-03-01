@@ -11,6 +11,7 @@ export type Col = {
 
 export type ColSlice = {
   pathname: string;
+  id: string;
 }
 
 export type ColState = {

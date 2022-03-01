@@ -1,5 +1,5 @@
 import { Col, ColState } from '../types/Col';
-
+import { v4 as uuidv4} from 'uuid';
 
 export default function mapColsToColStates(cols: Col[]) {
   return cols.slice()
@@ -9,6 +9,7 @@ export default function mapColsToColStates(cols: Col[]) {
         col,
         stack: [{
           pathname: col.pathname,
+          id: uuidv4(),
         }],
         index: 0,
       } as ColState;
