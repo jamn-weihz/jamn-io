@@ -92,7 +92,9 @@ export default function ColComponent(props: ColComponentProps) {
   return (
     <Paper onClick={handleClick} sx={{
       border: '1px solid',
-      borderColor: getColor(paletteDetail.mode, true),
+      borderColor: paletteDetail.mode === 'dark'
+        ? 'black'
+        : 'lavender',
       minWidth: getColWidth(sizeDetail.width),
       width: getColWidth(sizeDetail.width),
       height: '100%',

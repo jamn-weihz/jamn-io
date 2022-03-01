@@ -306,8 +306,8 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
           ? 'crosshair'
           : '', 
         border: post.userId === userDetail?.id 
-        ? `1px solid ${userDetail.color}`
-        : null
+          ? `1px solid ${userDetail.color}`
+          : null,
       }}
     >
       <PostComponent
