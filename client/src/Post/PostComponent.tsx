@@ -8,7 +8,6 @@ import CharCounter from './CharCounter';
 import Editor from './Editor/Editor';
 import { convertFromRaw } from 'draft-js';
 import React, { useContext, useEffect } from 'react';
-import useChangeCol from '../Col/useChangeCol';
 import { Col } from '../types/Col';
 import ColLink from '../Col/ColLink';
 import { PostContext } from '../App';
@@ -19,7 +18,6 @@ interface PostComponentProps {
   itemId: string;
 }
 export default function PostComponent(props: PostComponentProps) {
-  const { changeCol } = useChangeCol(0, true);
   const { dispatch } = useContext(PostContext);
   const client = useApolloClient();
   const userDetail = useReactiveVar(userVar);
@@ -64,12 +62,8 @@ export default function PostComponent(props: PostComponentProps) {
   const limit = 1000;
 
   return (
-    <Card variant='outlined' sx={{
-      margin: 1,
-      padding: 1,
-      border: props.post.userId === userDetail?.id
-        ? `1px solid ${userDetail.color}`
-        : null
+    <Box sx={{
+      margin:1,
     }}>
       <Box sx={{
         fontSize: 14,
@@ -119,7 +113,7 @@ export default function PostComponent(props: PostComponentProps) {
         </Button>&nbsp;&nbsp;
         <CharCounter count={count} limit={limit} />
       </Box>
-    </Card>
+    </Box>
   )
 
 }
