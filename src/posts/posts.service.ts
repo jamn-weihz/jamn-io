@@ -109,6 +109,42 @@ export class PostsService {
     });
   }
 
+  async getJamRecentPosts(userId: string, jamId: string, offset: number) {
+    const jam = await this.jamsService.getJamById(jamId);
+    if (!jam) {
+      throw new BadRequestException('This jam does not exist');
+    }
+    let canView = true;
+    if (jam.isPrivate && userId) {
+      const roles = await this.rolesService.getRolesByUserId(userId);
+      canView = roles.some(role => {
+        return role.jamId === jamId;
+      });
+    }
+    const posts = await this.postsRepository.createQueryBuilder('post')
+      .select('post')
+      .where('post.jamId = :jamId', {jamId})
+      .orderBy('post.saveDate', 'DESC')
+      .offset(offset)
+      .limit(10)
+      .getMany();
+
+    if (canView) {
+      return posts;
+    }
+    return posts.map(post => {
+      if (post.jamI === 1) {
+        return post;
+      }
+      return {
+        ...post,
+        name: '',
+        description: '',
+        draft: PRIVATE_POST_DRAFT,
+      };
+    })
+  }
+
   async createStartPost(userId: string) {
     const user = await this.usersService.getUserById(userId);
     this.usersService.incrementUserPostI(userId);
@@ -136,6 +172,7 @@ export class PostsService {
     if (jamId) {
       const jam = await this.jamsService.getJamById(jamId);
       await this.jamsService.incrementJamPostI(jamId);
+      console.log('jam.postI', jam.postI);
       jamI = jam.postI + 1;
     }
 

@@ -62,6 +62,7 @@ export default function JamProfile(props: JamProfileProps) {
         surveyorState={surveyorState}
         setSurveyorState={setSurveyorState}
         jam={props.jam}
+        hideOpaquePosts={false}
       />
     </Box>
   )

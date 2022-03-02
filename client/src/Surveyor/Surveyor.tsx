@@ -10,6 +10,7 @@ interface SurveyorProps {
   post?: Post;
   jam?: Jam;
   colUnit: ColUnit;
+  hideOpaquePosts: boolean;
   surveyorState: SurveyorState;
   setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
 }
@@ -44,6 +45,7 @@ export default function Surveyor(props: SurveyorProps) {
               setSurveyorState={props.setSurveyorState}
               jam={props.jam}
               post={props.post}
+              hideOpaquePosts={props.hideOpaquePosts}
             />
           );
         })

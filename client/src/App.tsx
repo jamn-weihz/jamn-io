@@ -262,7 +262,6 @@ function App() {
             },
             replace: true,
           })
-
         }
         else {
           addColVar({

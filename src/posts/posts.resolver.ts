@@ -1,5 +1,5 @@
 import { forwardRef, Inject, UseGuards, UseInterceptors } from '@nestjs/common';
-import { Args, Context, Query, Mutation, Parent, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
+import { Args, Context, Query, Mutation, Parent, ResolveField, Resolver, Subscription, Int } from '@nestjs/graphql';
 import { CurrentUser, GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { Jam } from 'src/jams/jam.model';
 import { JamsService } from 'src/jams/jams.service';
@@ -82,5 +82,15 @@ export class PostsResolver {
     @Args('postId') postId: string,
   ) {
     return this.postsService.getPostByIdWithPrivacy(user?.id, postId);
+  }
+
+  @UseInterceptors(GqlAuthInterceptor)
+  @Mutation(() => [Post], {name: 'getRecentJamPosts'})
+  async getRecentJamPosts(
+    @CurrentUser() user: User,
+    @Args('jamId') jamId: string,
+    @Args('offset', {type: () => Int}) offset: number,
+  ) {
+    return this.postsService.getJamRecentPosts(user?.id, jamId, offset)
   }
 }

@@ -100,9 +100,10 @@ export class UsersService {
     const vote = await this.votesService.createVote(user1.id, link.id, startPost.id, userPost.id, 1, 0);
 
     user1.focusId = userPost.id;
+    user1.postI = undefined;
 
-    const user2 = await this.usersRepository.save(user1);
-    return user2;
+    await this.usersRepository.save(user1);
+    return this.getUserById(user1.id);
   }
 
   async verifyUser(userId: string): Promise<User> {

@@ -62,6 +62,7 @@ export default function UserProfile(props: UserProfileProps) {
         colUnit={props.colUnit}
         surveyorState={surveyorState}
         setSurveyorState={setSurveyorState}
+        hideOpaquePosts={false}
       />
     </Box>
   )

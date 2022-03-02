@@ -158,10 +158,15 @@ export default function AppBar(props: AppbarProps) {
         marginBottom: '5px',
         padding: '5px',
       }}>
-        <IconButton size='small' onClick={handlePaletteClick} sx={{
-          fontSize: sizeDetail.width < MOBILE_WIDTH ? 16: 32,
-          color: getColor(paletteDetail.mode)
-        }}>
+        <IconButton 
+          size='small' 
+          onClick={handlePaletteClick}
+          title='Toggle light/dark mode' 
+          sx={{
+            fontSize: sizeDetail.width < MOBILE_WIDTH ? 16: 32,
+            color: getColor(paletteDetail.mode)
+          }}
+        >
           <Brightness4Icon fontSize='inherit'/>
         </IconButton>
       </Box>

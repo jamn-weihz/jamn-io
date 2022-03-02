@@ -58,6 +58,7 @@ type Mutation {
   getNext(offset: Int!, postId: String!): [Link!]!
   getPosts(postIds: [String!]!): [Post!]!
   getPrev(offset: Int!, postId: String!): [Link!]!
+  getRecentJamPosts(jamId: String!, offset: Int!): [Post!]!
   inviteRole(jamId: String!, sessionId: String!, userName: String!): Role!
   linkPosts(sessionId: String!, sourcePostId: String!, targetPostId: String!): Link!
   loginGoogleUser(pathnames: [String!]!, token: String!): User!

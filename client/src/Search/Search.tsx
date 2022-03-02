@@ -140,6 +140,7 @@ export default function Search(props: SearchProps) {
                   colUnit={props.colUnit}
                   surveyorState={surveyorState}
                   setSurveyorState={setSurveyorState}
+                  hideOpaquePosts={true}
                 />
                 </Box>
             </InstantSearch>

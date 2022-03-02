@@ -109,6 +109,7 @@ export default function PostCol(props: PostColProps) {
                 colUnit={props.colUnit} 
                 surveyorState={surveyorState}
                 setSurveyorState={setSurveyorState}
+                hideOpaquePosts={false}
               />
             </Box>
           : <NotFound />

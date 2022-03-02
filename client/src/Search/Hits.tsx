@@ -44,12 +44,14 @@ function Hits(props: HitsProps) {
     let isChange = props.hits.some((hit, i) => hit.id != hits[i]?.id);
     if (!isChange) return;
 
+    console.log('hits');
+
     setHits(props.hits);
 
     const slice = props.surveyorState.stack[props.surveyorState.index];
 
-    const idToItem = {} as ItemState;
-    const itemIds = [] as string[];
+    const idToItem: ItemState = {};
+    const itemIds: string[] = [];
     if (props.hits.length) {
       props.hits.forEach(hit => {
         if (hit.__typename === 'Post') {
@@ -65,7 +67,7 @@ function Hits(props: HitsProps) {
             itemIds.push(itemId);
           }
           else {
-            const item = {
+            const item: Item = {
               id: uuidv4(),
               parentId: '',
               linkId: '',
@@ -75,7 +77,7 @@ function Hits(props: HitsProps) {
               nextIds: [],
               prevIds: [],
               refresh: false,
-            } as Item;
+            };
             idToItem[item.id] = item;
             itemIds.push(item.id);
           }
@@ -105,7 +107,6 @@ function Hits(props: HitsProps) {
       stack,
       triggerRefinement: false,
     });
-    console.log('hits')
   }, [props.hits])
 
   return null;

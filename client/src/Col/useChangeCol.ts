@@ -114,8 +114,6 @@ export default function useChangeCol(di: number, navigate: boolean, context?: Co
       });
     }
     else {
-
-
       if (di === -1) {
         dispatch({
           type: 'UPDATE_COL',

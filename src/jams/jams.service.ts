@@ -85,8 +85,9 @@ export class JamsService {
     const vote = await this.votesService.createVote(userId, link.id, startPost.id, jamPost.id, 1, 0);
 
     jam1.focusId = jamPost.id;
-    const jam2 = await this.jamsRepository.save(jam1);
-    return jam2;
+    jam1.postI = undefined;
+    await this.jamsRepository.save(jam1);
+    return this.getJamById(jam1.id);
   }
 
   async setJamColor(userId: string, jamId: string, color: string) {

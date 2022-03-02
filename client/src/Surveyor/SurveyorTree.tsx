@@ -22,6 +22,7 @@ interface SurveyorTreeProps {
   depth: number;
   surveyorState: SurveyorState;
   setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
+  hideOpaquePosts: boolean;
 }
 export default function SurveyorTree(props: SurveyorTreeProps) {
   const client = useApolloClient();
@@ -69,7 +70,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
 
   if (!post) return null;
 
-  if (post.isOpaque) return null;
+  if (props.hideOpaquePosts && post.isOpaque) return null;
 
   return (
     <Box>
@@ -104,6 +105,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
                 setSurveyorState={props.setSurveyorState}
                 jam={props.jam}
                 post={props.post}
+                hideOpaquePosts={props.hideOpaquePosts}
               />
             )
           })

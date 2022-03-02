@@ -9,7 +9,6 @@ import useUpdateUser from '../User/useUpdateUser';
 import { DEFAULT_COLOR, DEV_SERVER_URI, MAPBOX_ACCESS_TOKEN } from '../constants';
 import { Jam } from '../types/Jam';
 import StartJamForm from './StartJamForm';
-import { useNavigate } from 'react-router-dom';
 import useChangeCol from '../Col/useChangeCol';
 import { ColUnit } from '../types/Col';
 import { getColor } from '../utils';
@@ -33,7 +32,6 @@ interface MapProps {
   colUnit: ColUnit;
 }
 export default function Map(props: MapProps) {
-  const navigate = useNavigate();
   const { changeCol } = useChangeCol(0, true);
   const paletteDetail = useReactiveVar(paletteVar);
 
@@ -251,8 +249,8 @@ export default function Map(props: MapProps) {
       const features = event.features as any[];
       const jam = JSON.parse(features[0].properties?.jam) as Jam;
       const pathname = `/j/${jam.name}`
+      console.log('point click')
       changeCol(props.colUnit.col, pathname);
-      navigate(pathname)
     });
     map.current.on('mouseenter', 'clusters', () => {
       map.current.getCanvas().style.cursor = 'pointer';
@@ -325,11 +323,6 @@ export default function Map(props: MapProps) {
     }
   };
 
-  useEffect(() => {
-    if (isStartingJam) {
-
-    }
-  }, [isStartingJam])
   return (
     <Box sx={{
       height: '100%'
