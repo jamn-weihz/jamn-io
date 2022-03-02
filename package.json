@@ -41,6 +41,7 @@
     "googleapis": "^95.0.0",
     "graphql": "^16.3.0",
     "graphql-redis-subscriptions": "^2.4.2",
+    "graphql-ws": "^5.6.2",
     "ioredis": "^4.28.5",
     "joi": "^17.6.0",
     "mailgun-js": "^0.22.0",

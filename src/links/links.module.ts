@@ -10,11 +10,13 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RolesModule } from 'src/roles/roles.module';
+import { JamsModule } from 'src/jams/jams.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Link]),
     forwardRef(() => UsersModule),
+    forwardRef(() => JamsModule),
     forwardRef(() => PostsModule),
     RolesModule,
     VotesModule,

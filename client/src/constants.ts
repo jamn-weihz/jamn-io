@@ -1,5 +1,5 @@
-export const DEV_SERVER_URI = 'http://localhost:4000';
-export const DEV_WS_SERVER_URI = 'ws://localhost:4000';
+export const DEV_SERVER_URI = 'http://localhost:9000';
+export const DEV_WS_SERVER_URI = 'ws://localhost:9000';
 
 export const EMAIL_REGEX = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
 

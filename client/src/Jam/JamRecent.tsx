@@ -11,6 +11,7 @@ import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
 import { v4 as uuidv4 } from 'uuid';
 import { Item, ItemState } from '../types/Item';
 import Loading from '../Loading';
+import useJamPostSubscription from './useJamPostSubscription';
 
 const GET_RECENT_JAM_POSTS = gql`
   mutation GetRecentJamPosts($jamId: String!, $offset: Int!) {
@@ -46,6 +47,38 @@ export default function JamRecent(props: JamRecentProps) {
   } as SurveyorState);
 
   const containerEl = useRef<HTMLElement>();
+
+  useJamPostSubscription(props.jam.id, (post: Post) => {
+    const item: Item = {
+      id: uuidv4(),
+      parentId: '',
+      linkId: '',
+      postId: post.id,
+      showNext: false,
+      showPrev: false,
+      nextIds: [],
+      prevIds: [],
+      refresh: false,
+    };
+    dispatch({
+      type: 'ADD_ITEMS',
+      idToItem: {
+        [item.id]: item,
+      },
+    });
+    const slice = surveyorState.stack[surveyorState.index];
+
+    const stack = surveyorState.stack.slice();
+    stack.splice(surveyorState.index, 1, {
+      ...slice,
+      itemIds: [...slice.itemIds, item.id],
+    });
+
+    setSurveyorState({
+      ...surveyorState,
+      stack,
+    })
+  });
 
   useEffect(() => {
     if (surveyorState.scrollToBottom && containerEl.current) {

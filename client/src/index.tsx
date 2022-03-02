@@ -18,6 +18,61 @@ import { BrowserRouter } from 'react-router-dom';
 
 import { DEV_SERVER_URI, DEV_WS_SERVER_URI } from './constants';
 
+// for Apollo Client v3:
+import {
+  ApolloLink,
+  Operation,
+  FetchResult,
+  Observable,
+} from '@apollo/client/core';
+// or for Apollo Client v2:
+// import { ApolloLink, Operation, FetchResult, Observable } from 'apollo-link'; // yarn add apollo-link
+
+import { print } from 'graphql';
+import { createClient, ClientOptions, Client } from 'graphql-ws';
+
+class WebSocketLink1 extends ApolloLink {
+  private client: Client;
+
+  constructor(options: ClientOptions) {
+    super();
+    this.client = createClient(options);
+  }
+
+  public request(operation: Operation): Observable<FetchResult> {
+    return new Observable((sink) => {
+      return this.client.subscribe<FetchResult>(
+        { ...operation, query: print(operation.query) },
+        {
+          next: sink.next.bind(sink),
+          complete: sink.complete.bind(sink),
+          error: sink.error.bind(sink),
+        },
+      );
+    });
+  }
+}
+
+const wsLink1 = new WebSocketLink1({
+  url: process.env.NODE_ENV === 'production'
+    ? window.location.origin.replace(/^http/, 'ws') + '/graphql'
+    : `${DEV_WS_SERVER_URI}/graphql`,
+  connectionParams: () => {
+    const session = {token: 'asdf'} //getSession();
+    if (!session) {
+      return {};
+    }
+    return {
+      Authorization: `Bearer ${session.token}`,
+    };
+  },
+  lazy: true,
+  on: {
+    connected: () => console.log('connected'),
+    error: (error) => console.error(error),
+  }
+});
+
 const wsLink = new WebSocketLink({
   uri: process.env.NODE_ENV === 'production'
     ? window.location.origin.replace(/^http/, 'ws') + '/graphql'

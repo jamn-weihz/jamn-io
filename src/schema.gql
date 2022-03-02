@@ -136,6 +136,7 @@ type Role {
 }
 
 type Subscription {
+  jamPost(jamId: String!): Post!
   jamRole(jamId: String!, sessionId: String!): Role!
   linkPosts(postIds: [String!]!, sessionId: String!): Link!
   savePost(cardIds: [String!]!, sessionId: String!): Post!

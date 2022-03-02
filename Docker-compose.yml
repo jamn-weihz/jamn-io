@@ -3,8 +3,10 @@ services:
   app:
     container_name: jamn_app_1
     build: .
+    networks:
+      - jamn_net
     ports:
-      - 4000:4000
+      - 9000:9000
     depends_on:
       - redis
       - postgres
@@ -16,11 +18,15 @@ services:
       - nodemodules:/Users/peterwei/workspace/jamn/node_modules
   redis:
     container_name: jamn_redis_1
+    networks:
+      - jamn_net
     image: redis
     ports:
       - 6379:6379
   postgres:
     container_name: jamn_postgres_1
+    networks:
+      - jamn_net
     image: postgis/postgis
     platform: linux/amd64
     restart: always
@@ -32,10 +38,24 @@ services:
       - db:/var/lib/postgres
   adminer: # to connect use host.docker.internal
     container_name: jamn_adminer_1
+    networks:
+      - jamn_net
     image: adminer
     restart: always
     ports:
       - 8080:8080
+  graphql_playground:
+    container_name: jamn_playground_1
+    networks:
+      - jamn_net
+    image: mkrou/graphql-playground-docker
+    restart: always
+    env_file:
+      - docker.env
+    ports: 
+      - 8081:8080
 volumes:
   nodemodules:
   db:
+networks:
+  jamn_net:

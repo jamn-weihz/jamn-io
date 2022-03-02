@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { GraphQLModule } from "@nestjs/graphql";
-import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
+import { ApolloDriver } from "@nestjs/apollo";
 import { UsersModule } from './users/users.module';
 import { PostsModule } from './posts/posts.module';
 import { LinksModule } from './links/links.module';
@@ -38,7 +38,6 @@ import * as Joi from 'joi';
         ALGOLIA_APP_ID: Joi.string().required(),
         ALGOLIA_API_KEY: Joi.string().required(),
         ALGOLIA_INDEX_NAME: Joi.string().required(),
-        DEV_CLIENT_URI: Joi.string(),
       })
     }),
     TypeOrmModule.forRootAsync({
@@ -65,11 +64,19 @@ import * as Joi from 'joi';
         autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
         sortSchema: true,
         installSubscriptionHandlers: true,
+        subscriptions: {
+          'subscriptions-transport-ws': {
+            path: '/graphql',
+          },
+        },
         context: ({req, res}) => ({req, res}),
         cors: configServce.get('ENV') === 'production'
           ?  false
           : {
-              origin: configServce.get('DEV_CLIENT_URI'),
+              origin: [
+                'http://localhost:8081',
+                'http://localhost:3000'
+              ],
               credentials: true,
             }
       })

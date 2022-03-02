@@ -11,6 +11,8 @@ import { Link } from './link.model';
 import { LinksService } from './links.service';
 import { RedisPubSub } from 'graphql-redis-subscriptions';
 import { GqlAuthInterceptor } from 'src/auth/gql-auth.interceptor';
+import { UsersService } from 'src/users/users.service';
+import { JamsService } from 'src/jams/jams.service';
 
 @Resolver(() => Link)
 export class LinksResolver {
@@ -18,6 +20,8 @@ export class LinksResolver {
     private readonly linksService: LinksService,
     private readonly postsService: PostsService,
     private readonly votesService: VotesService,
+    private readonly usersService: UsersService,
+    private readonly jamsService: JamsService,
     @Inject(PUB_SUB) 
     private readonly pubSub: RedisPubSub,
   ) {}
@@ -135,6 +139,19 @@ export class LinksResolver {
       },
     })
     return link;
+  }
+
+  @Subscription(() => Post, {name: 'jamPost', 
+    filter: (payload, variables) => {
+      return payload.jamId === variables.jamId;
+    }
+  })
+  jamPost(
+    @Context() context: any,
+    @Args('jamId') jamId: string,
+  ) {
+    console.log('context', context);
+    return this.pubSub.asyncIterator('jamPost');
   }
 
   @UseInterceptors(GqlAuthInterceptor)
