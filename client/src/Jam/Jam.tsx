@@ -59,24 +59,24 @@ export default function JamComponent(props: JamComponentProps) {
   });
 
   useEffect(() => {
-    setIsLoading(true);
     if (startJamDetail.jam && startJamDetail.jam.name === props.name) {
       setJam(startJamDetail.jam);
       startJamVar({
         jam: null,
       })
     }
-    else {
+    else if (jam?.name !== props.name) {
+      setIsLoading(true);
       getJamByName({
         variables: {
           name: props.name,
         },
       });
     }
-
   }, [startJamDetail.jam, props.name]);
 
   if (isLoading) return <Loading />
+
 
   const jam1 = client.cache.readFragment({
     id: client.cache.identify(jam || {}),

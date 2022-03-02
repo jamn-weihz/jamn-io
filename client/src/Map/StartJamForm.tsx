@@ -77,11 +77,11 @@ export default function StartJamForm(props: StartJamModalProps) {
     onCompleted: data => {
       console.log(data);
       props.setIsOpen(false);
-      const pathname = `/j/${data.startJam.name}`;
-      changeCol(props.col, pathname);
       startJamVar({
         jam: data.startJam,
-      })
+      });
+      const pathname = `/j/${data.startJam.name}`;
+      changeCol(props.col, pathname);
     }
   });
 
