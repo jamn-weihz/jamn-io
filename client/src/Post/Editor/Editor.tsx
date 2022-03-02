@@ -17,6 +17,7 @@ import createIframelyPlugin from './createIframelyPlugin';
 import linkifyIt, { LinkifyIt } from 'linkify-it';
 import tlds from 'tlds';
 import moveSelectionToEnd from './moveSelectionToEnd';
+import { ColUnit } from '../../types/Col';
 
 const iframelyPlugin = createIframelyPlugin();
 
@@ -37,6 +38,7 @@ export function extractLinks(text: string): linkifyIt.Match[] | null {
 interface EditorComponentProps {
   post: Post;
   isReadonly: boolean;
+  colUnit: ColUnit;
 }
 export default function EditorComponent(props: EditorComponentProps) {
   const client = useApolloClient();

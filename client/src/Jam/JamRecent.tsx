@@ -29,7 +29,8 @@ export default function JamRecent(props: JamRecentProps) {
   const { state, dispatch } = useContext(ItemContext);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [nearTop, setNearTop] = useState(false);
+  const [scrollTop, setScrollTop] = useState(0);
+  const [hasScrolledUp, setHasScrolledUp] = useState(false);
 
   const [surveyorState, setSurveyorState] = useState({
     index: 0,
@@ -51,7 +52,7 @@ export default function JamRecent(props: JamRecentProps) {
       const slice = surveyorState.stack[surveyorState.index];
       if (slice.itemIds.length) {
         containerEl.current.scrollTo({
-          top: containerEl.current.clientHeight,
+          top: containerEl.current.scrollHeight,
           behavior: 'smooth',
         });
         setSurveyorState({
@@ -59,7 +60,6 @@ export default function JamRecent(props: JamRecentProps) {
           scrollToBottom: false,
         })
       }
-
     }
   }, [surveyorState])
 
@@ -135,17 +135,23 @@ export default function JamRecent(props: JamRecentProps) {
     });
     if (containerEl.current) {
       containerEl.current.addEventListener('scroll', event => {
-        if (containerEl.current?.scrollTop)
-        if ((containerEl.current?.scrollTop || 300) < 300) {
-          setNearTop(true);
+        if (containerEl.current?.scrollTop !== undefined) {
+          setScrollTop(top => {
+            if (containerEl.current?.scrollTop !== undefined) {
+              if (containerEl.current?.scrollTop < top) {
+                setHasScrolledUp(true);
+              }
+              return containerEl.current?.scrollTop
+            }
+            return 0;
+          })
         }
       });
     }
   }, [])
 
   useEffect(() => {
-    if (nearTop) {
-      setNearTop(false);
+    if (scrollTop < 500) {
       if (!isLoading) {
         const slice = surveyorState.stack[surveyorState.index];
         const remaining = props.jam.postI - slice.itemIds.length;
@@ -159,9 +165,17 @@ export default function JamRecent(props: JamRecentProps) {
           });
         }
       }
-      
     }
-  }, [nearTop]);
+  }, [scrollTop]);
+
+  useEffect(() => {
+    if (!hasScrolledUp && containerEl.current) {
+      containerEl.current.scrollTo({
+        top: containerEl.current.scrollHeight,
+        behavior: 'smooth',
+      })
+    }
+  }, [containerEl.current?.scrollHeight])
 
   const handleLoadMoreClick = (event: React.MouseEvent) => {
     if (!isLoading) {

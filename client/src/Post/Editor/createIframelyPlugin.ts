@@ -25,7 +25,6 @@ function addEmbed(
 }
 
 export interface EmbedPluginConfig {
-  videoComponent?: ComponentType<IframelyComponentProps>;
   decorator?(
     component: ComponentType<IframelyComponentProps>
   ): ComponentType<IframelyComponentProps>;

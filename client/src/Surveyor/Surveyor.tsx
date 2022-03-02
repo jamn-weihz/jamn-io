@@ -40,7 +40,7 @@ export default function Surveyor(props: SurveyorProps) {
               key={`surveyor-tree-${itemId}`}
               itemId={itemId}
               depth={0}
-              col={props.colUnit.col}
+              colUnit={props.colUnit}
               surveyorState={props.surveyorState}
               setSurveyorState={props.setSurveyorState}
               jam={props.jam}

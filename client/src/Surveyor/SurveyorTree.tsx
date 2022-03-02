@@ -6,8 +6,8 @@ import { useApolloClient } from '@apollo/client';
 
 import { SurveyorState } from '../types/Surveyor';
 import { FULL_POST_FIELDS } from '../fragments';
-import { Post, PostAction } from '../types/Post';
-import { Col } from '../types/Col';
+import { Post } from '../types/Post';
+import { Col, ColUnit } from '../types/Col';
 import useGetPrev from '../Post/useGetPrev';
 import useGetNext from '../Post/useGetNext';
 import { LOAD_LIMIT } from '../constants';
@@ -17,7 +17,7 @@ import { Jam } from '../types/Jam';
 interface SurveyorTreeProps {
   post?: Post;
   jam?: Jam;
-  col: Col;
+  colUnit: ColUnit;
   itemId: string;
   depth: number;
   surveyorState: SurveyorState;
@@ -80,7 +80,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
         justifyContent: 'space-between',
       }}>
         <SurveyorEntry
-          col={props.col}
+          colUnit={props.colUnit}
           item={item}
           depth={props.depth}
           surveyorState={props.surveyorState}
@@ -100,7 +100,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
                 key={`surveyor-tree-${itemId}`}
                 itemId={itemId}
                 depth={props.depth + 1}
-                col={props.col}
+                colUnit={props.colUnit}
                 surveyorState={props.surveyorState}
                 setSurveyorState={props.setSurveyorState}
                 jam={props.jam}

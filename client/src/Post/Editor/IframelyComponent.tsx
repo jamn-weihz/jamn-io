@@ -1,10 +1,12 @@
 import { useReactiveVar } from "@apollo/client";
 import { Box } from "@mui/material";
-import React, {useEffect, useState} from "react";
-import { paletteVar, sizeVar } from "../../cache";
+import { useEffect, useState} from "react";
+import { paletteVar } from "../../cache";
 import { IFRAMELY_API_KEY_DARK, IFRAMELY_API_KEY_LIGHT } from "../../constants";
-import { getColWidth } from "../../utils";
+import { ColUnit } from "../../types/Col";
+
 export interface IframelyComponentProps {
+  colUnit?: ColUnit
   url: string
 };
 
@@ -29,7 +31,8 @@ export default function IframelyComponent(props: any) {
             setIsLoaded(true);
             if (res.html) {
               setHtml({__html: res.html});
-            } else if (res.error) {
+            } 
+            else if (res.error) {
               setError({code: res.error, message: res.message});
             }
           },
@@ -38,7 +41,8 @@ export default function IframelyComponent(props: any) {
             setError(error);
           }
         )
-    } else {
+    } 
+    else {
       setError({code: 400, message: 'Provide url attribute for the element'})
     }
   }, []);
@@ -49,9 +53,11 @@ export default function IframelyComponent(props: any) {
 
   if (error) {
     return <div>Error: {error.code} - {error.message}</div>;
-  } else if (!isLoaded) {
+  } 
+  else if (!isLoaded) {
     return <div>Loading...</div>;
-  } else {
+  } 
+  else {
     return (
       <Box sx={{
         width: '100%'

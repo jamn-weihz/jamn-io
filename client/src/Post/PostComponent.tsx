@@ -1,5 +1,5 @@
 import { useApolloClient, useReactiveVar } from '@apollo/client';
-import { Box, Button, Card } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { paletteVar, userVar } from '../cache';
 import { FULL_POST_FIELDS } from '../fragments';
 import { Post } from '../types/Post';
@@ -8,12 +8,12 @@ import CharCounter from './CharCounter';
 import Editor from './Editor/Editor';
 import { convertFromRaw } from 'draft-js';
 import React, { useContext, useEffect } from 'react';
-import { Col } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import ColLink from '../Col/ColLink';
 import { PostContext } from '../App';
 
 interface PostComponentProps {
-  col: Col;
+  colUnit: ColUnit;
   post: Post;
   itemId: string;
 }
@@ -71,7 +71,7 @@ export default function PostComponent(props: PostComponentProps) {
         paddingBottom: '4px',
       }}>
         <ColLink
-          col={props.col} 
+          col={props.colUnit.col} 
           pathname={`/u/${post.user.name}`}
           sx={{
             color: post.user.color,
@@ -85,7 +85,7 @@ export default function PostComponent(props: PostComponentProps) {
         {
           post.jam
             ? <ColLink 
-                col={props.col}
+                col={props.colUnit.col}
                 pathname={`/j/${post.jam?.name}`}
                 sx={{
                   color: post.jam.color,
@@ -97,7 +97,7 @@ export default function PostComponent(props: PostComponentProps) {
         }
       </Box>
       <Box>
-        <Editor post={post} isReadonly={false} />
+        <Editor post={post} isReadonly={false} colUnit={props.colUnit}/>
       </Box>
       <Box sx={{
         display: false && post.userId === userDetail?.id && !post.commitDate

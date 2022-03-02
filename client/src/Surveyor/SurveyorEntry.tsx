@@ -26,7 +26,7 @@ import { Jam } from '../types/Jam';
 import { FULL_POST_FIELDS, LINK_FIELDS, VOTE_FIELDS } from '../fragments';
 import useGetPrev from '../Post/useGetPrev';
 import useGetNext from '../Post/useGetNext';
-import { Col } from '../types/Col';
+import { ColUnit } from '../types/Col';
 import useLinkPosts from '../Post/useLinkPosts';
 import { getColor } from '../utils';
 import { Vote } from '../types/Vote';
@@ -40,7 +40,7 @@ import useChangeCol from '../Col/useChangeCol';
 interface SurveyorEntryProps {
   post?: Post;
   jam?: Jam;
-  col: Col;
+  colUnit: ColUnit;
   item: Item;
   depth: number;
   surveyorState: SurveyorState;
@@ -209,14 +209,14 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
 
   const handleOpenClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    changeCol(props.col, `/p/${props.item.postId}`)
+    changeCol(props.colUnit.col, `/p/${props.item.postId}`)
   }
 
   const handlePromoteClick = (event: React.MouseEvent) => { 
     event.stopPropagation();
 
     if (props.post && props.post.id !== props.item.postId) {
-      changeCol(props.col, `/p/${props.item.postId}`)
+      changeCol(props.colUnit.col, `/p/${props.item.postId}`)
     }
     const { idToItem, rootItem } = promoteItem(state, props.item);
 
@@ -313,7 +313,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
       }}
     >
       <PostComponent
-        col={props.col}
+        colUnit={props.colUnit}
         post={post}
         itemId={props.item.id}
       />

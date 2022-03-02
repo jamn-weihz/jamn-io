@@ -54,3 +54,5 @@ export const snackbarVar = makeVar({
 export const addColVar = makeVar({
   id: '',
 })
+
+export const iframelyLoadVar = makeVar({} as any)
