@@ -50,7 +50,7 @@ export default function Surveyor(props: SurveyorProps) {
           );
         })
       }
-      <Box sx={{height: '150px'}}/>
+      <Box sx={{height: '10px'}}/>
     </Box>
   );
 }

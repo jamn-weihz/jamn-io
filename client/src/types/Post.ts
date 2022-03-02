@@ -6,8 +6,10 @@ export type Post = {
   id: string;
   userId: string;
   user: User;
+  userI: number;
   jamId: string | null;
   jam: Jam | null;
+  jamI: number;
   inLinks: Link[];
   outLinks: Link[];
   privacy: string;

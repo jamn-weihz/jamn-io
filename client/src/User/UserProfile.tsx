@@ -7,6 +7,8 @@ import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
 import { ColUnit } from '../types/Col';
 import { Item } from '../types/Item';
 import { ItemContext } from '../App';
+import { useReactiveVar } from '@apollo/client';
+import { userVar } from '../cache';
 
 interface UserProfileProps {
   user: User;
@@ -15,6 +17,8 @@ interface UserProfileProps {
 
 export default function UserProfile(props: UserProfileProps) {
   const { dispatch } = useContext(ItemContext);
+
+  const userDetail = useReactiveVar(userVar);
 
   const [surveyorState, setSurveyorState] = useState(null as unknown as SurveyorState);
 
@@ -44,9 +48,10 @@ export default function UserProfile(props: UserProfileProps) {
     const surveyorState: SurveyorState = {
       index: 0,
       stack: [surveyorSlice],
-      scrollToTop: false,
       reload: false,
       triggerRefinement: false,
+      scrollToTop: false,
+      scrollToBottom: false,
     };
     setSurveyorState(surveyorState)
   }, [])
@@ -55,7 +60,10 @@ export default function UserProfile(props: UserProfileProps) {
 
   return(
     <Box sx={{
-      height: 'calc(100% - 110px)'
+      height: userDetail?.id === props.user.id
+        ? 'calc(100% - 120px)'
+        : 'calc(100% - 90px)',
+      overflow: 'scroll',
     }}>
       <Surveyor 
         key={`surveyor-${props.colUnit.col.id}`}

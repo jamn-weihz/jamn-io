@@ -1,5 +1,5 @@
 import Surveyor from '../Surveyor/Surveyor';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Card, IconButton } from '@mui/material';
 import { ColUnit } from '../types/Col';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
@@ -21,17 +21,22 @@ interface SearchProps {
 export default function Search(props: SearchProps) {
   const paletteDetail = useReactiveVar(paletteVar);
 
+  const containerEl = useRef<HTMLElement>();
+
   const [reload, setReload] = useState(false);
   useEffect(() => {
     if (reload) {
       setReload(false);
     }
-  }, [reload])
+  }, [reload]);
+
   const [searchClient, setSearchClient] = useState(null as SearchClient | null);
+  
   useEffect(() => {
     setSearchClient(algoliasearch(ALGOLIA_APP_ID, ALGOLIA_APP_KEY));
   }, []);
 
+  
   const [surveyorState, setSurveyorState] = useState(() => {
     const surveyorSlice: SurveyorSlice = {
       originalQuery: '',
@@ -41,12 +46,26 @@ export default function Search(props: SearchProps) {
     const surveyorState: SurveyorState = {
       index: 0,
       stack: [surveyorSlice],
-      scrollToTop: false,
       reload: false,
       triggerRefinement: false,
+      scrollToTop: false,
+      scrollToBottom: false,
     };
     return surveyorState;
   });
+
+  useEffect(() => {
+    if (surveyorState.scrollToTop && containerEl.current)  {
+      containerEl.current.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+      setSurveyorState({
+        ...surveyorState,
+        scrollToTop: false,
+      })
+    }
+  }, [surveyorState.scrollToTop]);
 
   const handleBackClick = (event: React.MouseEvent) => {
     const stack = surveyorState.stack.slice();
@@ -131,7 +150,7 @@ export default function Search(props: SearchProps) {
                   />
                 </Box>
               </Card>
-              <Box sx={{
+              <Box ref={containerEl} sx={{
                 height: '100%',
                 overflow: 'scroll',
               }}>

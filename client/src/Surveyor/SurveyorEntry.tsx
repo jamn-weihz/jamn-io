@@ -7,6 +7,8 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import LinkIcon from '@mui/icons-material/Link';
 import ChatBubbleTwoToneIcon from '@mui/icons-material/ChatBubbleTwoTone';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import FilterAltTwoToneIcon from '@mui/icons-material/FilterAltTwoTone';
 import NotificationsTwoToneIcon from '@mui/icons-material/NotificationsTwoTone';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
@@ -324,7 +326,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
         {
           link 
             ? <Card variant='outlined' sx={{
-                marginBottom: '5px',
+                marginBottom: '8px',
               }}>
                 <Button 
                   disabled={!userDetail || isVoting}
@@ -341,12 +343,13 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
                       : color,
                     minWidth: 0,
                     minHeight: 0,
+                    padding: '2px',
                   }}
                 >
                   { 
                     (userVote?.weight || 0) > 0
                       ? <ControlPointIcon fontSize='inherit' />
-                      : '+'
+                      : <AddIcon fontSize='inherit' />
                   }
                 </Button>
                 <Button
@@ -357,6 +360,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
                     minWidth: 0,
                     minHeight: 0,
                     color,
+                    padding: '2px',
                   }}
                 >
                   { link.weight }
@@ -376,12 +380,13 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
                       : color,
                     minWidth: 0,
                     minHeight: 0,
+                    padding: '2px',
                   }}
                 >
                   { 
                     (userVote?.weight || 0) < 0
                       ? <RemoveCircleOutlineIcon fontSize='inherit' />
-                      : '-'
+                      : <RemoveIcon fontSize='inherit' />
                   }
                 </Button>
               </Card>
@@ -389,7 +394,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
         }
         <Box sx={{ 
           padding: '5px', 
-          marginTop: '-2px',
+          marginTop: '-5px',
           whiteSpace: 'nowrap',
         }}>
           <Box component='span' sx={{whiteSpace: 'nowrap'}}>
@@ -492,7 +497,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
         <Box sx={{
           color,
           paddingBottom: '5px',
-          marginTop: '2px',
+          marginTop: '-2px',
           whiteSpace: 'nowrap',
         }}>
           <Button 

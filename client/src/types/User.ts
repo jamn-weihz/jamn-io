@@ -18,6 +18,8 @@ export type User = {
   mapLng: number | null;
   mapLat: number | null;
   mapZoom: number | null;
+  postI: number;
+  voteI: number;
   verifyEmailDate: Date;
   isRegisteredWithGoogle: boolean;
   createDate: Date;

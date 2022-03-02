@@ -61,9 +61,10 @@ export default function PostCol(props: PostColProps) {
       const surveyorState: SurveyorState = {
         index: 0,
         stack: [surveyorSlice],
-        scrollToTop: false,
         reload: false,
         triggerRefinement: false,
+        scrollToTop: false,
+        scrollToBottom: false,
       };
       setSurveyorState(surveyorState);
     }
@@ -98,9 +99,13 @@ export default function PostCol(props: PostColProps) {
 
   return (
     <Box sx={{
-      height: '100%'
+      height: '100%',
     }}>
       <ColBar colUnit={props.colUnit} />
+      <Box sx={{
+        height: 'calc(100% - 70px)',
+        overflow: 'scroll',
+      }}>
       {
         post?.id
           ? <Box>
@@ -114,6 +119,7 @@ export default function PostCol(props: PostColProps) {
             </Box>
           : <NotFound />
       }
+      </Box>
     </Box>
   )
 }

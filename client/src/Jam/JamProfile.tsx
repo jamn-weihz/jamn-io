@@ -43,9 +43,10 @@ export default function JamProfile(props: JamProfileProps) {
     const surveyorState: SurveyorState = {
       index: 0,
       stack: [surveyorSlice],
-      scrollToTop: false,
       reload: false,
       triggerRefinement: false,
+      scrollToTop: false,
+      scrollToBottom: false,
     };
     setSurveyorState(surveyorState)
   }, []);
@@ -54,7 +55,8 @@ export default function JamProfile(props: JamProfileProps) {
 
   return(
     <Box sx={{
-      height: 'calc(100% - 110px)'
+      height: 'calc(100% - 90px)',
+      overflow: 'scroll',
     }}>
       <Surveyor 
         key={`surveyor-${props.colUnit.col.id}`}

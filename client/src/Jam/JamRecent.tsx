@@ -1,6 +1,6 @@
 import { gql, useMutation } from '@apollo/client';
-import { Box } from '@mui/material';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { Box, Link } from '@mui/material';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ItemContext } from '../App';
 import { FULL_POST_FIELDS } from '../fragments';
 import Surveyor from '../Surveyor/Surveyor';
@@ -10,6 +10,7 @@ import { Post } from '../types/Post';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
 import { v4 as uuidv4 } from 'uuid';
 import { Item, ItemState } from '../types/Item';
+import Loading from '../Loading';
 
 const GET_RECENT_JAM_POSTS = gql`
   mutation GetRecentJamPosts($jamId: String!, $offset: Int!) {
@@ -27,6 +28,9 @@ interface JamRecentProps {
 export default function JamRecent(props: JamRecentProps) {
   const { state, dispatch } = useContext(ItemContext);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [nearTop, setNearTop] = useState(false);
+
   const [surveyorState, setSurveyorState] = useState({
     index: 0,
     stack: [{
@@ -34,12 +38,30 @@ export default function JamRecent(props: JamRecentProps) {
       query: '',
       itemIds: [],
     }],
-    scrollToTop: false,
     reload: false,
     triggerRefinement: false,
+    scrollToTop: false,
+    scrollToBottom: true,
   } as SurveyorState);
 
   const containerEl = useRef<HTMLElement>();
+
+  useEffect(() => {
+    if (surveyorState.scrollToBottom && containerEl.current) {
+      const slice = surveyorState.stack[surveyorState.index];
+      if (slice.itemIds.length) {
+        containerEl.current.scrollTo({
+          top: containerEl.current.clientHeight,
+          behavior: 'smooth',
+        });
+        setSurveyorState({
+          ...surveyorState,
+          scrollToBottom: false,
+        })
+      }
+
+    }
+  }, [surveyorState])
 
   const [getRecent] = useMutation(GET_RECENT_JAM_POSTS, {
     onError: error => {
@@ -47,6 +69,8 @@ export default function JamRecent(props: JamRecentProps) {
     },
     onCompleted: data => {
       console.log(data);
+      setIsLoading(false);
+
       const slice = surveyorState.stack[surveyorState.index];
 
       const itemIds: string[] = [];
@@ -100,21 +124,83 @@ export default function JamRecent(props: JamRecentProps) {
     },
   });
 
+  
   useEffect(() => {
+    setIsLoading(true);
     getRecent({
       variables: {
         jamId: props.jam.id,
         offset: 0,
       }
     });
+    if (containerEl.current) {
+      containerEl.current.addEventListener('scroll', event => {
+        if (containerEl.current?.scrollTop)
+        if ((containerEl.current?.scrollTop || 300) < 300) {
+          setNearTop(true);
+        }
+      });
+    }
   }, [])
 
+  useEffect(() => {
+    if (nearTop) {
+      setNearTop(false);
+      if (!isLoading) {
+        const slice = surveyorState.stack[surveyorState.index];
+        const remaining = props.jam.postI - slice.itemIds.length;
+        if (remaining > 0) {
+          setIsLoading(true);
+          getRecent({
+            variables: {
+              jamId: props.jam.id,
+              offset: slice.itemIds.length,
+            }
+          });
+        }
+      }
+      
+    }
+  }, [nearTop]);
+
+  const handleLoadMoreClick = (event: React.MouseEvent) => {
+    if (!isLoading) {
+      const slice = surveyorState.stack[surveyorState.index];
+      setIsLoading(true);
+      getRecent({
+        variables: {
+          jamId: props.jam.id,
+          offset: slice.itemIds.length,
+        }
+      })
+    }
+  }
 
   if (!surveyorState) return null;
+
+  const slice = surveyorState.stack[surveyorState.index];
+
+  const remaining = props.jam.postI - slice.itemIds.length
   return (
     <Box ref={containerEl} sx={{
-      height: 'calc(100% - 110px)'
+      height: 'calc(100% - 90px)',
+      overflow: 'scroll',
     }}>
+      <Box sx={{
+        margin: 1,
+      }}>
+        {
+          isLoading 
+            ? <Loading />
+            : remaining > 0
+              ? <Box>
+                  <Link onClick={handleLoadMoreClick}>
+                    { remaining } more
+                  </Link>
+                </Box>
+              : null
+        }
+      </Box>
       <Surveyor 
         key={`surveyor-${props.colUnit.col.id}`}
         colUnit={props.colUnit}

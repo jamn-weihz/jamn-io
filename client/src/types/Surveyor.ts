@@ -8,6 +8,7 @@ export type SurveyorState = {
   index: number;
   stack: SurveyorSlice[];
   scrollToTop: boolean;
+  scrollToBottom: boolean;
   reload: boolean;
   triggerRefinement: boolean;
 }
