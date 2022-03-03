@@ -1,8 +1,8 @@
 import { gql, useApolloClient, useReactiveVar, useSubscription } from '@apollo/client';
 import { useContext } from 'react';
-import { ItemContext, ItemContextType, PostContext, PostContextType } from '../App';
+import { CardContext, CardContextType, PostContext, PostContextType } from '../App';
 import { sessionVar, userVar } from '../cache';
-import { ItemState } from '../types/Item';
+import { CardState } from '../types/Card';
 
 const SAVE_POST = gql`
   subscription SavePost($userId: String!, $sessionId: String!, $cardIds: [String!]!) {
@@ -13,11 +13,11 @@ const SAVE_POST = gql`
     }
   }
 `
-export default function useSavePostSubcription(cardIds: string[], postContext: PostContextType, itemContext: ItemContextType) {
+export default function useSavePostSubcription(cardIds: string[], postContext: PostContextType, cardContext: CardContextType) {
   const userDetail = useReactiveVar(userVar);
 
   const { state: postState } = postContext;
-  const { state, dispatch } = itemContext;
+  const { state, dispatch } = cardContext;
 
   const client = useApolloClient();
   const sessionDetail = useReactiveVar(sessionVar);
@@ -42,16 +42,16 @@ export default function useSavePostSubcription(cardIds: string[], postContext: P
       });
       console.log(postState);
 
-      const idToItem: ItemState = {};
+      const idToCard: CardState = {};
       postState[savePost.id].forEach(id => {
-        idToItem[id] = {
+        idToCard[id] = {
           ...state[id],
           refreshPost: true,
         }
       })
       dispatch({
         type: 'MERGE_ITEMS',
-        idToItem,
+        idToCard,
       })
 
     },

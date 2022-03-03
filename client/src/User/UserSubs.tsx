@@ -1,9 +1,9 @@
 import { useReactiveVar } from '@apollo/client';
 import { Box } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
-import { ItemContext } from '../App';
+import { CardContext } from '../App';
 import { userVar } from '../cache';
-import Surveyor from '../Item/ItemSurveyor';
+import Surveyor from '../Card/CardSurveyor';
 import Loading from '../Loading';
 import useGetPosts from '../Post/useGetPosts';
 import { ColUnit } from '../types/Col';
@@ -11,14 +11,14 @@ import { SurveyorState } from '../types/Surveyor';
 import { User } from '../types/User';
 import { v4 as uuidv4 } from 'uuid';
 import { Post } from '../types/Post';
-import { Item, ItemState } from '../types/Item';
+import { Card, CardState } from '../types/Card';
 
 interface UserSubsProps {
   user: User;
   colUnit: ColUnit;
 }
 export default function UserSubs(props: UserSubsProps) {
-  const { state, dispatch } = useContext(ItemContext);
+  const { state, dispatch } = useContext(CardContext);
 
   const userDetail = useReactiveVar(userVar);
 
@@ -27,7 +27,7 @@ export default function UserSubs(props: UserSubsProps) {
     stack: [{
       originalQuery: '',
       query: '',
-      itemIds: [],
+      cardIds: [],
     }],
     reload: false,
     triggerRefinement: false,
@@ -40,10 +40,10 @@ export default function UserSubs(props: UserSubsProps) {
   const { getPosts } = useGetPosts((posts: Post[]) => {
     const slice = surveyorState.stack[surveyorState.index];
 
-    const itemIds: string[] = [];
-    const idToItem: ItemState = {};
+    const cardIds: string[] = [];
+    const idToCard: CardState = {};
     posts.forEach(post => {
-      const item: Item = {
+      const card: Card = {
         id: uuidv4(),
         userId: post.userId,
         postId: post.id,
@@ -56,21 +56,21 @@ export default function UserSubs(props: UserSubsProps) {
         refreshPost: false,
         getLinks: false,
         isNewlySaved: false,
-        isRootRecentUserVoteItem: false,
+        isRootRecentUserVoteCard: false,
       };
-      itemIds.push(item.id);
-      idToItem[item.id] = item;
+      cardIds.push(card.id);
+      idToCard[card.id] = card;
     });
     
     dispatch({
       type: 'MERGE_ITEMS',
-      idToItem,
+      idToCard,
     });
 
     const stack = surveyorState.stack.slice();
     stack.splice(surveyorState.index, 1, {
       ...slice,
-      itemIds: [...slice.itemIds, ...itemIds]
+      cardIds: [...slice.cardIds, ...cardIds]
     });
     setSurveyorState({
       ...surveyorState,
@@ -83,16 +83,16 @@ export default function UserSubs(props: UserSubsProps) {
 
     const postIds: string[] = [];
     props.user.subs.forEach(sub => {
-      let itemId;
-      slice.itemIds.some(id => {
+      let cardId;
+      slice.cardIds.some(id => {
         if (state[id].postId === sub.postId) {
-          itemId = id;
+          cardId = id;
           return true;
         }
         return false
       });
 
-      if (!itemId) {
+      if (!cardId) {
         postIds.push(sub.postId);
       }
     });
@@ -101,18 +101,18 @@ export default function UserSubs(props: UserSubsProps) {
       getPosts(postIds);
     }
 
-    const itemIds: string[] = [];
-    slice.itemIds.forEach(itemId => {
-      const isSubbed = props.user.subs.some(sub => sub.postId === state[itemId].postId);
+    const cardIds: string[] = [];
+    slice.cardIds.forEach(cardId => {
+      const isSubbed = props.user.subs.some(sub => sub.postId === state[cardId].postId);
       if (isSubbed) {
-        itemIds.push(itemId);
+        cardIds.push(cardId);
       }
     });
 
     const stack = surveyorState.stack.slice();
     stack.splice(surveyorState.index, 1, {
       ...slice,
-      itemIds,
+      cardIds,
     });
     setSurveyorState({
       ...surveyorState,

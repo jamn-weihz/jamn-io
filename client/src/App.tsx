@@ -15,11 +15,11 @@ import { getAppbarWidth, getColWidth } from './utils';
 import { PostAction, PostState } from './types/Post';
 import useSavePostSubcription from './Post/useSavePostSubcription';
 import useLinkPostsSubcription from './Post/useLinkPostsSubscription';
-import { ItemAction, ItemState } from './types/Item';
-import reduceAddPrev from './Item/reduceAddPrev';
-import reduceAddNext from './Item/reduceAddNext';
-import reduceAddLink from './Item/reduceAddLink';
-import reduceRemoveLink from './Item/reduceRemoveLink';
+import { CardAction, CardState } from './types/Card';
+import reduceAddPrev from './Card/reduceAddPrev';
+import reduceAddNext from './Card/reduceAddNext';
+import reduceAddLink from './Card/reduceAddLink';
+import reduceRemoveLink from './Card/reduceRemoveLink';
 import SnackBar from './Auth/SnackBar';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useAddCol from './Col/useAddCol';
@@ -44,11 +44,11 @@ export type ColContextType = {
 };
 export const ColContext = React.createContext({} as ColContextType);
 
-export type ItemContextType = {
-  state: ItemState;
-  dispatch: Dispatch<ItemAction>;
+export type CardContextType = {
+  state: CardState;
+  dispatch: Dispatch<CardAction>;
 };
-export const ItemContext = React.createContext({} as ItemContextType);
+export const CardContext = React.createContext({} as CardContextType);
 
 export type PostContextType = {
   state: PostState;
@@ -330,14 +330,14 @@ function App(props: AppProps) {
           ...state,
           [action.postId]: [
             ...(state[action.postId] || []),
-            action.itemId,
+            action.cardId,
           ],
         }
       case 'REMOVE':
         return {
           ...state,
           [action.postId]: (state[action.postId] || [])
-            .filter(itemId => itemId !== action.itemId),
+            .filter(cardId => cardId !== action.cardId),
         }
       default:
         throw new Error('Invalid action type')
@@ -347,18 +347,18 @@ function App(props: AppProps) {
 
   const postIds = useMemo(() => Object.keys(postState), [postState]);
 
-  const itemReducer = (state: ItemState, action: ItemAction) => {
+  const cardReducer = (state: CardState, action: CardAction) => {
     console.log(action);
     switch (action.type) {
       case 'MERGE_ITEMS':
         return {
           ...state,
-          ...action.idToItem,
+          ...action.idToCard,
         };
       case 'UPDATE_ITEM': 
         return {
           ...state,
-          [action.item.id]: action.item,
+          [action.card.id]: action.card,
         };
       case 'ADD_PREV':
         return reduceAddPrev(state, action);
@@ -373,23 +373,26 @@ function App(props: AppProps) {
     }
   };
 
-  const [itemState, itemDispatch] = useReducer(itemReducer, {});
+  const [cardState, cardDispatch] = useReducer(cardReducer, {});
+
+
+  //const [userState, userDisptach] = useReducer(userReducer, {})
 
   useSavePostSubcription(postIds, {
     state: postState,
     dispatch: postDispatch,
   }, {
-    state: itemState,
-    dispatch: itemDispatch,
+    state: cardState,
+    dispatch: cardDispatch,
   });
-  useLinkPostsSubcription(postIds, itemDispatch);
+  useLinkPostsSubcription(postIds, cardDispatch);
   
   if (!theme) return null;
 
   return (
     <ColContext.Provider value={{state: colState, dispatch: colDispatch}}>
     <PostContext.Provider value={{state: postState, dispatch: postDispatch}}>
-    <ItemContext.Provider value={{state: itemState, dispatch: itemDispatch}}>
+    <CardContext.Provider value={{state: cardState, dispatch: cardDispatch}}>
       <ThemeProvider theme={theme}>
         <Paper sx={{
           position: 'relative',
@@ -429,7 +432,7 @@ function App(props: AppProps) {
           <SnackBar />
         </Paper>
       </ThemeProvider>
-    </ItemContext.Provider>
+    </CardContext.Provider>
     </PostContext.Provider>
     </ColContext.Provider>
   );

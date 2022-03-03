@@ -163,6 +163,7 @@ type Sub {
 type Subscription {
   jamPost(jamId: String!): Post!
   jamRole(jamId: String!, sessionId: String!): Role!
+  lead(userId: String!): Lead!
   linkPosts(postIds: [String!]!, sessionId: String!): Link!
   savePost(cardIds: [String!]!, sessionId: String!, userId: String!): Post!
   setJam(jamId: String!, sessionId: String!): Jam!

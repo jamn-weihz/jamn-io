@@ -1,4 +1,4 @@
-import Surveyor from '../Item/ItemSurveyor';
+import Surveyor from '../Card/CardSurveyor';
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Card, IconButton } from '@mui/material';
 import { ColUnit } from '../types/Col';
@@ -41,7 +41,7 @@ export default function Search(props: SearchProps) {
     const surveyorSlice: SurveyorSlice = {
       originalQuery: '',
       query: '',
-      itemIds: [],
+      cardIds: [],
     };
     const surveyorState: SurveyorState = {
       index: 0,

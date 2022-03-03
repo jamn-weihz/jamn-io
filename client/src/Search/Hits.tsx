@@ -5,8 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { Dispatch, SetStateAction, useContext, useEffect, useState,  } from 'react';
 import { FULL_POST_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
-import { Item, ItemState } from '../types/Item';
-import { ItemContext } from '../App';
+import { Card, CardState } from '../types/Card';
+import { CardContext } from '../App';
 import useGetPosts from '../Post/useGetPosts';
 
 interface HitsProps {
@@ -17,7 +17,7 @@ interface HitsProps {
   setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
 }
 function Hits(props: HitsProps) {
-  const { state, dispatch } = useContext(ItemContext);
+  const { state, dispatch } = useContext(CardContext);
 
   const [hits, setHits] = useState([] as any[]);
 
@@ -35,24 +35,24 @@ function Hits(props: HitsProps) {
 
     const slice = props.surveyorState.stack[props.surveyorState.index];
 
-    const idToItem: ItemState = {};
-    const itemIds: string[] = [];
+    const idToCard: CardState = {};
+    const cardIds: string[] = [];
     if (props.hits.length) {
       props.hits.forEach(hit => {
         if (hit.__typename === 'Post') {
-          let itemId;
-          slice.itemIds.some(id => {
+          let cardId;
+          slice.cardIds.some(id => {
             if (state[id].postId === hit.id) {
-              itemId = id;
+              cardId = id;
               return true;
             }
             return false;
           });
-          if (itemId) {
-            itemIds.push(itemId);
+          if (cardId) {
+            cardIds.push(cardId);
           }
           else {
-            const item: Item = {
+            const card: Card = {
               id: uuidv4(),
               userId: hit.userId,
               parentId: '',
@@ -65,27 +65,27 @@ function Hits(props: HitsProps) {
               isNewlySaved: false,
               refreshPost: false,
               getLinks: false,
-              isRootRecentUserVoteItem: false,
+              isRootRecentUserVoteCard: false,
             };
-            idToItem[item.id] = item;
-            itemIds.push(item.id);
+            idToCard[card.id] = card;
+            cardIds.push(card.id);
           }
         }
       });
-      if (Object.keys(idToItem).length) {
-        getPosts(Object.keys(idToItem).map(id => idToItem[id].postId));
+      if (Object.keys(idToCard).length) {
+        getPosts(Object.keys(idToCard).map(id => idToCard[id].postId));
       }
     }
-    if (Object.keys(idToItem).length) {
+    if (Object.keys(idToCard).length) {
       dispatch({
         type: 'MERGE_ITEMS',
-        idToItem,
+        idToCard,
       });
     }
     const stack = props.surveyorState.stack.slice()
     stack.splice(props.surveyorState.index, 1, {
       ...slice,
-      itemIds,
+      cardIds,
     });
     props.setSurveyorState({
       ...props.surveyorState,

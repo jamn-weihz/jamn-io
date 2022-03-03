@@ -8,10 +8,10 @@ import NotFound from '../NotFound';
 import { ColUnit } from '../types/Col';
 import { Post } from '../types/Post';
 import { v4 as uuidv4 } from 'uuid'; 
-import Surveyor from '../Item/ItemSurveyor';
+import Surveyor from '../Card/CardSurveyor';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
-import { Item } from '../types/Item';
-import { ItemContext } from '../App';
+import { Card } from '../types/Card';
+import { CardContext } from '../App';
 
 const GET_POST = gql`
   query GetPost($postId: String!) {
@@ -32,11 +32,11 @@ export default function PostCol(props: PostColProps) {
 
   const [surveyorState, setSurveyorState] = useState(null as unknown as SurveyorState);
 
-  const { state, dispatch } = useContext(ItemContext);
+  const { state, dispatch } = useContext(CardContext);
 
   useEffect(() => {
     if (post?.id && !surveyorState) {
-      const item: Item = {
+      const card: Card = {
         id: uuidv4(),
         userId: post.userId,
         parentId: '',
@@ -49,18 +49,18 @@ export default function PostCol(props: PostColProps) {
         isNewlySaved: false,
         refreshPost: false,
         getLinks: true,
-        isRootRecentUserVoteItem: false,
+        isRootRecentUserVoteCard: false,
       };
       dispatch({
         type: 'MERGE_ITEMS',
-        idToItem: {
-          [item.id]: item
+        idToCard: {
+          [card.id]: card
         },
       });
       const surveyorSlice: SurveyorSlice = {
         originalQuery: '',
         query: '',
-        itemIds: [item.id],
+        cardIds: [card.id],
       };
       const surveyorState: SurveyorState = {
         index: 0,

@@ -20,6 +20,7 @@ import UserRecent from './UserRecent';
 import UserSubs from './UserSubs';
 import UserLeaders from './UserLeaders';
 import UserFollowers from './UserFollowers';
+import useLeadSubscription from './useLeadSubscription';
 
 const GET_USER_BY_NAME = gql`
   query GetUserByName($name: String!) {
@@ -42,6 +43,7 @@ export default function UserComponent(props: UserProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   useUserRoleSubscription(user?.id || '');
+  useLeadSubscription(user?.id || '')
   
   const [getUserByName] = useLazyQuery(GET_USER_BY_NAME, {
     onError: error => {

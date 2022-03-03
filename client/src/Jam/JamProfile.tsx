@@ -1,12 +1,12 @@
 import { Box } from '@mui/material';
 import {  useContext, useEffect, useState } from 'react';
-import Surveyor from '../Item/ItemSurveyor';
+import Surveyor from '../Card/CardSurveyor';
 import { Jam } from '../types/Jam';
 import { v4 as uuidv4 } from 'uuid';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
 import { ColUnit } from '../types/Col';
-import { Item } from '../types/Item';
-import { ItemContext } from '../App';
+import { Card } from '../types/Card';
+import { CardContext } from '../App';
 
 interface JamProfileProps {
   jam: Jam;
@@ -14,11 +14,11 @@ interface JamProfileProps {
 }
 
 export default function JamProfile(props: JamProfileProps) {
-  const { dispatch } = useContext(ItemContext);
+  const { dispatch } = useContext(CardContext);
   const [surveyorState, setSurveyorState] = useState(null as unknown as SurveyorState);
 
   useEffect(() => {
-    const item: Item = {
+    const card: Card = {
       id: uuidv4(),
       userId: props.jam.focus.userId,
       parentId: '',
@@ -31,18 +31,18 @@ export default function JamProfile(props: JamProfileProps) {
       isNewlySaved: false,
       refreshPost: false,
       getLinks: true,
-      isRootRecentUserVoteItem: false,
+      isRootRecentUserVoteCard: false,
     };
     dispatch({
       type: 'MERGE_ITEMS',
-      idToItem: {
-        [item.id]: item
+      idToCard: {
+        [card.id]: card
       },
     });
     const surveyorSlice: SurveyorSlice = {
       originalQuery: '',
       query: '',
-      itemIds: [item.id],
+      cardIds: [card.id],
     };
     const surveyorState: SurveyorState = {
       index: 0,

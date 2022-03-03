@@ -19,7 +19,7 @@ import useUnfollowUser from '../User/useUnfollowUser';
 interface PostComponentProps {
   colUnit: ColUnit;
   post: Post;
-  itemId: string;
+  cardId: string;
 }
 export default function PostComponent(props: PostComponentProps) {
   const { dispatch } = useContext(PostContext);
@@ -32,13 +32,13 @@ export default function PostComponent(props: PostComponentProps) {
       dispatch({
         type: 'ADD',
         postId: props.post.id,
-        itemId: props.itemId,
+        cardId: props.cardId,
       });
       return () => {
         dispatch({
           type: 'REMOVE',
           postId: props.post.id,
-          itemId: props.itemId,
+          cardId: props.cardId,
         });
       };
     }
@@ -161,7 +161,7 @@ export default function PostComponent(props: PostComponentProps) {
           post={post}
           isReadonly={false}
           colUnit={props.colUnit}
-          itemId={props.itemId}
+          cardId={props.cardId}
         />
       </Box>
       <Box sx={{

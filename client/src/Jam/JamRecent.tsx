@@ -1,15 +1,15 @@
 import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { Box, Link } from '@mui/material';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { ItemContext, PostContext } from '../App';
+import { CardContext, PostContext } from '../App';
 import { FULL_POST_FIELDS } from '../fragments';
-import Surveyor from '../Item/ItemSurveyor';
+import Surveyor from '../Card/CardSurveyor';
 import { ColUnit } from '../types/Col';
 import { Jam } from '../types/Jam';
 import { Post } from '../types/Post';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
 import { v4 as uuidv4 } from 'uuid';
-import { Item, ItemState } from '../types/Item';
+import { Card, CardState } from '../types/Card';
 import Loading from '../Loading';
 import useJamPostSubscription from './useJamPostSubscription';
 
@@ -27,7 +27,7 @@ interface JamRecentProps {
   colUnit: ColUnit;
 }
 export default function JamRecent(props: JamRecentProps) {
-  const { state, dispatch } = useContext(ItemContext);
+  const { state, dispatch } = useContext(CardContext);
 
   const client = useApolloClient();
 
@@ -40,7 +40,7 @@ export default function JamRecent(props: JamRecentProps) {
     stack: [{
       originalQuery: '',
       query: '',
-      itemIds: [],
+      cardIds: [],
     }],
     reload: false,
     triggerRefinement: false,
@@ -51,7 +51,7 @@ export default function JamRecent(props: JamRecentProps) {
   const containerEl = useRef<HTMLElement>();
 
   useJamPostSubscription(props.jam.id, (post: Post) => {
-    const item: Item = {
+    const card: Card = {
       id: uuidv4(),
       userId: post.userId,
       parentId: '',
@@ -64,12 +64,12 @@ export default function JamRecent(props: JamRecentProps) {
       isNewlySaved: false,
       refreshPost: false,
       getLinks: false,
-      isRootRecentUserVoteItem: false,
+      isRootRecentUserVoteCard: false,
     };
     dispatch({
       type: 'MERGE_ITEMS',
-      idToItem: {
-        [item.id]: item,
+      idToCard: {
+        [card.id]: card,
       },
     });
     const slice = surveyorState.stack[surveyorState.index];
@@ -77,7 +77,7 @@ export default function JamRecent(props: JamRecentProps) {
     const stack = surveyorState.stack.slice();
     stack.splice(surveyorState.index, 1, {
       ...slice,
-      itemIds: [...slice.itemIds, item.id],
+      cardIds: [...slice.cardIds, card.id],
     });
 
     setSurveyorState({
@@ -89,7 +89,7 @@ export default function JamRecent(props: JamRecentProps) {
   useEffect(() => {
     if (surveyorState.scrollToBottom && containerEl.current) {
       const slice = surveyorState.stack[surveyorState.index];
-      if (slice.itemIds.length) {
+      if (slice.cardIds.length) {
         containerEl.current.scrollTo({
           top: containerEl.current.scrollHeight,
           behavior: 'smooth',
@@ -112,22 +112,22 @@ export default function JamRecent(props: JamRecentProps) {
 
       const slice = surveyorState.stack[surveyorState.index];
 
-      const itemIds: string[] = [];
-      const idToItem: ItemState = {};
+      const cardIds: string[] = [];
+      const idToCard: CardState = {};
       data.getRecentJamPosts.forEach((post: Post) => {
-        let itemId;
-        slice.itemIds.some(id => {
+        let cardId;
+        slice.cardIds.some(id => {
           if (state[id].postId === post.id) {
-            itemId = id;
+            cardId = id;
             return true;
           }
           return false;
         });
-        if (itemId) {
-          itemIds.push(itemId)
+        if (cardId) {
+          cardIds.push(cardId)
         }
         else {
-          const item: Item = {
+          const card: Card = {
             id: uuidv4(),
             userId: post.userId,
             parentId: '',
@@ -140,22 +140,22 @@ export default function JamRecent(props: JamRecentProps) {
             isNewlySaved: false,
             refreshPost: false,
             getLinks: false,
-            isRootRecentUserVoteItem: false
+            isRootRecentUserVoteCard: false
           };
-          idToItem[item.id] = item;
-          itemIds.push(item.id);
+          idToCard[card.id] = card;
+          cardIds.push(card.id);
         }
       });
 
       dispatch({
         type: 'MERGE_ITEMS',
-        idToItem,
+        idToCard,
       });
 
       const stack = surveyorState.stack.slice();
       stack.splice(surveyorState.index, 1, {
         ...slice,
-        itemIds: [...itemIds.reverse(), ...slice.itemIds]
+        cardIds: [...cardIds.reverse(), ...slice.cardIds]
       });
       setSurveyorState({
         ...surveyorState,
@@ -194,13 +194,13 @@ export default function JamRecent(props: JamRecentProps) {
     if (scrollTop < 500) {
       if (!isLoading) {
         const slice = surveyorState.stack[surveyorState.index];
-        const remaining = props.jam.postI - slice.itemIds.length;
+        const remaining = props.jam.postI - slice.cardIds.length;
         if (remaining > 0) {
           setIsLoading(true);
           getRecent({
             variables: {
               jamId: props.jam.id,
-              offset: slice.itemIds.length,
+              offset: slice.cardIds.length,
             }
           });
         }
@@ -220,11 +220,11 @@ export default function JamRecent(props: JamRecentProps) {
   useEffect(() => {
     const slice = surveyorState.stack[surveyorState.index];
 
-    let hasNewlySaved = slice.itemIds.some(itemId => {
-      return state[itemId].isNewlySaved;
+    let hasNewlySaved = slice.cardIds.some(cardId => {
+      return state[cardId].isNewlySaved;
     })
 
-    const itemIds = slice.itemIds.slice().sort((a, b) => {
+    const cardIds = slice.cardIds.slice().sort((a, b) => {
       const postA = client.cache.readFragment({
         id: client.cache.identify({
           id: state[a].postId,
@@ -254,15 +254,15 @@ export default function JamRecent(props: JamRecentProps) {
       return postA.saveDate < postB.saveDate ? -1 : 1;
     });
 
-    const hasDiff = itemIds.some((id, i) => {
-      return id !== slice.itemIds[i];
+    const hasDiff = cardIds.some((id, i) => {
+      return id !== slice.cardIds[i];
     });
 
     if (hasDiff) {
       const stack = surveyorState.stack.slice();
       stack.splice(surveyorState.index, 1, {
         ...slice,
-        itemIds,
+        cardIds,
       });
       setSurveyorState({
         ...surveyorState,
@@ -284,7 +284,7 @@ export default function JamRecent(props: JamRecentProps) {
       getRecent({
         variables: {
           jamId: props.jam.id,
-          offset: slice.itemIds.length,
+          offset: slice.cardIds.length,
         }
       })
     }
@@ -294,7 +294,7 @@ export default function JamRecent(props: JamRecentProps) {
 
   const slice = surveyorState.stack[surveyorState.index];
 
-  const remaining = props.jam.postI - slice.itemIds.length
+  const remaining = props.jam.postI - slice.cardIds.length
   return (
     <Box ref={containerEl} sx={{
       height: 'calc(100% - 90px)',

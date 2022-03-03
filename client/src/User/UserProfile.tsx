@@ -1,12 +1,12 @@
 import { Box } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
-import Surveyor from '../Item/ItemSurveyor';
+import Surveyor from '../Card/CardSurveyor';
 import { User } from '../types/User';
 import { v4 as uuidv4 } from 'uuid';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
 import { ColUnit } from '../types/Col';
-import { Item } from '../types/Item';
-import { ItemContext } from '../App';
+import { Card } from '../types/Card';
+import { CardContext } from '../App';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../cache';
 
@@ -16,14 +16,14 @@ interface UserProfileProps {
 }
 
 export default function UserProfile(props: UserProfileProps) {
-  const { dispatch } = useContext(ItemContext);
+  const { dispatch } = useContext(CardContext);
 
   const userDetail = useReactiveVar(userVar);
 
   const [surveyorState, setSurveyorState] = useState(null as unknown as SurveyorState);
 
   useEffect(() => {
-    const item: Item = {
+    const card: Card = {
       id: uuidv4(),
       userId: props.user.id,
       parentId: '',
@@ -36,18 +36,18 @@ export default function UserProfile(props: UserProfileProps) {
       isNewlySaved: false,
       refreshPost: false,
       getLinks: true,
-      isRootRecentUserVoteItem: false,
+      isRootRecentUserVoteCard: false,
     };
     dispatch({
       type: 'MERGE_ITEMS',
-      idToItem: {
-        [item.id]: item
+      idToCard: {
+        [card.id]: card
       },
     });
     const surveyorSlice: SurveyorSlice = {
       originalQuery: '',
       query: '',
-      itemIds: [item.id],
+      cardIds: [card.id],
     };
     const surveyorState: SurveyorState = {
       index: 0,

@@ -1,4 +1,4 @@
-import { Box, Button, Card, IconButton, Menu, MenuItem } from '@mui/material';
+import { Box, Button, Card as MUICard, IconButton, Menu, MenuItem } from '@mui/material';
 import NorthIcon from '@mui/icons-material/North';
 import ReplyIcon from '@mui/icons-material/Reply';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
@@ -31,30 +31,30 @@ import { getColor } from '../utils';
 import { Vote } from '../types/Vote';
 import { DEFAULT_COLOR } from '../constants';
 import useVotePosts from '../Post/useVotePosts';
-import { Item } from '../types/Item';
-import { ItemContext } from '../App';
-import promoteItem from './promoteItem';
+import { Card } from '../types/Card';
+import { CardContext } from '../App';
+import promoteCard from './promoteCard';
 import useChangeCol from '../Col/useChangeCol';
 import useSubPost from '../Post/useSubPost';
 import useUnsubPost from '../Post/useUnsubPost';
 
-interface ItemComponentProps {
+interface CardComponentProps {
   post?: Post;
   jam?: Jam;
   colUnit: ColUnit;
-  item: Item;
+  card: Card;
   depth: number;
   surveyorState: SurveyorState;
   setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
 }
 
-export default function ItemComponent(props: ItemComponentProps) {
+export default function CardComponent(props: CardComponentProps) {
   const client = useApolloClient();
   const userDetail = useReactiveVar(userVar);
   const linkDetail = useReactiveVar(linkVar);  
   const paletteDetail = useReactiveVar(paletteVar);
 
-  const { state, dispatch } = useContext(ItemContext);
+  const { state, dispatch } = useContext(CardContext);
 
   const [menuAnchorEl, setMenuAnchorEl] = useState(null as Element | null);
 
@@ -63,51 +63,51 @@ export default function ItemComponent(props: ItemComponentProps) {
 
   const { linkPosts } = useLinkPosts();
 
-  const { getPrev } = useGetPrev(props.item.id, props.item.postId);
-  const { getNext } = useGetNext(props.item.id, props.item.postId);
+  const { getPrev } = useGetPrev(props.card.id, props.card.postId);
+  const { getNext } = useGetNext(props.card.id, props.card.postId);
 
-  const { replyPost } = useReplyPost(props.item.id, props.item.postId, props.jam?.id);
+  const { replyPost } = useReplyPost(props.card.id, props.card.postId, props.jam?.id);
 
   const { changeCol } = useChangeCol(0, true);
 
-  const { subPost } = useSubPost(props.item.postId)
-  const { unsubPost } = useUnsubPost(props.item.postId);
+  const { subPost } = useSubPost(props.card.postId)
+  const { unsubPost } = useUnsubPost(props.card.postId);
 
   useEffect(() => {
-    if (props.item.getLinks) {
-      if (props.item.showNext) {
+    if (props.card.getLinks) {
+      if (props.card.showNext) {
         getNext(0);
       }
-      else if (props.item.showPrev) {
+      else if (props.card.showPrev) {
         getPrev(0);
       }
       dispatch({
         type: 'UPDATE_ITEM',
-        item: {
-          ...props.item,
+        card: {
+          ...props.card,
           getLinks: false,
         }
       });
 
     }
-  }, [props.item.getLinks]);
+  }, [props.card.getLinks]);
 
   const handlePrevClick = (event: React.MouseEvent) => {
-    if (props.item.showPrev) {
+    if (props.card.showPrev) {
       dispatch({
         type: 'UPDATE_ITEM',
-        item: {
-          ...props.item,
+        card: {
+          ...props.card,
           showPrev: false,
         }
       });
     }
     else {
-      getPrev(props.item.prevIds.length);
+      getPrev(props.card.prevIds.length);
       dispatch({
         type: 'UPDATE_ITEM',
-        item: {
-          ...props.item,
+        card: {
+          ...props.card,
           showPrev: true,
           showNext: false,
         },
@@ -116,21 +116,21 @@ export default function ItemComponent(props: ItemComponentProps) {
   }
 
   const handleNextClick = (event: React.MouseEvent) => {
-    if (props.item.showNext) {
+    if (props.card.showNext) {
       dispatch({
         type: 'UPDATE_ITEM',
-        item: {
-          ...props.item,
+        card: {
+          ...props.card,
           showNext: false,
         }
       });
     }
     else {
-      getNext(props.item.nextIds.length);
+      getNext(props.card.nextIds.length);
       dispatch({
         type: 'UPDATE_ITEM',
-        item: {
-          ...props.item,
+        card: {
+          ...props.card,
           showPrev: false,
           showNext: true,
         },
@@ -145,7 +145,7 @@ export default function ItemComponent(props: ItemComponentProps) {
 
   const handleLinkClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    if (linkDetail.sourcePostId === props.item.postId) {
+    if (linkDetail.sourcePostId === props.card.postId) {
       linkVar({
         sourcePostId: '',
         targetPostId: '',
@@ -153,23 +153,23 @@ export default function ItemComponent(props: ItemComponentProps) {
     }
     else {
       linkVar({
-        sourcePostId: props.item.postId,
+        sourcePostId: props.card.postId,
         targetPostId: '', 
       })
     }
   }
 
   const handleMouseEnter = (event: React.MouseEvent) => {
-    if (linkDetail.sourcePostId && linkDetail.sourcePostId !== props.item.postId) {
+    if (linkDetail.sourcePostId && linkDetail.sourcePostId !== props.card.postId) {
       linkVar({
         ...linkDetail,
-        targetPostId: props.item.postId,
+        targetPostId: props.card.postId,
       });
     }
   }
 
   const handleMouseLeave = (event: React.MouseEvent) => {
-    if (linkDetail.sourcePostId && linkDetail.sourcePostId !== props.item.postId) {
+    if (linkDetail.sourcePostId && linkDetail.sourcePostId !== props.card.postId) {
       linkVar({
         ...linkDetail,
         targetPostId: '',
@@ -178,20 +178,20 @@ export default function ItemComponent(props: ItemComponentProps) {
   }
 
   const handleClick = (event: React.MouseEvent) => {
-    if (linkDetail.sourcePostId === props.item.postId) {
+    if (linkDetail.sourcePostId === props.card.postId) {
       linkVar({
         sourcePostId: '',
         targetPostId: '',
       })
     }
-    if (linkDetail.sourcePostId && linkDetail.targetPostId === props.item.postId) {
+    if (linkDetail.sourcePostId && linkDetail.targetPostId === props.card.postId) {
       linkPosts();
     }
   }
 
   const handleVoteClick = (clicks: number) => (event: React.MouseEvent) => {
-    if (props.item.linkId) {
-      votePosts(props.item.linkId, clicks);
+    if (props.card.linkId) {
+      votePosts(props.card.linkId, clicks);
       setIsVoting(true)
     }
   }
@@ -205,33 +205,33 @@ export default function ItemComponent(props: ItemComponentProps) {
 
   const handleCopyClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    navigator.clipboard.writeText(`https://jamn.io/p/${props.item.postId}`);
+    navigator.clipboard.writeText(`https://jamn.io/p/${props.card.postId}`);
     handleMenuClose();
   }
 
   const handleOpenClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    changeCol(props.colUnit.col, `/p/${props.item.postId}`)
+    changeCol(props.colUnit.col, `/p/${props.card.postId}`)
   }
 
   const handlePromoteClick = (event: React.MouseEvent) => { 
     event.stopPropagation();
 
-    if (props.post && props.post.id !== props.item.postId) {
-      changeCol(props.colUnit.col, `/p/${props.item.postId}`)
+    if (props.post && props.post.id !== props.card.postId) {
+      changeCol(props.colUnit.col, `/p/${props.card.postId}`)
     }
-    const { idToItem, rootItem } = promoteItem(state, props.item);
+    const { idToCard, rootCard } = promoteCard(state, props.card);
 
     dispatch({
       type: 'MERGE_ITEMS',
-      idToItem,
+      idToCard,
     });
 
     const stack = props.surveyorState.stack.slice();
     stack.push({
       originalQuery: '',
       query: '',
-      itemIds: [rootItem.id],
+      cardIds: [rootCard.id],
     });
     props.setSurveyorState({
       ...props.surveyorState,
@@ -254,7 +254,7 @@ export default function ItemComponent(props: ItemComponentProps) {
 
   const post = client.cache.readFragment({
     id: client.cache.identify({
-      id: props.item.postId,
+      id: props.card.postId,
       __typename: 'Post',
     }),
     fragment: FULL_POST_FIELDS,
@@ -263,10 +263,10 @@ export default function ItemComponent(props: ItemComponentProps) {
 
   if (!post) return null;
 
-  const link = props.item.linkId
+  const link = props.card.linkId
   ? client.cache.readFragment({
       id: client.cache.identify({
-        id: props.item.linkId,
+        id: props.card.linkId,
         __typename: 'Link',
       }),
       fragment: gql`
@@ -293,22 +293,22 @@ export default function ItemComponent(props: ItemComponentProps) {
       return false;
     });
   }
-  else if (props.item.linkId) {
-    console.error('Missing link', props.item.linkId)
+  else if (props.card.linkId) {
+    console.error('Missing link', props.card.linkId)
   }
 
   const color = getColor(paletteDetail.mode);
 
   const isLinking = (
-    linkDetail.sourcePostId === props.item.postId || 
-    linkDetail.targetPostId === props.item.postId
+    linkDetail.sourcePostId === props.card.postId || 
+    linkDetail.targetPostId === props.card.postId
   );
 
-  const subbed = userDetail?.subs.some(sub => sub.postId === props.item.postId);
+  const subbed = userDetail?.subs.some(sub => sub.postId === props.card.postId);
   
   const slice = props.surveyorState.stack[props.surveyorState.index];
   return (
-    <Card elevation={5} 
+    <MUICard elevation={5} 
       onMouseEnter={handleMouseEnter} 
       onMouseLeave={handleMouseLeave} 
       onClick={handleClick}
@@ -319,7 +319,7 @@ export default function ItemComponent(props: ItemComponentProps) {
         backgroundColor: isLinking
           ? getColor(paletteDetail.mode, true)
           : '',
-        cursor: linkDetail.sourcePostId && linkDetail.sourcePostId !== props.item.postId
+        cursor: linkDetail.sourcePostId && linkDetail.sourcePostId !== props.card.postId
           ? 'crosshair'
           : '', 
         border: post.userId === userDetail?.id 
@@ -330,7 +330,7 @@ export default function ItemComponent(props: ItemComponentProps) {
       <PostComponent
         colUnit={props.colUnit}
         post={post}
-        itemId={props.item.id}
+        cardId={props.card.id}
       />
       <Box sx={{
         display: 'flex',
@@ -340,7 +340,7 @@ export default function ItemComponent(props: ItemComponentProps) {
       }}>
         {
           link 
-            ? <Card variant='outlined' sx={{
+            ? <MUICard variant='outlined' sx={{
                 marginBottom: '8px',
               }}>
                 <Button 
@@ -404,7 +404,7 @@ export default function ItemComponent(props: ItemComponentProps) {
                       : <RemoveIcon fontSize='inherit' />
                   }
                 </Button>
-              </Card>
+              </MUICard>
             : null
         }
         <Box sx={{ 
@@ -520,7 +520,7 @@ export default function ItemComponent(props: ItemComponentProps) {
               }
 
               {
-                props.depth !== 0 || slice.itemIds.length !== 1
+                props.depth !== 0 || slice.cardIds.length !== 1
                   ? <MenuItem onClick={handlePromoteClick} sx={{
                       fontSize: 14,
                     }}>
@@ -551,7 +551,7 @@ export default function ItemComponent(props: ItemComponentProps) {
             onClick={handlePrevClick}
             color='inherit'
             size='small'
-            variant={props.item.showPrev ? 'outlined' : 'text'}
+            variant={props.card.showPrev ? 'outlined' : 'text'}
             sx={{
               fontSize: 10,
               minWidth: 0,
@@ -564,7 +564,7 @@ export default function ItemComponent(props: ItemComponentProps) {
             onClick={handleNextClick}
             color='inherit'
             size='small'
-            variant={props.item.showNext ? 'outlined' : 'text'}
+            variant={props.card.showNext ? 'outlined' : 'text'}
             sx={{
               fontSize: 10,
               maxWidth: '50px',
@@ -575,6 +575,6 @@ export default function ItemComponent(props: ItemComponentProps) {
           </Button>
         </Box>
       </Box>
-    </Card>
+    </MUICard>
   )
 }

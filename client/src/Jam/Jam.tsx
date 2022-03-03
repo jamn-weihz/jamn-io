@@ -131,9 +131,6 @@ export default function JamComponent(props: JamComponentProps) {
                 </ColLink>
                 &nbsp;&nbsp;
                 <ColLink col={props.colUnit.col} pathname={`/j/${jam1.name}/settings`} sx={{
-                  display: role && role.type === 'ADMIN'
-                    ? 'initial'
-                    : 'none',
                   color: path[3] === 'settings' ? jam1.color : color,
                 }}>
                   Settings

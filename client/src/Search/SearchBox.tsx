@@ -62,7 +62,7 @@ function SearchBox(props: SearchBoxProps) {
     stack.push({
       originalQuery: query,
       query,
-      itemIds: [],
+      cardIds: [],
     });
     props.setSurveyorState({
       ...props.surveyorState,

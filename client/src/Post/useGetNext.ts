@@ -1,6 +1,6 @@
 import { gql, useMutation } from '@apollo/client';
 import { useContext } from 'react';
-import { ItemContext } from '../App';
+import { CardContext } from '../App';
 import { LINK_FIELDS, VOTE_FIELDS, FULL_POST_FIELDS } from '../fragments';
 
 const GET_NEXT = gql`
@@ -24,8 +24,8 @@ const GET_NEXT = gql`
   ${VOTE_FIELDS}
 `;
 
-export default function useGetNext(itemId: string, postId: string) {
-  const { dispatch } = useContext(ItemContext);
+export default function useGetNext(cardId: string, postId: string) {
+  const { dispatch } = useContext(CardContext);
 
   const [getNextLinks] = useMutation(GET_NEXT, {
     onError: error => {
@@ -35,7 +35,7 @@ export default function useGetNext(itemId: string, postId: string) {
       console.log(data);
       dispatch({
         type: 'ADD_NEXT',
-        itemId,
+        cardId,
         outLinks: data.getNext,
       })
     },

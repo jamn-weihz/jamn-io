@@ -18,7 +18,7 @@ import linkifyIt, { LinkifyIt } from 'linkify-it';
 import tlds from 'tlds';
 import moveSelectionToEnd from './moveSelectionToEnd';
 import { ColUnit } from '../../types/Col';
-import { ItemContext } from '../../App';
+import { CardContext } from '../../App';
 
 const iframelyPlugin = createIframelyPlugin();
 
@@ -40,15 +40,15 @@ interface EditorComponentProps {
   post: Post;
   isReadonly: boolean;
   colUnit: ColUnit;
-  itemId: string;
+  cardId: string;
 }
 export default function EditorComponent(props: EditorComponentProps) {
-  const { state, dispatch } = useContext(ItemContext);
+  const { state, dispatch } = useContext(CardContext);
 
   const userDetail = useReactiveVar(userVar);
   const focusDetail = useReactiveVar(focusVar);
 
-  const { savePost } = useSavePost(props.post.id, props.itemId);
+  const { savePost } = useSavePost(props.post.id, props.cardId);
 
   const [saveTimeout, setSaveTimeout] = useState(null as ReturnType<typeof setTimeout> | null);
   const [focused, setFocused] = useState(false);
@@ -78,16 +78,16 @@ export default function EditorComponent(props: EditorComponentProps) {
   });
 
   useEffect(() => {
-    if (state[props.itemId].isNewlySaved) {
+    if (state[props.cardId].isNewlySaved) {
       dispatch({
         type: 'UPDATE_ITEM',
-        item: {
-          ...state[props.itemId],
+        card: {
+          ...state[props.cardId],
           isNewlySaved: false,
         },
       });
     }
-    if (state[props.itemId].refreshPost && props.post.draft) {
+    if (state[props.cardId].refreshPost && props.post.draft) {
       const contentState = convertFromRaw(JSON.parse(props.post.draft));
       if (focused) {
         setEditorState(moveSelectionToEnd(EditorState.createWithContent(contentState)));
@@ -99,13 +99,13 @@ export default function EditorComponent(props: EditorComponentProps) {
       }
       dispatch({
         type: 'UPDATE_ITEM',
-        item: {
-          ...state[props.itemId],
+        card: {
+          ...state[props.cardId],
           refreshPost: false
         }
       })
     }
-  }, [props.post.draft, state[props.itemId]])
+  }, [props.post.draft, state[props.cardId]])
 
   const handleChange = (newState: EditorState) => {
     if (props.post.userId !== userDetail?.id || props.post.commitDate) {

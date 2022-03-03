@@ -1,5 +1,5 @@
 import { Box, Link as MUILink } from '@mui/material';
-import ItemComponent from './ItemComponent';
+import CardComponent from './CardComponent';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 
 import { useApolloClient } from '@apollo/client';
@@ -11,42 +11,42 @@ import { Col, ColUnit } from '../types/Col';
 import useGetPrev from '../Post/useGetPrev';
 import useGetNext from '../Post/useGetNext';
 import { LOAD_LIMIT } from '../constants';
-import { ItemContext } from '../App';
+import { CardContext } from '../App';
 import { Jam } from '../types/Jam';
 
-interface ItemTreeProps {
+interface CardTreeProps {
   post?: Post;
   jam?: Jam;
   colUnit: ColUnit;
-  itemId: string;
+  cardId: string;
   depth: number;
   surveyorState: SurveyorState;
   setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
   hideOpaquePosts: boolean;
 }
-export default function ItemTree(props: ItemTreeProps) {
+export default function CardTree(props: CardTreeProps) {
   const client = useApolloClient();
 
-  const {state, dispatch} = useContext(ItemContext);
-  const item = state[props.itemId];
+  const {state, dispatch} = useContext(CardContext);
+  const card = state[props.cardId];
 
-  const { getPrev } = useGetPrev(props.itemId, item?.postId);
-  const { getNext } = useGetNext(props.itemId, item?.postId);
+  const { getPrev } = useGetPrev(props.cardId, card?.postId);
+  const { getNext } = useGetNext(props.cardId, card?.postId);
 
-  if (!item) return null;
+  if (!card) return null;
 
   const handleLoadClick = (event: React.MouseEvent) => {
-    if (item.showPrev) {
-      getPrev(item.prevIds.length);
+    if (card.showPrev) {
+      getPrev(card.prevIds.length);
     }
-    else if (item.showNext) {
-      getNext(item.nextIds.length);
+    else if (card.showNext) {
+      getNext(card.nextIds.length);
     }
   }
 
   const post = client.cache.readFragment({
     id: client.cache.identify({
-      id: item.postId,
+      id: card.postId,
       __typename: 'Post',
     }),
     fragment: FULL_POST_FIELDS,
@@ -54,17 +54,17 @@ export default function ItemTree(props: ItemTreeProps) {
   }) as Post;
 
   let remaining = 0;
-  let itemIds = [] as string[];
-  if (item.showPrev) {
-    itemIds = item.prevIds;
-    remaining = itemIds.length > 0
-      ? Math.min(LOAD_LIMIT, post.prevCount - itemIds.length)
+  let cardIds = [] as string[];
+  if (card.showPrev) {
+    cardIds = card.prevIds;
+    remaining = cardIds.length > 0
+      ? Math.min(LOAD_LIMIT, post.prevCount - cardIds.length)
       : 0;
   }
-  else if (item.showNext) {
-    itemIds = item.nextIds;
-    remaining = itemIds.length > 0 
-      ? Math.min(LOAD_LIMIT, post.nextCount - itemIds.length)
+  else if (card.showNext) {
+    cardIds = card.nextIds;
+    remaining = cardIds.length > 0 
+      ? Math.min(LOAD_LIMIT, post.nextCount - cardIds.length)
       : 0;
   }
 
@@ -79,9 +79,9 @@ export default function ItemTree(props: ItemTreeProps) {
         flexDirection: 'row',
         justifyContent: 'space-between',
       }}>
-        <ItemComponent
+        <CardComponent
           colUnit={props.colUnit}
-          item={item}
+          card={card}
           depth={props.depth}
           surveyorState={props.surveyorState}
           setSurveyorState={props.setSurveyorState}
@@ -94,11 +94,11 @@ export default function ItemTree(props: ItemTreeProps) {
         marginLeft: '8px',
       }}>
         {
-          itemIds.map(itemId => {
+          cardIds.map(cardId => {
             return (
-              <ItemTree
-                key={`surveyor-tree-${itemId}`}
-                itemId={itemId}
+              <CardTree
+                key={`surveyor-tree-${cardId}`}
+                cardId={cardId}
                 depth={props.depth + 1}
                 colUnit={props.colUnit}
                 surveyorState={props.surveyorState}

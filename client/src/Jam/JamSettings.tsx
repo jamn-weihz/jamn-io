@@ -49,6 +49,8 @@ export default function JamSettings(props: JamSettingsProps) {
 
   const [colorTimeout, setColorTimeout] = useState(null as ReturnType<typeof setTimeout> | null);
 
+  const isAdmin = props.jam.roles.some(role => role.type === 'ADMIN' && role.userId === userDetail?.id)
+  
   const [setJamColor] = useMutation(SET_JAM_COLOR, {
     onError: error => {
       console.error(error);
@@ -95,10 +97,12 @@ export default function JamSettings(props: JamSettingsProps) {
   });
 
   const handleColorChange = (color: any) => {
+    if (!isAdmin) return; 
     setColor(color.hex);
   };
 
   const handleColorChangeComplete = (color: any) => {
+    if (!isAdmin) return;
     if (colorTimeout) {
       clearTimeout(colorTimeout);
     }
@@ -116,6 +120,7 @@ export default function JamSettings(props: JamSettingsProps) {
   };
 
   const handleCloseChange = () => {
+    if (!isAdmin) return;
     setJamIsClosed({
       variables: {
         sessionId: sessionDetail.id,
@@ -127,6 +132,7 @@ export default function JamSettings(props: JamSettingsProps) {
   }
 
   const handlePrivateChange = () => {
+    if (!isAdmin) return;
     setJamIsPrivate({
       variables: {
         sessionId: sessionDetail.id,
@@ -137,9 +143,6 @@ export default function JamSettings(props: JamSettingsProps) {
     setIsPrivate(!isPrivate);
   }
 
-  if (!props.jam.roles.some(role => role.type === 'ADMIN' && role.userId === userDetail?.id))
-    return null;
-  
   return (
     <Box>
       <Card elevation={5} sx={{
@@ -151,7 +154,7 @@ export default function JamSettings(props: JamSettingsProps) {
           flexDirection: 'row',
           margin: 1,
         }}>
-          <Checkbox checked={isClosed} onChange={handleCloseChange}/>
+          <Checkbox disabled={!isAdmin} checked={isClosed} onChange={handleCloseChange}/>
           Closed (new members require approval)
         </Box>
         <Box sx={{
@@ -159,7 +162,7 @@ export default function JamSettings(props: JamSettingsProps) {
           display: 'flex',
           flexDirection: 'row',
         }}>
-          <Checkbox checked={isPrivate} onChange={handlePrivateChange}/>
+          <Checkbox disabled={!isAdmin} checked={isPrivate} onChange={handlePrivateChange}/>
           Private (posts visible only to members)
         </Box>
         <Box sx={{

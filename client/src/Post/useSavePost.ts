@@ -1,8 +1,8 @@
 import { gql, useApolloClient, useMutation, useReactiveVar } from '@apollo/client';
 import { useContext } from 'react';
-import { ItemContext, PostContext } from '../App';
+import { CardContext, PostContext } from '../App';
 import { snackbarVar, sessionVar } from '../cache';
-import { ItemState } from '../types/Item';
+import { CardState } from '../types/Card';
 
 const SAVE_POST = gql`
   mutation SavePost($sessionId: String!, $postId: String!, $draft: String!) {
@@ -16,11 +16,11 @@ const SAVE_POST = gql`
   }
 `;
 
-export default function useSavePost(postId: string, itemId: string) {
+export default function useSavePost(postId: string, cardId: string) {
   const client = useApolloClient();
 
   const { state: postState } = useContext(PostContext);
-  const { state, dispatch } = useContext(ItemContext);
+  const { state, dispatch } = useContext(CardContext);
   
   const sessionDetail = useReactiveVar(sessionVar);
   const [save] = useMutation(SAVE_POST, {
@@ -35,17 +35,17 @@ export default function useSavePost(postId: string, itemId: string) {
     },
     onCompleted: data => {
       console.log(data);
-      const idToItem: ItemState = {};
+      const idToCard: CardState = {};
 
       postState[postId].forEach(id => {
-        if (id === itemId) {
-          idToItem[id] = {
+        if (id === cardId) {
+          idToCard[id] = {
             ...state[id],
             isNewlySaved: true,
           }
         }
         else {
-          idToItem[id] = {
+          idToCard[id] = {
             ...state[id],
             refreshPost: true,
           };
@@ -54,7 +54,7 @@ export default function useSavePost(postId: string, itemId: string) {
 
       dispatch({
         type: 'MERGE_ITEMS',
-        idToItem,
+        idToCard,
       });
     },
   });

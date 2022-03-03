@@ -1,7 +1,7 @@
 export type SurveyorSlice = {
   originalQuery: string;
   query: string;
-  itemIds: string[];
+  cardIds: string[];
 }
 
 export type SurveyorState = {
@@ -14,7 +14,7 @@ export type SurveyorState = {
 }
 
 export type ChildrenState = {
-  [itemId: string]: string[],
+  [cardId: string]: string[],
 }
 
 export type ChildrenAction = {

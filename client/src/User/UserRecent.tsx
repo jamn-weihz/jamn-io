@@ -1,11 +1,11 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { Box, Link } from '@mui/material';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { ItemContext } from '../App';
-import Surveyor from '../Item/ItemSurveyor';
+import { CardContext } from '../App';
+import Surveyor from '../Card/CardSurveyor';
 import Loading from '../Loading';
 import { ColUnit } from '../types/Col';
-import { Item, ItemState } from '../types/Item';
+import { Card, CardState } from '../types/Card';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
 import { User } from '../types/User';
 import { Vote } from '../types/Vote';
@@ -29,7 +29,7 @@ interface UserRecentProps {
 }
 
 export default function UserRecent(props: UserRecentProps) {
-  const { state, dispatch } = useContext(ItemContext);
+  const { state, dispatch } = useContext(CardContext);
 
   const userDetail = useReactiveVar(userVar);
 
@@ -38,7 +38,7 @@ export default function UserRecent(props: UserRecentProps) {
     stack: [{
       originalQuery: '',
       query: '',
-      itemIds: [],
+      cardIds: [],
     }],
     reload: false,
     triggerRefinement: false,
@@ -54,25 +54,25 @@ export default function UserRecent(props: UserRecentProps) {
   userUserVoteSubscription(props.user.id, (vote: Vote) => {
     const slice = surveyorState.stack[surveyorState.index];
 
-    let itemId = '';
-    slice.itemIds.some(id => {
+    let cardId = '';
+    slice.cardIds.some(id => {
       if (state[id].postId === vote.sourcePostId) {
         const hasTargetPost = state[id].nextIds.some(nextId => {
           return state[nextId].postId === vote.targetPostId;
         })
         if (hasTargetPost) {
-          itemId = id;
+          cardId = id;
           return true;
         }
       }
       return false;
     });
 
-    if (itemId) {
+    if (cardId) {
       const stack = surveyorState.stack.slice();
       stack.splice(surveyorState.index, 1, {
         ...slice,
-        itemIds: [...slice.itemIds.filter(id => id !== itemId), itemId],
+        cardIds: [...slice.cardIds.filter(id => id !== cardId), cardId],
       });
       setSurveyorState({
         ...surveyorState,
@@ -80,7 +80,7 @@ export default function UserRecent(props: UserRecentProps) {
       });
     }
     else {
-      const targetItem: Item = {
+      const targetCard: Card = {
         id: uuidv4(),
         userId: vote.targetPost.userId,
         parentId: '',
@@ -93,9 +93,9 @@ export default function UserRecent(props: UserRecentProps) {
         isNewlySaved: false,
         refreshPost: false,
         getLinks: false,
-        isRootRecentUserVoteItem: false,
+        isRootRecentUserVoteCard: false,
       };
-      const sourceItem: Item = {
+      const sourceCard: Card = {
         id: uuidv4(),
         userId: vote.sourcePost.userId,
         parentId: '',
@@ -103,25 +103,25 @@ export default function UserRecent(props: UserRecentProps) {
         postId: vote.sourcePostId,
         showNext: true,
         showPrev: false,
-        nextIds: [targetItem.id],
+        nextIds: [targetCard.id],
         prevIds: [],
         isNewlySaved: false,
         refreshPost: false,
         getLinks: false,
-        isRootRecentUserVoteItem: true,
+        isRootRecentUserVoteCard: true,
       };
       dispatch({
         type: 'MERGE_ITEMS',
-        idToItem: {
-          [sourceItem.id]: sourceItem,
-          [targetItem.id]: targetItem,
+        idToCard: {
+          [sourceCard.id]: sourceCard,
+          [targetCard.id]: targetCard,
         },
       });
 
       const stack = surveyorState.stack.slice();
       stack.splice(surveyorState.index, 1, {
         ...slice,
-        itemIds: [...slice.itemIds, sourceItem.id],
+        cardIds: [...slice.cardIds, sourceCard.id],
       });
       setSurveyorState({
         ...surveyorState,
@@ -140,27 +140,27 @@ export default function UserRecent(props: UserRecentProps) {
 
       const slice = surveyorState.stack[surveyorState.index];
 
-      const itemIds: string[] = [];
-      const idToItem: ItemState = {};
+      const cardIds: string[] = [];
+      const idToCard: CardState = {};
       data.getRecentUserVotes.forEach((vote: Vote) => {
-        let itemId;
-        slice.itemIds.some(id => {
+        let cardId;
+        slice.cardIds.some(id => {
           if (state[id].postId === vote.sourcePostId) {
             const hasTargetPost = state[id].nextIds.some(nextId => {
               return state[nextId].postId === vote.targetPostId;
             })
             if (hasTargetPost) {
-              itemId = id;
+              cardId = id;
               return true;
             }
           }
           return false;
         });
-        if (itemId) {
-          itemIds.push(itemId)
+        if (cardId) {
+          cardIds.push(cardId)
         }
         else {
-          const targetItem: Item = {
+          const targetCard: Card = {
             id: uuidv4(),
             userId: vote.targetPost.userId,
             parentId: '',
@@ -173,9 +173,9 @@ export default function UserRecent(props: UserRecentProps) {
             isNewlySaved: false,
             refreshPost: false,
             getLinks: false,
-            isRootRecentUserVoteItem: false,
+            isRootRecentUserVoteCard: false,
           };
-          const sourceItem: Item = {
+          const sourceCard: Card = {
             id: uuidv4(),
             userId: vote.sourcePost.userId,
             parentId: '',
@@ -183,28 +183,28 @@ export default function UserRecent(props: UserRecentProps) {
             postId: vote.sourcePostId,
             showNext: true,
             showPrev: false,
-            nextIds: [targetItem.id],
+            nextIds: [targetCard.id],
             prevIds: [],
             isNewlySaved: false,
             refreshPost: false,
             getLinks: false,
-            isRootRecentUserVoteItem: true,
+            isRootRecentUserVoteCard: true,
           };
-          idToItem[sourceItem.id] = sourceItem;
-          idToItem[targetItem.id] = targetItem;
-          itemIds.push(sourceItem.id);
+          idToCard[sourceCard.id] = sourceCard;
+          idToCard[targetCard.id] = targetCard;
+          cardIds.push(sourceCard.id);
         }
       });
 
       dispatch({
         type: 'MERGE_ITEMS',
-        idToItem,
+        idToCard,
       });
 
       const stack = surveyorState.stack.slice();
       stack.splice(surveyorState.index, 1, {
         ...slice,
-        itemIds: [...itemIds.reverse(), ...slice.itemIds]
+        cardIds: [...cardIds.reverse(), ...slice.cardIds]
       });
 
       setSurveyorState({
@@ -243,13 +243,13 @@ export default function UserRecent(props: UserRecentProps) {
     if (scrollTop < 500) {
       if (!isLoading) {
         const slice = surveyorState.stack[surveyorState.index];
-        const remaining = props.user.voteI - slice.itemIds.length;
+        const remaining = props.user.voteI - slice.cardIds.length;
         if (remaining > 0) {
           setIsLoading(true);
           getRecent({
             variables: {
               userId: props.user.id,
-              offset: slice.itemIds.length,
+              offset: slice.cardIds.length,
             }
           });
         }
@@ -273,14 +273,14 @@ export default function UserRecent(props: UserRecentProps) {
       getRecent({
         variables: {
           userId: props.user.id,
-          offset: slice.itemIds.length,
+          offset: slice.cardIds.length,
         }
       })
     }
   }
 
   const slice = surveyorState.stack[surveyorState.index];
-  const remaining = props.user.voteI - slice.itemIds.length;
+  const remaining = props.user.voteI - slice.cardIds.length;
 
   return (
     <Box ref={containerEl} sx={{

@@ -27,7 +27,7 @@ export default function AppBar(props: AppbarProps) {
   const sizeDetail = useReactiveVar(sizeVar);
   const paletteDetail = useReactiveVar(paletteVar);
 
-  const handleItemClick = (col: Col) => (event: React.MouseEvent) => {
+  const handleCardClick = (col: Col) => (event: React.MouseEvent) => {
     console.log(col);
     event.stopPropagation();
 
@@ -75,7 +75,7 @@ export default function AppBar(props: AppbarProps) {
       <Box key={'appbar-col-'+colUnit.col.id} sx={{
         padding: '5px',
       }}>
-        <IconButton size='small' onClick={handleItemClick(colUnit.col)} sx={{
+        <IconButton size='small' onClick={handleCardClick(colUnit.col)} sx={{
           fontSize: sizeDetail.width < MOBILE_WIDTH ? 16 : 32,
           color: colUnit.col.i === state.i
             ? userDetail?.color || DEFAULT_COLOR

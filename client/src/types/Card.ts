@@ -1,6 +1,6 @@
 import { Link } from "./Link"
 
-export type Item = {
+export type Card = {
   id: string;
   userId: string;
   parentId: string;
@@ -13,22 +13,22 @@ export type Item = {
   isNewlySaved: boolean;
   refreshPost: boolean;
   getLinks: boolean;
-  isRootRecentUserVoteItem: boolean;
+  isRootRecentUserVoteCard: boolean;
 }
 
-export type ItemState = {
-  [id: string]: Item
+export type CardState = {
+  [id: string]: Card
 }
 
 export type AddPrevAction = {
   type: 'ADD_PREV';
-  itemId: string;
+  cardId: string;
   inLinks: Link[];
 }
 
 export type AddNextAction = {
   type: 'ADD_NEXT';
-  itemId: string;
+  cardId: string;
   outLinks: Link[];
 }
 export type AddLinkAction = {
@@ -39,19 +39,19 @@ export type RemoveLinkAction = {
   type: 'REMOVE_LINK';
   link: Link;
 }
-export type MergeItemsAction = {
+export type MergeCardsAction = {
   type: 'MERGE_ITEMS';
-  idToItem: ItemState;
+  idToCard: CardState;
 }
 
-export type UpdateItemAction = {
+export type UpdateCardAction = {
   type: 'UPDATE_ITEM';
-  item: Item;
+  card: Card;
 }
 
-export type ItemAction = 
-  MergeItemsAction |
-  UpdateItemAction |
+export type CardAction = 
+  MergeCardsAction |
+  UpdateCardAction |
   AddPrevAction |
   AddNextAction |
   AddLinkAction |

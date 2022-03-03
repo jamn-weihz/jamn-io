@@ -10,6 +10,7 @@ import React from 'react';
 import { getColor } from '../utils';
 import useFollowUser from './useFollowUser';
 import useUnfollowUser from './useUnfollowUser';
+import useLeadSubscription from './useLeadSubscription';
 
 interface UserFollowersProps {
   user: User;

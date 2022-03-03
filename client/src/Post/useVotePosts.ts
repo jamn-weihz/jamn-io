@@ -1,6 +1,6 @@
 import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { Dispatch, SetStateAction, useContext } from 'react';
-import { ItemContext } from '../App';
+import { CardContext } from '../App';
 import { snackbarVar, sessionVar } from '../cache';
 import { LINK_FIELDS, VOTE_FIELDS } from '../fragments';
 
@@ -27,7 +27,7 @@ const VOTE_POSTS = gql`
 
 
 export default function useVotePosts(setIsVoting: Dispatch<SetStateAction<boolean>>) {
-  const { dispatch } = useContext(ItemContext);
+  const { dispatch } = useContext(CardContext);
   const sessionDetail = useReactiveVar(sessionVar);
   const [vote] = useMutation(VOTE_POSTS, {
     onError: error => {
