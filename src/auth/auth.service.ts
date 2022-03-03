@@ -79,7 +79,7 @@ export class AuthService {
       name: 'Authentication',
       value: '',
       options: {
-        httpOnly: true,
+        httpOnly: false,
         path: '/',
         maxAge: 0,
       }
@@ -88,7 +88,7 @@ export class AuthService {
       name: 'Refresh',
       value: '',
       options: {
-        httpOnly: true,
+        httpOnly: false,
         path: '/',
         maxAge: 0,
       }
@@ -148,7 +148,7 @@ export class AuthService {
       name: 'Authentication',
       value: token,
       options: {
-        httpOnly: true,
+        httpOnly: false,
         path: '/',
         maxAge: parseInt(expirationTime) * 1000,
       }
@@ -167,7 +167,7 @@ export class AuthService {
       name: 'Refresh',
       value: token,
       options: {
-        httpOnly: true,
+        httpOnly: false,
         path: '/',
         maxAge: parseInt(expirationTime) * 1000,
       }

@@ -1,4 +1,4 @@
-import Surveyor from '../Surveyor/Surveyor';
+import Surveyor from '../Item/ItemSurveyor';
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Card, IconButton } from '@mui/material';
 import { ColUnit } from '../types/Col';

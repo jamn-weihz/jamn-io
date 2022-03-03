@@ -16,10 +16,10 @@ import { PostAction, PostState } from './types/Post';
 import useSavePostSubcription from './Post/useSavePostSubcription';
 import useLinkPostsSubcription from './Post/useLinkPostsSubscription';
 import { ItemAction, ItemState } from './types/Item';
-import reduceAddPrev from './Surveyor/reduceAddPrev';
-import reduceAddNext from './Surveyor/reduceAddNext';
-import reduceAddLink from './Surveyor/reduceAddLink';
-import reduceRemoveLink from './Surveyor/reduceRemoveLink';
+import reduceAddPrev from './Item/reduceAddPrev';
+import reduceAddNext from './Item/reduceAddNext';
+import reduceAddLink from './Item/reduceAddLink';
+import reduceRemoveLink from './Item/reduceRemoveLink';
 import SnackBar from './Auth/SnackBar';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useAddCol from './Col/useAddCol';
@@ -340,8 +340,9 @@ function App() {
   const postIds = useMemo(() => Object.keys(postState), [postState]);
 
   const itemReducer = (state: ItemState, action: ItemAction) => {
+    console.log(action);
     switch (action.type) {
-      case 'ADD_ITEMS':
+      case 'MERGE_ITEMS':
         return {
           ...state,
           ...action.idToItem,
@@ -366,7 +367,13 @@ function App() {
 
   const [itemState, itemDispatch] = useReducer(itemReducer, {});
 
-  useSavePostSubcription(postIds);
+  useSavePostSubcription(postIds, {
+    state: postState,
+    dispatch: postDispatch,
+  }, {
+    state: itemState,
+    dispatch: itemDispatch,
+  });
   useLinkPostsSubcription(postIds, itemDispatch);
   
   if (!theme) return null;

@@ -8,7 +8,7 @@ import NotFound from '../NotFound';
 import { ColUnit } from '../types/Col';
 import { Post } from '../types/Post';
 import { v4 as uuidv4 } from 'uuid'; 
-import Surveyor from '../Surveyor/Surveyor';
+import Surveyor from '../Item/ItemSurveyor';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
 import { Item } from '../types/Item';
 import { ItemContext } from '../App';
@@ -45,10 +45,12 @@ export default function PostCol(props: PostColProps) {
         showNext: true,
         prevIds: [],
         nextIds: [],
-        refresh: true,
+        isNewlySaved: false,
+        refreshPost: false,
+        getLinks: true,
       };
       dispatch({
-        type: 'ADD_ITEMS',
+        type: 'MERGE_ITEMS',
         idToItem: {
           [item.id]: item
         },

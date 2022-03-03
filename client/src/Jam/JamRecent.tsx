@@ -1,9 +1,9 @@
-import { gql, useMutation } from '@apollo/client';
+import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { Box, Link } from '@mui/material';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { ItemContext } from '../App';
+import { ItemContext, PostContext } from '../App';
 import { FULL_POST_FIELDS } from '../fragments';
-import Surveyor from '../Surveyor/Surveyor';
+import Surveyor from '../Item/ItemSurveyor';
 import { ColUnit } from '../types/Col';
 import { Jam } from '../types/Jam';
 import { Post } from '../types/Post';
@@ -28,6 +28,8 @@ interface JamRecentProps {
 }
 export default function JamRecent(props: JamRecentProps) {
   const { state, dispatch } = useContext(ItemContext);
+
+  const client = useApolloClient();
 
   const [isLoading, setIsLoading] = useState(false);
   const [scrollTop, setScrollTop] = useState(0);
@@ -58,10 +60,12 @@ export default function JamRecent(props: JamRecentProps) {
       showPrev: false,
       nextIds: [],
       prevIds: [],
-      refresh: false,
+      isNewlySaved: false,
+      refreshPost: false,
+      getLinks: false,
     };
     dispatch({
-      type: 'ADD_ITEMS',
+      type: 'MERGE_ITEMS',
       idToItem: {
         [item.id]: item,
       },
@@ -130,7 +134,9 @@ export default function JamRecent(props: JamRecentProps) {
             showPrev: false,
             nextIds: [],
             prevIds: [],
-            refresh: false,
+            isNewlySaved: false,
+            refreshPost: false,
+            getLinks: false,
           };
           idToItem[item.id] = item;
           itemIds.push(item.id);
@@ -138,7 +144,7 @@ export default function JamRecent(props: JamRecentProps) {
       });
 
       dispatch({
-        type: 'ADD_ITEMS',
+        type: 'MERGE_ITEMS',
         idToItem,
       });
 
@@ -208,7 +214,69 @@ export default function JamRecent(props: JamRecentProps) {
         behavior: 'smooth',
       })
     }
-  }, [containerEl.current?.scrollHeight])
+  }, [containerEl.current?.scrollHeight]);
+
+  useEffect(() => {
+    console.log('it changed bro')
+    const slice = surveyorState.stack[surveyorState.index];
+
+    let hasNewlySaved = slice.itemIds.some(itemId => {
+      return state[itemId].isNewlySaved;
+    })
+
+    const itemIds = slice.itemIds.slice().sort((a, b) => {
+      const postA = client.cache.readFragment({
+        id: client.cache.identify({
+          id: state[a].postId,
+          __typename: 'Post',
+        }),
+        fragment: gql`
+          fragment PostWithSaveDate on Post {
+            id
+            saveDate
+          }
+        `,
+      }) as Post;
+
+      const postB = client.cache.readFragment({
+        id: client.cache.identify({
+          id: state[b].postId,
+          __typename: 'Post',
+        }),
+        fragment: gql`
+          fragment PostWithSaveDate on Post {
+            id
+            saveDate
+          }
+        `,
+      }) as Post;
+
+      return postA.saveDate < postB.saveDate ? -1 : 1;
+    });
+
+    const hasDiff = itemIds.some((id, i) => {
+      return id !== slice.itemIds[i];
+    });
+    console.log(hasDiff)
+
+    if (hasDiff) {
+      const stack = surveyorState.stack.slice();
+      stack.splice(surveyorState.index, 1, {
+        ...slice,
+        itemIds,
+      });
+      setSurveyorState({
+        ...surveyorState,
+        stack,
+      });
+    }
+    if (hasNewlySaved && containerEl.current) {
+      containerEl.current.scrollTo({
+        top: containerEl.current.scrollHeight,
+        behavior: 'smooth',
+      })
+    }
+  }, [state])
 
   const handleLoadMoreClick = (event: React.MouseEvent) => {
     if (!isLoading) {

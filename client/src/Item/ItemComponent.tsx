@@ -18,7 +18,6 @@ import { Post, PostAction } from '../types/Post';
 import { useApolloClient } from '@apollo/client';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { Link } from '../types/Link';
-import { useSearchParams } from 'react-router-dom';
 import { SurveyorState } from '../types/Surveyor';
 import PostComponent from '../Post/PostComponent';
 import useReplyPost from '../Post/useReplyPost';
@@ -37,7 +36,7 @@ import { ItemContext } from '../App';
 import promoteItem from './promoteItem';
 import useChangeCol from '../Col/useChangeCol';
 
-interface SurveyorEntryProps {
+interface ItemComponentProps {
   post?: Post;
   jam?: Jam;
   colUnit: ColUnit;
@@ -47,9 +46,7 @@ interface SurveyorEntryProps {
   setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
 }
 
-export default function SurveyorEntry(props: SurveyorEntryProps) {
-  const [searchParams, setSearchParams] = useSearchParams();
-
+export default function ItemComponent(props: ItemComponentProps) {
   const client = useApolloClient();
   const userDetail = useReactiveVar(userVar);
   const linkDetail = useReactiveVar(linkVar);  
@@ -72,7 +69,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
   const { changeCol } = useChangeCol(0, true);
 
   useEffect(() => {
-    if (props.item.refresh) {
+    if (props.item.getLinks) {
       if (props.item.showNext) {
         getNext(0);
       }
@@ -83,12 +80,12 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
         type: 'UPDATE_ITEM',
         item: {
           ...props.item,
-          refresh: false,
+          getLinks: false,
         }
       });
 
     }
-  }, [props.item.refresh]);
+  }, [props.item.getLinks]);
 
   const handlePrevClick = (event: React.MouseEvent) => {
     if (props.item.showPrev) {
@@ -221,7 +218,7 @@ export default function SurveyorEntry(props: SurveyorEntryProps) {
     const { idToItem, rootItem } = promoteItem(state, props.item);
 
     dispatch({
-      type: 'ADD_ITEMS',
+      type: 'MERGE_ITEMS',
       idToItem,
     });
 

@@ -17,7 +17,8 @@ export default function useJamPostSubscription(jamId: string, onSubscriptionData
     variables: {
       jamId,
     },
-    onSubscriptionData: ({subscriptionData: {data: jamPost}}) => {
+    onSubscriptionData: ({subscriptionData: {data: {jamPost}}}) => {
+      console.log(jamPost);
       client.cache.writeQuery({
         query: gql`
           query WritePost {

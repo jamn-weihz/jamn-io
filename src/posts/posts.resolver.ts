@@ -56,14 +56,27 @@ export class PostsResolver {
     filter: (payload, variables) => {
       if (payload.sessionId === variables.sessionId) return false;
       return variables.cardIds.some(id => id === payload.savePost.id);
-    }
+    },
+    async resolve(this: PostsResolver, value, variables) {
+      console.log(value.savePost);
+      if (value.savePost.jamId) {
+        console.log('herewego')
+        return this.postsService.getPostByIdWithPrivacy(variables.userId, value.savePost.id)
+      }
+      console.log('maybe next time')
+      return value.savePost;
+    },
   })
   savePostSubscription(
+    @Context() context: any,
     @Args('sessionId') sessionId: string,
+    @Args('userId') userId: string,
     @Args('cardIds', {type: () => [String]}) cardIds: string[]
   ) {
-    console.log('savePostSubscription')
-    return this.pubSub.asyncIterator('savePost')
+    console.log('savePostSubscription');
+    if (context.extra.user.id === userId) {
+      return this.pubSub.asyncIterator('savePost')
+    }
   }
 
   @UseInterceptors(GqlAuthInterceptor)

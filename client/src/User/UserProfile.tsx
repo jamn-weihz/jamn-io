@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
-import Surveyor from '../Surveyor/Surveyor';
+import Surveyor from '../Item/ItemSurveyor';
 import { User } from '../types/User';
 import { v4 as uuidv4 } from 'uuid';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
@@ -32,10 +32,12 @@ export default function UserProfile(props: UserProfileProps) {
       showNext: true,
       prevIds: [],
       nextIds: [],
-      refresh: true,
+      isNewlySaved: false,
+      refreshPost: false,
+      getLinks: true,
     };
     dispatch({
-      type: 'ADD_ITEMS',
+      type: 'MERGE_ITEMS',
       idToItem: {
         [item.id]: item
       },

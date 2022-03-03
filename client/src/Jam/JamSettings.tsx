@@ -152,7 +152,7 @@ export default function JamSettings(props: JamSettingsProps) {
         </Box>
         <Box sx={{
           margin: 1,
-          display: 'none',
+          display: 'flex',
           flexDirection: 'row',
         }}>
           <Checkbox checked={isPrivate} onChange={handlePrivateChange}/>

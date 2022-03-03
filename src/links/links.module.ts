@@ -24,11 +24,9 @@ import { JamsModule } from 'src/jams/jams.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return {
-          secret: configService.get('JWT_ACCESS_TOKEN_SECRET')
-        }
-      },
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('JWT_ACCESS_TOKEN_SECRET')
+      }),
     }),
   ],
   providers: [LinksService, LinksResolver],

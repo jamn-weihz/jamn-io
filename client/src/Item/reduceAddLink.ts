@@ -16,7 +16,9 @@ export default function reduceAddLink(state: ItemState, action: any) {
           showNext: false,
           prevIds: [],
           nextIds: [],
-          refresh: false,
+          isNewlySaved: false,
+          refreshPost: false,
+          getLinks: false,
         } as Item;
         idToItem[newItem.id] = newItem;
         idToItem[item.id] = {
@@ -36,7 +38,9 @@ export default function reduceAddLink(state: ItemState, action: any) {
           showNext: false,
           prevIds: [],
           nextIds: [],
-          refresh: false,
+          isNewlySaved: false,
+          refreshPost: false,
+          getLinks: false,
         } as Item;
         idToItem[newItem.id] = newItem;
         idToItem[item.id] = {

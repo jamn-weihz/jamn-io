@@ -9,7 +9,9 @@ export type Item = {
   showNext: boolean;
   prevIds: string[];
   nextIds: string[];
-  refresh: boolean;
+  isNewlySaved: boolean;
+  refreshPost: boolean;
+  getLinks: boolean;
 }
 
 export type ItemState = {
@@ -35,8 +37,8 @@ export type RemoveLinkAction = {
   type: 'REMOVE_LINK';
   link: Link;
 }
-export type AddItemsAction = {
-  type: 'ADD_ITEMS';
+export type MergeItemsAction = {
+  type: 'MERGE_ITEMS';
   idToItem: ItemState;
 }
 
@@ -46,7 +48,7 @@ export type UpdateItemAction = {
 }
 
 export type ItemAction = 
-  AddItemsAction |
+  MergeItemsAction |
   UpdateItemAction |
   AddPrevAction |
   AddNextAction |

@@ -4,6 +4,7 @@ import { FULL_POST_FIELDS, LINK_FIELDS, VOTE_FIELDS } from '../fragments';
 import { v4 as uuidv4 } from 'uuid';
 import { useContext } from 'react';
 import { ItemContext } from '../App';
+import { Item } from '../types/Item';
 
 const REPLY_POST = gql`
   mutation ReplyPost($sessionId: String!, $sourcePostId: String!, $jamId: String) {
@@ -44,7 +45,7 @@ export default function useReplyPost(itemId: string, sourcePostId: string, jamId
       focusVar({
         postId: data.replyPost.targetPost.id,
       });
-      const newItem = {
+      const newItem: Item = {
         id: uuidv4(),
         parentId: itemId,
         linkId: data.replyPost.id,
@@ -53,10 +54,12 @@ export default function useReplyPost(itemId: string, sourcePostId: string, jamId
         showNext: true,
         prevIds: [],
         nextIds: [],
-        refresh: false,
+        isNewlySaved: false,
+        refreshPost: false,
+        getLinks: false,
       };
       dispatch({
-        type: 'ADD_ITEMS',
+        type: 'MERGE_ITEMS',
         idToItem: {
           [newItem.id]: newItem,
         },

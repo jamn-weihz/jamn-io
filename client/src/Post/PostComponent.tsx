@@ -97,7 +97,12 @@ export default function PostComponent(props: PostComponentProps) {
         }
       </Box>
       <Box>
-        <Editor post={post} isReadonly={false} colUnit={props.colUnit}/>
+        <Editor
+          post={post}
+          isReadonly={false}
+          colUnit={props.colUnit}
+          itemId={props.itemId}
+        />
       </Box>
       <Box sx={{
         display: false && post.userId === userDetail?.id && !post.commitDate

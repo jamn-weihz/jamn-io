@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import {  useContext, useEffect, useState } from 'react';
-import Surveyor from '../Surveyor/Surveyor';
+import Surveyor from '../Item/ItemSurveyor';
 import { Jam } from '../types/Jam';
 import { v4 as uuidv4 } from 'uuid';
 import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
@@ -27,10 +27,12 @@ export default function JamProfile(props: JamProfileProps) {
       showNext: true,
       prevIds: [],
       nextIds: [],
-      refresh: true,
+      isNewlySaved: false,
+      refreshPost: false,
+      getLinks: true,
     };
     dispatch({
-      type: 'ADD_ITEMS',
+      type: 'MERGE_ITEMS',
       idToItem: {
         [item.id]: item
       },

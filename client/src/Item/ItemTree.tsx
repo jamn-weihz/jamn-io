@@ -1,5 +1,5 @@
 import { Box, Link as MUILink } from '@mui/material';
-import SurveyorEntry from './SurveyorEntry';
+import ItemComponent from './ItemComponent';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 
 import { useApolloClient } from '@apollo/client';
@@ -14,7 +14,7 @@ import { LOAD_LIMIT } from '../constants';
 import { ItemContext } from '../App';
 import { Jam } from '../types/Jam';
 
-interface SurveyorTreeProps {
+interface ItemTreeProps {
   post?: Post;
   jam?: Jam;
   colUnit: ColUnit;
@@ -24,7 +24,7 @@ interface SurveyorTreeProps {
   setSurveyorState: Dispatch<SetStateAction<SurveyorState>>;
   hideOpaquePosts: boolean;
 }
-export default function SurveyorTree(props: SurveyorTreeProps) {
+export default function ItemTree(props: ItemTreeProps) {
   const client = useApolloClient();
 
   const {state, dispatch} = useContext(ItemContext);
@@ -68,7 +68,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
       : 0;
   }
 
-  if (!post) return null;
+  if (!post?.id) return null;
 
   if (props.hideOpaquePosts && post.isOpaque) return null;
 
@@ -79,7 +79,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
         flexDirection: 'row',
         justifyContent: 'space-between',
       }}>
-        <SurveyorEntry
+        <ItemComponent
           colUnit={props.colUnit}
           item={item}
           depth={props.depth}
@@ -96,7 +96,7 @@ export default function SurveyorTree(props: SurveyorTreeProps) {
         {
           itemIds.map(itemId => {
             return (
-              <SurveyorTree
+              <ItemTree
                 key={`surveyor-tree-${itemId}`}
                 itemId={itemId}
                 depth={props.depth + 1}

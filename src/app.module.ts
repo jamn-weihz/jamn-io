@@ -19,6 +19,12 @@ import { SearchModule } from './search/search.module';
 import { ColsModule } from './cols/cols.module';
 import { PubSubModule } from './pub-sub/pub-sub.module';
 import * as Joi from 'joi';
+import { Context } from "apollo-server-core";
+import { AuthService } from "./auth/auth.service";
+import { ExtractJwt } from "passport-jwt";
+import { Request } from "express";
+import { JwtModule, JwtService } from "@nestjs/jwt";
+import { UsersService } from "./users/users.service";
 
 @Module({
   imports: [
@@ -58,18 +64,31 @@ import * as Joi from 'joi';
     }),
     GraphQLModule.forRootAsync({
       driver: ApolloDriver,
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configServce: ConfigService) => ({
+      imports: [
+        ConfigModule,
+        JwtModule.register({
+          secret: process.env.JWT_ACCESS_TOKEN_SECRET,
+        }),
+        UsersModule,
+      ],
+      inject: [ConfigService, JwtService, UsersService],
+      useFactory: async (configServce: ConfigService, jwtService: JwtService, usersService: UsersService) => ({
         autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
         sortSchema: true,
-        installSubscriptionHandlers: true,
         subscriptions: {
-          'subscriptions-transport-ws': {
-            path: '/graphql',
-          },
+          'graphql-ws': {
+            onConnect: async (context: Context<any>) => {
+              const { connectionParams, extra } = context;
+              if (connectionParams?.Authentication) {
+                const payload: any = jwtService.decode(connectionParams.Authentication);
+                const user = await usersService.getUserById(payload.userId);
+                extra.user = user;
+              }
+            }
+          }
         },
-        context: ({req, res}) => ({req, res}),
+        //installSubscriptionHandlers: true,
+        context: ({req, res, connection, extra}) => ({req, res, connection, extra}),
         cors: configServce.get('ENV') === 'production'
           ?  false
           : {

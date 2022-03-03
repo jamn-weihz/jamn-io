@@ -137,12 +137,25 @@ export class LinksResolver {
         targetPost,
         votes,
       },
-    })
+    });
+    if (targetPost.jamId) {
+      const jam = await this.jamsService.getJamById(jamId);
+      this.pubSub.publish('jamPost', {
+        jamId: targetPost.jamId,
+        jamPost: {
+          ...targetPost,
+          user,
+          jam,
+        }
+      })
+    }
+
     return link;
   }
 
   @Subscription(() => Post, {name: 'jamPost', 
     filter: (payload, variables) => {
+      console.log(payload, variables);
       return payload.jamId === variables.jamId;
     }
   })
@@ -150,7 +163,6 @@ export class LinksResolver {
     @Context() context: any,
     @Args('jamId') jamId: string,
   ) {
-    console.log('context', context);
     return this.pubSub.asyncIterator('jamPost');
   }
 

@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { useRef, Dispatch, SetStateAction, useEffect } from 'react';
 import { SurveyorState } from '../types/Surveyor';
-import SurveyorTree from './SurveyorTree';
+import ItemTree from './ItemTree';
 import { ColUnit } from '../types/Col';
 import { Jam } from '../types/Jam';
 import { Post } from '../types/Post';
@@ -36,7 +36,7 @@ export default function Surveyor(props: SurveyorProps) {
       { 
         slice.itemIds.map((itemId, i) => {
           return (
-            <SurveyorTree
+            <ItemTree
               key={`surveyor-tree-${itemId}`}
               itemId={itemId}
               depth={0}

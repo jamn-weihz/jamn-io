@@ -13,9 +13,9 @@ export class GqlAuthInterceptor implements NestInterceptor {
     private readonly usersService: UsersService,
   ) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: any, next: CallHandler): Observable<any> {
     const ctx = GqlExecutionContext.create(context);
-    const token = ctx.getContext().req.cookies.Authentication;
+    const token = ctx.getContext().req?.cookies.Authentication;
     const payload = this.jwtService.decode(token) as any;
 
     if (payload?.userId) {

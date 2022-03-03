@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Post } from '../../types/Post';
 import {
   EditorState,
@@ -18,6 +18,7 @@ import linkifyIt, { LinkifyIt } from 'linkify-it';
 import tlds from 'tlds';
 import moveSelectionToEnd from './moveSelectionToEnd';
 import { ColUnit } from '../../types/Col';
+import { ItemContext } from '../../App';
 
 const iframelyPlugin = createIframelyPlugin();
 
@@ -39,15 +40,16 @@ interface EditorComponentProps {
   post: Post;
   isReadonly: boolean;
   colUnit: ColUnit;
+  itemId: string;
 }
 export default function EditorComponent(props: EditorComponentProps) {
-  const client = useApolloClient();
+  const { state, dispatch } = useContext(ItemContext);
+
   const userDetail = useReactiveVar(userVar);
   const focusDetail = useReactiveVar(focusVar);
 
-  const { savePost } = useSavePost(props.post.id);
+  const { savePost } = useSavePost(props.post.id, props.itemId);
 
-  const [isSaving, setIsSaving] = useState(false);
   const [saveTimeout, setSaveTimeout] = useState(null as ReturnType<typeof setTimeout> | null);
   const [focused, setFocused] = useState(false);
   const [editorState, setEditorState] = useState(() => {
@@ -76,10 +78,16 @@ export default function EditorComponent(props: EditorComponentProps) {
   });
 
   useEffect(() => {
-    if (isSaving) {
-      setIsSaving(false)
+    if (state[props.itemId].isNewlySaved) {
+      dispatch({
+        type: 'UPDATE_ITEM',
+        item: {
+          ...state[props.itemId],
+          isNewlySaved: false,
+        },
+      });
     }
-    else if (props.post.draft) {
+    if (state[props.itemId].refreshPost && props.post.draft) {
       const contentState = convertFromRaw(JSON.parse(props.post.draft));
       if (focused) {
         setEditorState(moveSelectionToEnd(EditorState.createWithContent(contentState)));
@@ -89,8 +97,15 @@ export default function EditorComponent(props: EditorComponentProps) {
           EditorState.createWithContent(contentState)
         );
       }
+      dispatch({
+        type: 'UPDATE_ITEM',
+        item: {
+          ...state[props.itemId],
+          refreshPost: false
+        }
+      })
     }
-  }, [props.post.draft])
+  }, [props.post.draft, state[props.itemId]])
 
   const handleChange = (newState: EditorState) => {
     if (props.post.userId !== userDetail?.id || props.post.commitDate) {
@@ -107,7 +122,6 @@ export default function EditorComponent(props: EditorComponentProps) {
       const timeout = setTimeout(() => {
         savePost(draft);
         setSaveTimeout(null);
-        setIsSaving(true);
       }, 1000);
       setSaveTimeout(timeout);
     }

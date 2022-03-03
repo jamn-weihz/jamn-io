@@ -11,22 +11,20 @@ import {
   createHttpLink,
   split
 } from '@apollo/client';
-import { WebSocketLink } from '@apollo/client/link/ws';
+//import { WebSocketLink } from '@apollo/client/link/ws';
 import { getMainDefinition } from '@apollo/client/utilities';
 
 import { BrowserRouter } from 'react-router-dom';
 
 import { DEV_SERVER_URI, DEV_WS_SERVER_URI } from './constants';
 
-// for Apollo Client v3:
 import {
   ApolloLink,
   Operation,
   FetchResult,
   Observable,
 } from '@apollo/client/core';
-// or for Apollo Client v2:
-// import { ApolloLink, Operation, FetchResult, Observable } from 'apollo-link'; // yarn add apollo-link
+
 
 import { print } from 'graphql';
 import { createClient, ClientOptions, Client } from 'graphql-ws';
@@ -58,13 +56,18 @@ const wsLink1 = new WebSocketLink1({
     ? window.location.origin.replace(/^http/, 'ws') + '/graphql'
     : `${DEV_WS_SERVER_URI}/graphql`,
   connectionParams: () => {
-    const session = {token: 'asdf'} //getSession();
-    if (!session) {
-      return {};
+    const cookies = document.cookie.split('; ');
+    let authToken;
+    cookies.some(cookie => {
+      authToken = cookie.match(/(?<=Authentication=).*/);
+      return !!authToken;
+    })
+    if (authToken) {
+      return {
+        Authentication: authToken[0]
+      };
     }
-    return {
-      Authorization: `Bearer ${session.token}`,
-    };
+    return {};
   },
   lazy: true,
   on: {
@@ -72,7 +75,7 @@ const wsLink1 = new WebSocketLink1({
     error: (error) => console.error(error),
   }
 });
-
+/*
 const wsLink = new WebSocketLink({
   uri: process.env.NODE_ENV === 'production'
     ? window.location.origin.replace(/^http/, 'ws') + '/graphql'
@@ -80,7 +83,7 @@ const wsLink = new WebSocketLink({
   options: {
     reconnect: true
   }
-});
+});*/
 
 const httpLink = createHttpLink({
   uri: process.env.NODE_ENV === 'production'
@@ -99,7 +102,7 @@ const splitLink = split(
       definition.operation === 'subscription'
     );
   },
-  wsLink,
+  wsLink1,
   httpLink,
 );
 

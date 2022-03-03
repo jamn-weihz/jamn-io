@@ -242,7 +242,7 @@ export class PostsService {
 
     const post1 = await this.postsRepository.save(post0);
     this.searchService.partialUpdatePosts([post1]);
-    return post1;
+    return this.getPostById(post1.id);
   }
 
   incrementPostPrevCount(postId: string, value: number) {

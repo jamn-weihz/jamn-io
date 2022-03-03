@@ -76,7 +76,9 @@ function Hits(props: HitsProps) {
               showPrev: false,
               nextIds: [],
               prevIds: [],
-              refresh: false,
+              isNewlySaved: false,
+              refreshPost: false,
+              getLinks: false,
             };
             idToItem[item.id] = item;
             itemIds.push(item.id);
@@ -93,7 +95,7 @@ function Hits(props: HitsProps) {
     }
     if (Object.keys(idToItem).length) {
       dispatch({
-        type: 'ADD_ITEMS',
+        type: 'MERGE_ITEMS',
         idToItem,
       });
     }
