@@ -134,7 +134,7 @@ export default function JamComponent(props: JamComponentProps) {
                   display: role && role.type === 'ADMIN'
                     ? 'initial'
                     : 'none',
-                  color: path[3] === 's' ? jam1.color : color,
+                  color: path[3] === 'settings' ? jam1.color : color,
                 }}>
                   Settings
                 </ColLink>
