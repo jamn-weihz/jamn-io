@@ -18,6 +18,8 @@ import ColBar from '../Col/ColBar';
 import useUserRoleSubscription from '../Role/useUserRoleSubscription';
 import UserRecent from './UserRecent';
 import UserSubs from './UserSubs';
+import UserLeaders from './UserLeaders';
+import UserFollowers from './UserFollowers';
 
 const GET_USER_BY_NAME = gql`
   query GetUserByName($name: String!) {
@@ -104,6 +106,7 @@ export default function UserComponent(props: UserProps) {
                 padding: 1,
                 marginBottom: 0,
                 borderBottom: '1px solid dimgrey',
+                whiteSpace: 'pre-wrap',
               }}>
                 <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/jams`} sx={{
                   color: path[3] === 'jams' 
@@ -112,7 +115,7 @@ export default function UserComponent(props: UserProps) {
                 }}>
                   Jams
                 </ColLink>
-                &nbsp;&nbsp;
+                { '  ' }
                 <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}`} sx={{
                   color: !path[3] || path[3] === '' 
                     ? user1.color 
@@ -120,7 +123,7 @@ export default function UserComponent(props: UserProps) {
                 }}>
                   Profile
                 </ColLink>
-                &nbsp;&nbsp;
+                { '  ' }
                 <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/recent`} sx={{
                   color: path[3] === 'recent' 
                     ? user1.color 
@@ -128,15 +131,31 @@ export default function UserComponent(props: UserProps) {
                 }}>
                   Recent
                 </ColLink>
-                &nbsp;&nbsp;
-                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/subs`} sx={{
-                  color: path[3] === 'subs' 
+                { '  ' }
+                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/subscriptions`} sx={{
+                  color: path[3] === 'subscriptions' 
                     ? user1.color 
                     : color,
                 }}>
-                  Subs
+                  Subscriptions
                 </ColLink>
-                &nbsp;&nbsp;
+                { '  ' }
+                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/leaders`} sx={{
+                  color: path[3] === 'leaders' 
+                    ? user1.color 
+                    : color,
+                }}>
+                  Leaders
+                </ColLink>
+                { '  ' }
+                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/followers`} sx={{
+                  color: path[3] === 'followers' 
+                    ? user1.color 
+                    : color,
+                }}>
+                  Followers
+                </ColLink>
+                { '  ' }
                 <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/settings`} sx={{
                   display: user1.id === userDetail?.id
                     ? 'initial'
@@ -150,7 +169,6 @@ export default function UserComponent(props: UserProps) {
               </Card>
               <Box sx={{
                 height: '100%',
-                overflow: 'scroll',
               }}>
                 {
                   path[3] === 'jams'
@@ -163,20 +181,30 @@ export default function UserComponent(props: UserProps) {
                           user={user1}
                           colUnit={props.colUnit}
                         />
-                      : path[3] === 'subs'
+                      : path[3] === 'subscriptions'
                           ? <UserSubs 
                               user={user1}
                               colUnit={props.colUnit}
                             />
-                          : path[3] === 'settings'
-                            ? <UserSettings
+                          : path[3] === 'leaders'
+                            ? <UserLeaders
                                 user={user1}
                                 colUnit={props.colUnit}
                               />
-                            : <UserProfile 
-                                user={user1} 
-                                colUnit={props.colUnit} 
-                              />
+                            : path[3] === 'followers'
+                              ? <UserFollowers
+                                  user={user1}
+                                  colUnit={props.colUnit}
+                                />
+                              : path[3] === 'settings'
+                                ? <UserSettings
+                                    user={user1}
+                                    colUnit={props.colUnit}
+                                  />
+                                : <UserProfile 
+                                    user={user1} 
+                                    colUnit={props.colUnit} 
+                                  />
                 }
               </Box>
             </Box>

@@ -1,7 +1,7 @@
 import { useReactiveVar } from '@apollo/client';
 import { Box, Button, Card } from '@mui/material'
 import React from 'react';
-import { paletteVar } from '../cache';
+import { paletteVar, userVar } from '../cache';
 import ColLink from '../Col/ColLink';
 import useRemoveRole from '../Role/useRemoveRole';
 import useRequestRole from '../Role/useRequestRole';
@@ -14,6 +14,7 @@ interface UserJamsProps {
   user: User;
 }
 export default function UserJams(props: UserJamsProps) {
+  const userDetail = useReactiveVar(userVar);
   const paletteDetail = useReactiveVar(paletteVar);
   const { requestRole } = useRequestRole();
   const { removeRole } = useRemoveRole();
@@ -25,11 +26,16 @@ export default function UserJams(props: UserJamsProps) {
     removeRole(roleId);
   }
   return (
-    <Box>
+    <Box sx={{
+      height: userDetail?.id === props.user.id
+        ? 'calc(100% - 150px)'
+        : 'calc(100% - 110px)',
+      overflow: 'scroll',
+    }}>
       {
         props.user.roles.filter(role => !role.deleteDate).map(role => {
           return (
-            <Card elevation={5} key={`role-${role.id}`} sx={{
+            <Card elevation={5} key={`role-${role.id}-${props.colUnit.col.id}`} sx={{
               margin:1,
               padding:1,
               fontSize: 16,

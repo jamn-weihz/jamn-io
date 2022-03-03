@@ -137,7 +137,7 @@ export default function JamSettings(props: JamSettingsProps) {
     setIsPrivate(!isPrivate);
   }
 
-  if (!userDetail?.roles.some(role => role.type === 'ADMIN' && role.jamId === props.jam.id))
+  if (!props.jam.roles.some(role => role.type === 'ADMIN' && role.userId === userDetail?.id))
     return null;
   
   return (

@@ -37,6 +37,16 @@ type Jam {
   updateDate: DateTime!
 }
 
+type Lead {
+  createDate: DateTime!
+  deleteDate: DateTime
+  followerUser: User!
+  followerUserId: String!
+  id: String!
+  leaderUser: User!
+  leaderUserId: String!
+}
+
 type Link {
   clicks: Int!
   createDate: DateTime!
@@ -55,6 +65,7 @@ type Link {
 
 type Mutation {
   addCol(pathname: String!): Col!
+  followUser(userId: String!): Lead!
   getNext(offset: Int!, postId: String!): [Link!]!
   getPosts(postIds: [String!]!): [Post!]!
   getPrev(offset: Int!, postId: String!): [Link!]!
@@ -82,6 +93,7 @@ type Mutation {
   shiftCol(colId: String!, di: Int!): [Col!]!
   startJam(desc: String!, lat: Float!, lng: Float!, name: String!): Jam!
   subPost(postId: String!): Sub!
+  unfollowUser(userId: String!): Lead!
   unsubPost(postId: String!): Sub!
   updateUserMap(lat: Float!, lng: Float!, zoom: Float!): User!
   verifyUser(code: String!): User!
@@ -168,10 +180,12 @@ type User {
   email: String
   focus: Post!
   focusId: String
+  followers: [Lead!]!
   id: String!
   isAdmin: Boolean!
   isRegisteredWithGoogle: Boolean!
   lat: Float
+  leaders: [Lead!]!
   lng: Float
   lowercaseName: String!
   mapLat: Float

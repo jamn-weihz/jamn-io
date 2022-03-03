@@ -71,7 +71,7 @@ export class PostsResolver {
     @Args('userId') userId: string,
     @Args('cardIds', {type: () => [String]}) cardIds: string[]
   ) {
-    console.log('savePostSubscription', context.connection, context.extra.user?.id, userId);
+    console.log('savePostSubscription');
     if (context.extra?.user?.id === userId) {
       return this.pubSub.asyncIterator('savePost');
     }

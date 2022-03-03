@@ -47,6 +47,10 @@ export class SubsService {
     if (!post) {
       throw new BadRequestException('This post does not exist');
     }
+    const sub = await this.getSubByUserIdAndPostId(userId, postId);
+    if (sub) {
+      throw new BadRequestException('Already subbed');
+    }
     const sub0 = new Sub();
     sub0.userId = userId;
     sub0.postId = postId;

@@ -151,6 +151,15 @@ export const SUB_FIELDS = gql`
   }
 `;
 
+export const LEAD_FIELDS = gql`
+  fragment LeadFields on Lead {
+    id
+    leaderUserId
+    followerUserId
+    deleteDate
+  }
+`;
+
 
 export const FULL_USER_FIELDS = gql`
   fragment FullUserFields on User {
@@ -172,12 +181,29 @@ export const FULL_USER_FIELDS = gql`
     subs {
       ...SubFields
     }
+    leaders {
+      ...LeadFields
+      leaderUser {
+        id
+        name
+        color
+      }
+    }
+    followers {
+      ...LeadFields 
+      followerUser {
+        id
+        name
+        color
+      }
+    }
   }
   ${ROLE_FIELDS}
   ${USER_FIELDS}
   ${COL_FIELDS}
   ${FULL_POST_FIELDS}
   ${SUB_FIELDS}
+  ${LEAD_FIELDS}
 `;
 
 export const FULL_JAM_FIELDS = gql`

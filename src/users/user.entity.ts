@@ -16,6 +16,7 @@ import { Exclude } from 'class-transformer';
 import { Role } from 'src/roles/role.entity';
 import { Post } from 'src/posts/post.entity';
 import { Sub } from 'src/subs/sub.entity';
+import { Lead } from 'src/leads/lead.entity';
 
 @Entity()
 export class User {
@@ -34,6 +35,12 @@ export class User {
 
   @OneToMany(() => Sub, sub => sub.user)
   subs: Sub[];
+
+  @OneToMany(() => Lead, lead => lead.followerUser)
+  leaders: Lead[];
+
+  @OneToMany(() => Lead, lead => lead.leaderUser)
+  followers: Lead[];
 
   @Column({default: 0})
   postI: number;

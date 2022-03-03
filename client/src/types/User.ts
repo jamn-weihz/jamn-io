@@ -1,4 +1,5 @@
 import { Col } from './Col';
+import { Lead } from './Lead';
 import { Post } from './Post';
 import { Role } from './Role';
 import { Sub } from './Sub';
@@ -10,6 +11,8 @@ export type User = {
   focus: Post;
   roles: Role[];
   subs: Sub[];
+  leaders: Lead[];
+  followers: Lead[];
   email: string;
   name: string;
   lowercaseName: string;

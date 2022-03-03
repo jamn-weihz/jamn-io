@@ -1,6 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ColsModule } from 'src/cols/cols.module';
+import { LeadsModule } from 'src/leads/leads.module';
 import { LinksModule } from 'src/links/links.module';
 import { PostsModule } from 'src/posts/posts.module';
 import { RolesModule } from 'src/roles/roles.module';
@@ -16,6 +17,7 @@ import { UsersService } from './users.service';
     RolesModule,
     ColsModule,
     SubsModule,
+    forwardRef(() => LeadsModule),
     forwardRef(() => PostsModule),
     forwardRef(() => LinksModule),
     forwardRef(() => VotesModule),

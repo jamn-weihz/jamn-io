@@ -141,7 +141,6 @@ export default function JamComponent(props: JamComponentProps) {
               </Card>
               <Box sx={{
                 height: '100%',
-                overflow: 'scroll',
               }}>
                 {
                   path[3] === 'users'

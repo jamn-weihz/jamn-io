@@ -285,8 +285,8 @@ export default function UserRecent(props: UserRecentProps) {
   return (
     <Box ref={containerEl} sx={{
       height: userDetail?.id === props.user.id
-        ? 'calc(100% - 130px)'
-        : 'calc(100% - 90px)',
+        ? 'calc(100% - 150px)'
+        : 'calc(100% - 110px)',
       overflow: 'scroll',
     }}>
       <Box sx={{

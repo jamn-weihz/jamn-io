@@ -11,6 +11,7 @@ export class RolesService {
   constructor(
     @InjectRepository(Role)
     private readonly rolesRepository: Repository<Role>,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => JamsService))
     private readonly jamsService: JamsService,

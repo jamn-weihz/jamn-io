@@ -4,6 +4,8 @@ import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { CurrentUser, GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { Col } from 'src/cols/col.model';
 import { ColsService } from 'src/cols/cols.service';
+import { Lead } from 'src/leads/lead.model';
+import { LeadsService } from 'src/leads/leads.service';
 import { Post } from 'src/posts/post.model';
 import { PostsService } from 'src/posts/posts.service';
 import { Role } from 'src/roles/role.model';
@@ -21,6 +23,7 @@ export class UsersResolver {
     private readonly colsService: ColsService,
     private readonly postsService: PostsService,
     private readonly subsService: SubsService,
+    private readonly leadsService: LeadsService,
   ) {}
 
   @ResolveField(() => Post, {name: 'focus'})
@@ -48,6 +51,20 @@ export class UsersResolver {
     @Parent() user: User,
   ) {
     return this.subsService.getSubsByUserId(user.id);
+  }
+
+  @ResolveField(() => [Lead], {name: 'leaders'})
+  async getUserLeaders(
+    @Parent() user: User,
+  ) {
+    return this.leadsService.getLeadsByFollowerUserId(user.id);
+  }
+
+  @ResolveField(() => [Lead], {name: 'followers'})
+  async getUserFollowers(
+    @Parent() user: User,
+  ) {
+    return this.leadsService.getLeadsByLeaderUserId(user.id);
   }
 
   @UseGuards(GqlAuthGuard)

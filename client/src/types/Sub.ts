@@ -9,4 +9,5 @@ export type Sub = {
   post: Post;
   createDate: Date;
   deleteDate: Date | null;
+  __typename: string;
 }
