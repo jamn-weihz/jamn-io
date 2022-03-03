@@ -27,6 +27,7 @@ import { ColAction, ColState, ColUnit } from './types/Col';
 import useChangeCol from './Col/useChangeCol';
 import { v4 as uuidv4 } from 'uuid';
 import useColStore from './Col/useColStore';
+import { RestartableClient } from '.';
 
 const GET_USER = gql`
   query GetUser {
@@ -55,7 +56,10 @@ export type PostContextType = {
 }
 export const PostContext = React.createContext({} as PostContextType);
 
-function App() {
+interface AppProps {
+  wsClient: RestartableClient;
+}
+function App(props: AppProps) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -73,6 +77,10 @@ function App() {
   
   const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    props.wsClient.restart();
+  }, [userDetail?.id]);
+  
   useEffect(() => {
     setTheme(createTheme({
       palette: {

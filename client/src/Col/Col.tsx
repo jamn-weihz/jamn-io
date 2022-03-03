@@ -56,7 +56,8 @@ export default function ColComponent(props: ColComponentProps) {
     }
     else if (path[1] === 'u') {
       return (
-        <User 
+        <User
+          key={`user-${path[2]}-${colUnit.col.id}`}
           colUnit={colUnit} 
           name={path[2]} 
         />
@@ -65,6 +66,7 @@ export default function ColComponent(props: ColComponentProps) {
     else if (path[1] === 'j') {
       return (
         <Jam 
+          key={`jam-${path[2]}-${colUnit.col.id}`}
           colUnit={colUnit} 
           name={path[2]} 
         />
@@ -73,6 +75,7 @@ export default function ColComponent(props: ColComponentProps) {
     else if (path[1] === 'p') {
       return (
         <PostCol
+          key={`post-${path[2]}-${colUnit.col.id}`}
           colUnit={colUnit}
           id={path[2]}
         />

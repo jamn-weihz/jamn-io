@@ -59,6 +59,7 @@ type Mutation {
   getPosts(postIds: [String!]!): [Post!]!
   getPrev(offset: Int!, postId: String!): [Link!]!
   getRecentJamPosts(jamId: String!, offset: Int!): [Post!]!
+  getRecentUserVotes(offset: Int!, userId: String!): [Vote!]!
   inviteRole(jamId: String!, sessionId: String!, userName: String!): Role!
   linkPosts(sessionId: String!, sourcePostId: String!, targetPostId: String!): Link!
   loginGoogleUser(pathnames: [String!]!, token: String!): User!
@@ -143,6 +144,7 @@ type Subscription {
   setJam(jamId: String!, sessionId: String!): Jam!
   startJam: Jam!
   userRole(sessionId: String!, userId: String!): Role!
+  userVote(userId: String!): Vote!
 }
 
 type User {

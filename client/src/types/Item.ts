@@ -2,6 +2,7 @@ import { Link } from "./Link"
 
 export type Item = {
   id: string;
+  userId: string;
   parentId: string;
   linkId: string;
   postId: string;
@@ -12,6 +13,7 @@ export type Item = {
   isNewlySaved: boolean;
   refreshPost: boolean;
   getLinks: boolean;
+  isRootRecentUserVoteItem: boolean;
 }
 
 export type ItemState = {

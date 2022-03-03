@@ -69,6 +69,7 @@ function Hits(props: HitsProps) {
           else {
             const item: Item = {
               id: uuidv4(),
+              userId: hit.userId,
               parentId: '',
               linkId: '',
               postId: hit.id,
@@ -79,6 +80,7 @@ function Hits(props: HitsProps) {
               isNewlySaved: false,
               refreshPost: false,
               getLinks: false,
+              isRootRecentUserVoteItem: false,
             };
             idToItem[item.id] = item;
             itemIds.push(item.id);

@@ -121,6 +121,27 @@ export const VOTE_FIELDS = gql`
   }
 `;
 
+export const FULL_VOTE_FIELDS = gql`
+  fragment FullVoteFields on Vote {
+    ...VoteFields
+    sourcePost {
+      ...FullPostFields
+    }
+    targetPost {
+      ...FullPostFields
+    }
+    link {
+      ...LinkFields
+      votes {
+        ...VoteFields
+      }
+    }
+  }
+  ${VOTE_FIELDS}
+  ${FULL_POST_FIELDS}
+  ${LINK_FIELDS}
+`;
+
 export const FULL_USER_FIELDS = gql`
   fragment FullUserFields on User {
     ...UserFields

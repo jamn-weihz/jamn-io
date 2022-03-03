@@ -60,10 +60,8 @@ export class PostsResolver {
     async resolve(this: PostsResolver, value, variables) {
       console.log(value.savePost);
       if (value.savePost.jamId) {
-        console.log('herewego')
         return this.postsService.getPostByIdWithPrivacy(variables.userId, value.savePost.id)
       }
-      console.log('maybe next time')
       return value.savePost;
     },
   })
@@ -73,10 +71,11 @@ export class PostsResolver {
     @Args('userId') userId: string,
     @Args('cardIds', {type: () => [String]}) cardIds: string[]
   ) {
-    console.log('savePostSubscription');
-    if (context.extra.user.id === userId) {
-      return this.pubSub.asyncIterator('savePost')
+    console.log('savePostSubscription', context.connection, context.extra.user?.id, userId);
+    if (context.extra?.user?.id === userId) {
+      return this.pubSub.asyncIterator('savePost');
     }
+    return this.pubSub.asyncIterator('');
   }
 
   @UseInterceptors(GqlAuthInterceptor)
@@ -105,5 +104,18 @@ export class PostsResolver {
     @Args('offset', {type: () => Int}) offset: number,
   ) {
     return this.postsService.getJamRecentPosts(user?.id, jamId, offset)
+  }
+
+  @Subscription(() => Post, {name: 'jamPost', 
+  filter: (payload, variables) => {
+      console.log(payload, variables);
+      return payload.jamId === variables.jamId;
+    }
+  })
+  jamPost(
+    @Context() context: any,
+    @Args('jamId') jamId: string,
+  ) {
+    return this.pubSub.asyncIterator('jamPost');
   }
 }

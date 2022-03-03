@@ -181,8 +181,9 @@ export class PostsService {
       text: name,
       type: 'unstyled',
       depth: 0,
+      inlineStyleRanges: [],
       entityRanges: [],
-      inlinStyleRanges: [],
+      data: {},
     }];
     if (desc) {
       blocks.push({
@@ -190,8 +191,9 @@ export class PostsService {
         text: desc,
         type: 'unstyled',
         depth: 0,
+        inlineStyleRanges: [],
         entityRanges: [],
-        inlinStyleRanges: [],
+        data: {},
       });
     }
     const draft = JSON.stringify({

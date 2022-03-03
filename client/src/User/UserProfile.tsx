@@ -25,6 +25,7 @@ export default function UserProfile(props: UserProfileProps) {
   useEffect(() => {
     const item: Item = {
       id: uuidv4(),
+      userId: props.user.id,
       parentId: '',
       linkId: '',
       postId: props.user.focusId,
@@ -35,6 +36,7 @@ export default function UserProfile(props: UserProfileProps) {
       isNewlySaved: false,
       refreshPost: false,
       getLinks: true,
+      isRootRecentUserVoteItem: false,
     };
     dispatch({
       type: 'MERGE_ITEMS',
@@ -63,7 +65,7 @@ export default function UserProfile(props: UserProfileProps) {
   return(
     <Box sx={{
       height: userDetail?.id === props.user.id
-        ? 'calc(100% - 120px)'
+        ? 'calc(100% - 130px)'
         : 'calc(100% - 90px)',
       overflow: 'scroll',
     }}>

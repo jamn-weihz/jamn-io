@@ -34,14 +34,24 @@ export class VotesService {
     })
   }
 
-  async getPositiveForeignVote(userId: string, linkId: string) {
+  async getForeignVote(userId: string, linkId: string) {
     return this.votesRepository.findOne({
       where: {
         userId: Not(userId),
         linkId,
-        weight: MoreThan(0),
       }
     })
+  }
+
+  async getRecentUserVotes(userId: string, offset: number) {
+    return this.votesRepository.createQueryBuilder('vote')
+      .select('vote')
+      .where('vote.userId = :userId', {userId})
+      .andWhere('vote.deleteDate is null')
+      .orderBy('vote.createDate', 'DESC')
+      .offset(offset)
+      .limit(10)
+      .getMany();
   }
   
   async createVote(userId: string, linkId: string, sourcePostId: string, targetPostId: string, clicks: number, tokens: number): Promise<Vote> {

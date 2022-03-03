@@ -53,6 +53,7 @@ export default function JamRecent(props: JamRecentProps) {
   useJamPostSubscription(props.jam.id, (post: Post) => {
     const item: Item = {
       id: uuidv4(),
+      userId: post.userId,
       parentId: '',
       linkId: '',
       postId: post.id,
@@ -63,6 +64,7 @@ export default function JamRecent(props: JamRecentProps) {
       isNewlySaved: false,
       refreshPost: false,
       getLinks: false,
+      isRootRecentUserVoteItem: false,
     };
     dispatch({
       type: 'MERGE_ITEMS',
@@ -127,6 +129,7 @@ export default function JamRecent(props: JamRecentProps) {
         else {
           const item: Item = {
             id: uuidv4(),
+            userId: post.userId,
             parentId: '',
             linkId: '',
             postId: post.id,
@@ -137,6 +140,7 @@ export default function JamRecent(props: JamRecentProps) {
             isNewlySaved: false,
             refreshPost: false,
             getLinks: false,
+            isRootRecentUserVoteItem: false
           };
           idToItem[item.id] = item;
           itemIds.push(item.id);
@@ -148,14 +152,11 @@ export default function JamRecent(props: JamRecentProps) {
         idToItem,
       });
 
-      const surveyorSlice: SurveyorSlice = {
+      const stack = surveyorState.stack.slice();
+      stack.splice(surveyorState.index, 1, {
         ...slice,
         itemIds: [...itemIds.reverse(), ...slice.itemIds]
-      };
-
-      const stack = surveyorState.stack.slice();
-      stack.splice(surveyorState.index, 1, surveyorSlice);
-
+      });
       setSurveyorState({
         ...surveyorState,
         stack,
@@ -307,7 +308,9 @@ export default function JamRecent(props: JamRecentProps) {
             ? <Loading />
             : remaining > 0
               ? <Box>
-                  <Link onClick={handleLoadMoreClick}>
+                  <Link onClick={handleLoadMoreClick} sx={{
+                    cursor: 'pointer',
+                  }}>
                     { remaining } more
                   </Link>
                 </Box>

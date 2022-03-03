@@ -138,7 +138,7 @@ export class LinksService {
     }
     const link1 = await this.getLinkById(linkId);
     if (link1.clicks === 0 && link1.tokens === 0 && link1.weight === 0) {
-      const foreignVote = await this.votesService.getPositiveForeignVote(userId, linkId);
+      const foreignVote = await this.votesService.getForeignVote(userId, linkId);
       if (!foreignVote) {
         return this.deleteLink(linkId);
       }

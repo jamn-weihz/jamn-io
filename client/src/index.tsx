@@ -18,40 +18,53 @@ import { BrowserRouter } from 'react-router-dom';
 
 import { DEV_SERVER_URI, DEV_WS_SERVER_URI } from './constants';
 
-import {
-  ApolloLink,
-  Operation,
-  FetchResult,
-  Observable,
-} from '@apollo/client/core';
-
-
-import { print } from 'graphql';
 import { createClient, ClientOptions, Client } from 'graphql-ws';
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 
-class WebSocketLink1 extends ApolloLink {
-  private client: Client;
-
-  constructor(options: ClientOptions) {
-    super();
-    this.client = createClient(options);
-  }
-
-  public request(operation: Operation): Observable<FetchResult> {
-    return new Observable((sink) => {
-      return this.client.subscribe<FetchResult>(
-        { ...operation, query: print(operation.query) },
-        {
-          next: sink.next.bind(sink),
-          complete: sink.complete.bind(sink),
-          error: sink.error.bind(sink),
-        },
-      );
-    });
-  }
+export interface RestartableClient extends Client {
+  restart(): void;
 }
 
-const wsLink1 = new WebSocketLink1({
+function createRestartableClient(options: ClientOptions): RestartableClient {
+  let restartRequested = false;
+  let restart = () => {
+    restartRequested = true;
+  };
+
+  const client = createClient({
+    ...options,
+    on: {
+      ...options.on,
+      opened: (socket: any) => {
+        options.on?.opened?.(socket);
+
+        restart = () => {
+          if (socket.readyState === WebSocket.OPEN) {
+            // if the socket is still open for the restart, do the restart
+            socket.close(4205, 'Client Restart');
+          } else {
+            // otherwise the socket might've closed, indicate that you want
+            // a restart on the next opened event
+            restartRequested = true;
+          }
+        };
+
+        // just in case you were eager to restart
+        if (restartRequested) {
+          restartRequested = false;
+          restart();
+        }
+      },
+    },
+  });
+
+  return {
+    ...client,
+    restart: () => restart(),
+  };
+}
+
+const wsClient = createRestartableClient({
   url: process.env.NODE_ENV === 'production'
     ? window.location.origin.replace(/^http/, 'ws') + '/graphql'
     : `${DEV_WS_SERVER_URI}/graphql`,
@@ -69,21 +82,9 @@ const wsLink1 = new WebSocketLink1({
     }
     return {};
   },
-  lazy: true,
-  on: {
-    connected: () => console.log('connected'),
-    error: (error) => console.error(error),
-  }
 });
-/*
-const wsLink = new WebSocketLink({
-  uri: process.env.NODE_ENV === 'production'
-    ? window.location.origin.replace(/^http/, 'ws') + '/graphql'
-    : `${DEV_WS_SERVER_URI}/graphql`,
-  options: {
-    reconnect: true
-  }
-});*/
+
+const wsLink = new GraphQLWsLink(wsClient);
 
 const httpLink = createHttpLink({
   uri: process.env.NODE_ENV === 'production'
@@ -102,7 +103,7 @@ const splitLink = split(
       definition.operation === 'subscription'
     );
   },
-  wsLink1,
+  wsLink,
   httpLink,
 );
 
@@ -115,7 +116,7 @@ ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
       <BrowserRouter>
-        <App />
+        <App wsClient={wsClient} />
       </BrowserRouter>
     </ApolloProvider>
   </React.StrictMode>,

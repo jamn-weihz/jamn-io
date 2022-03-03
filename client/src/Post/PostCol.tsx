@@ -38,6 +38,7 @@ export default function PostCol(props: PostColProps) {
     if (post?.id && !surveyorState) {
       const item: Item = {
         id: uuidv4(),
+        userId: post.userId,
         parentId: '',
         linkId: '',
         postId: post.id,
@@ -48,6 +49,7 @@ export default function PostCol(props: PostColProps) {
         isNewlySaved: false,
         refreshPost: false,
         getLinks: true,
+        isRootRecentUserVoteItem: false,
       };
       dispatch({
         type: 'MERGE_ITEMS',

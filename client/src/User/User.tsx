@@ -16,6 +16,7 @@ import ColLink from '../Col/ColLink';
 import { getColor } from '../utils';
 import ColBar from '../Col/ColBar';
 import useUserRoleSubscription from '../Role/useUserRoleSubscription';
+import UserRecent from './UserRecent';
 
 const GET_USER_BY_NAME = gql`
   query GetUserByName($name: String!) {
@@ -146,7 +147,7 @@ export default function UserComponent(props: UserProps) {
                   path[3] === 'j'
                     ? <UserJams user={user1} colUnit={props.colUnit} />
                     : path[3] === 'r'
-                      ? null
+                      ? <UserRecent user={user1} colUnit={props.colUnit} />
                       : path[3] === 's'
                         ? <UserSettings colUnit={props.colUnit} user={user1} />
                         : <UserProfile 

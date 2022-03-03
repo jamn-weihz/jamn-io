@@ -8,8 +8,9 @@ export const START_POST_DRAFT = JSON.stringify({
       text: 'Season 1: Start 🚀🚀🚀',
       type: 'unstyled',
       depth: 0,
-      entityRanges: [],
       inlineStyleRanges: [],
+      entityRanges: [],
+      data: {},
     }
   ],
   entityMap: {}
@@ -22,8 +23,9 @@ export const PRIVATE_POST_DRAFT = JSON.stringify({
       text: '<private>',
       type: 'unstyled',
       depth: 0,
-      entityRanges: [],
       inlineStyleRanges: [],
+      entityRanges: [],
+      data: {},
     }
   ],
   entityMap: {},

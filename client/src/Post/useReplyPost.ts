@@ -47,6 +47,7 @@ export default function useReplyPost(itemId: string, sourcePostId: string, jamId
       });
       const newItem: Item = {
         id: uuidv4(),
+        userId: data.replyPost.targetPost.userId,
         parentId: itemId,
         linkId: data.replyPost.id,
         postId: data.replyPost.targetPost.id,
@@ -57,6 +58,7 @@ export default function useReplyPost(itemId: string, sourcePostId: string, jamId
         isNewlySaved: false,
         refreshPost: false,
         getLinks: false,
+        isRootRecentUserVoteItem: false,
       };
       dispatch({
         type: 'MERGE_ITEMS',

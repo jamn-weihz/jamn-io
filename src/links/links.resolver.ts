@@ -61,15 +61,18 @@ export class LinksResolver {
     const link = await this.linksService.linkPosts(user.id, sourcePostId, targetPostId, 1, 0);
     const sourcePost = await this.postsService.getPostById(sourcePostId);
     const targetPost = await this.postsService.getPostById(targetPostId);
-    const votes = await this.votesService.getVotesByLinkId(link.id);
     this.pubSub.publish('linkPosts', {
       sessionId,
       linkPosts: {
         ...link,
         sourcePost,
         targetPost,
-        votes,
       },
+    });
+    const vote = await this.votesService.getVoteByUserIdAndLinkId(user.id, link.id);
+    this.pubSub.publish('userVote', {
+      userId: user.id,
+      userVote: vote,
     });
     return link;
   }
@@ -104,15 +107,18 @@ export class LinksResolver {
     const link = await this.linksService.votePosts(user.id, linkId, clicks, 0);
     const sourcePost = await this.postsService.getPostById(link.sourcePostId);
     const targetPost = await this.postsService.getPostById(link.targetPostId);
-    const votes = await this.votesService.getVotesByLinkId(link.id);
     this.pubSub.publish('linkPosts', {
       sessionId,
       linkPosts: {
         ...link,
         sourcePost,
         targetPost,
-        votes,
       }
+    });
+    const vote = await this.votesService.getVoteByUserIdAndLinkId(user.id, link.id);
+    this.pubSub.publish('userVote', {
+      userId: user.id,
+      userVote: vote,
     });
     return link;
   }
@@ -128,42 +134,26 @@ export class LinksResolver {
     const link = await this.linksService.replyPost(user.id, sourcePostId, jamId);
     const sourcePost = await this.postsService.getPostById(sourcePostId);
     const targetPost = await this.postsService.getPostById(link.targetPostId);
-    const votes = await this.votesService.getVotesByLinkId(link.id);
     this.pubSub.publish('linkPosts', {
       sessionId,
       linkPosts: {
         ...link,
         sourcePost,
         targetPost,
-        votes,
       },
     });
     if (targetPost.jamId) {
-      const jam = await this.jamsService.getJamById(jamId);
       this.pubSub.publish('jamPost', {
         jamId: targetPost.jamId,
-        jamPost: {
-          ...targetPost,
-          user,
-          jam,
-        }
+        jamPost: targetPost,
       })
     }
-
+    const vote = await this.votesService.getVoteByUserIdAndLinkId(user.id, link.id);
+    this.pubSub.publish('userVote', {
+      userId: user.id,
+      userVote: vote,
+    });
     return link;
-  }
-
-  @Subscription(() => Post, {name: 'jamPost', 
-    filter: (payload, variables) => {
-      console.log(payload, variables);
-      return payload.jamId === variables.jamId;
-    }
-  })
-  jamPost(
-    @Context() context: any,
-    @Args('jamId') jamId: string,
-  ) {
-    return this.pubSub.asyncIterator('jamPost');
   }
 
   @UseInterceptors(GqlAuthInterceptor)

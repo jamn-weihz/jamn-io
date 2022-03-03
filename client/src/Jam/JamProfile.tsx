@@ -20,6 +20,7 @@ export default function JamProfile(props: JamProfileProps) {
   useEffect(() => {
     const item: Item = {
       id: uuidv4(),
+      userId: props.jam.focus.userId,
       parentId: '',
       linkId: '',
       postId: props.jam.focusId,
@@ -30,6 +31,7 @@ export default function JamProfile(props: JamProfileProps) {
       isNewlySaved: false,
       refreshPost: false,
       getLinks: true,
+      isRootRecentUserVoteItem: false,
     };
     dispatch({
       type: 'MERGE_ITEMS',

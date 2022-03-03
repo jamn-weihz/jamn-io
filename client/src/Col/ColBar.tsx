@@ -107,7 +107,7 @@ export default function ColBar(props: ColBarProps) {
           maxWidth: sizeDetail.width < MOBILE_WIDTH
             ? getColWidth(sizeDetail.width) - 120
             : '220px',
-          color:  props.user?.color || props.jam?.color,
+          color:  props.user?.color || props.jam?.color || color,
           fontWeight: 'bold',
         }}>
           {props.colUnit.col.pathname.split('/').slice(0, 3).join('/')}
