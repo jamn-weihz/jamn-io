@@ -57,14 +57,14 @@ const wsLink1 = new WebSocketLink1({
     : `${DEV_WS_SERVER_URI}/graphql`,
   connectionParams: () => {
     const cookies = document.cookie.split('; ');
-    let authToken;
+    let authCookie;
     cookies.some(cookie => {
-      authToken = cookie.match(/(?<=Authentication=).*/);
-      return !!authToken;
+      authCookie = cookie.match(/^Authentication=.*$/);
+      return !!authCookie;
     })
-    if (authToken) {
+    if (authCookie && authCookie[0]) {
       return {
-        Authentication: authToken[0]
+        Authentication: (authCookie[0] as string).split('=')[1]
       };
     }
     return {};

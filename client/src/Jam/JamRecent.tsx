@@ -217,7 +217,6 @@ export default function JamRecent(props: JamRecentProps) {
   }, [containerEl.current?.scrollHeight]);
 
   useEffect(() => {
-    console.log('it changed bro')
     const slice = surveyorState.stack[surveyorState.index];
 
     let hasNewlySaved = slice.itemIds.some(itemId => {
@@ -257,7 +256,6 @@ export default function JamRecent(props: JamRecentProps) {
     const hasDiff = itemIds.some((id, i) => {
       return id !== slice.itemIds[i];
     });
-    console.log(hasDiff)
 
     if (hasDiff) {
       const stack = surveyorState.stack.slice();
