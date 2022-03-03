@@ -112,8 +112,8 @@ export default function JamComponent(props: JamComponentProps) {
                 marginBottom: 0,
                 borderBottom: '1px solid dimgrey',
               }}>
-                <ColLink col={props.colUnit.col} pathname={`/j/${jam1.name}/u`} sx={{
-                  color: path[3] === 'u' ? jam1.color : color,
+                <ColLink col={props.colUnit.col} pathname={`/j/${jam1.name}/users`} sx={{
+                  color: path[3] === 'users' ? jam1.color : color,
                 }}>
                   Users
                 </ColLink>
@@ -124,13 +124,13 @@ export default function JamComponent(props: JamComponentProps) {
                   Profile
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.colUnit.col} pathname={`/j/${jam1.name}/r`} sx={{
-                  color: path[3] === 'r' ? jam1.color : color,
+                <ColLink col={props.colUnit.col} pathname={`/j/${jam1.name}/recent`} sx={{
+                  color: path[3] === 'recent' ? jam1.color : color,
                 }}>
                   Recent
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.colUnit.col} pathname={`/j/${jam1.name}/s`} sx={{
+                <ColLink col={props.colUnit.col} pathname={`/j/${jam1.name}/settings`} sx={{
                   display: role && role.type === 'ADMIN'
                     ? 'initial'
                     : 'none',
@@ -144,11 +144,11 @@ export default function JamComponent(props: JamComponentProps) {
                 overflow: 'scroll',
               }}>
                 {
-                  path[3] === 'u'
+                  path[3] === 'users'
                     ? <JamUsers jam={jam1} colUnit={props.colUnit}/>
-                    : path[3] === 'r'
+                    : path[3] === 'recent'
                       ? <JamRecent jam={jam1} colUnit={props.colUnit} />
-                      : path[3] === 's'
+                      : path[3] === 'settings'
                         ? <JamSettings jam={jam1} colUnit={props.colUnit}/>
                         : <JamProfile 
                             jam={jam1} 

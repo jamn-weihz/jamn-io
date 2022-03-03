@@ -81,6 +81,8 @@ type Mutation {
   setUserName(name: String!): User!
   shiftCol(colId: String!, di: Int!): [Col!]!
   startJam(desc: String!, lat: Float!, lng: Float!, name: String!): Jam!
+  subPost(postId: String!): Sub!
+  unsubPost(postId: String!): Sub!
   updateUserMap(lat: Float!, lng: Float!, zoom: Float!): User!
   verifyUser(code: String!): User!
   votePosts(clicks: Int!, linkId: String!, sessionId: String!): Link!
@@ -136,6 +138,16 @@ type Role {
   userId: String!
 }
 
+type Sub {
+  createDate: DateTime!
+  deleteDate: DateTime
+  id: String!
+  post: Post!
+  postId: String!
+  user: User!
+  userId: String!
+}
+
 type Subscription {
   jamPost(jamId: String!): Post!
   jamRole(jamId: String!, sessionId: String!): Role!
@@ -168,6 +180,7 @@ type User {
   name: String!
   postI: Int!
   roles: [Role!]!
+  subs: [Sub!]!
   updateDate: DateTime!
   verifyEmailDate: DateTime
   voteI: Int!

@@ -1,6 +1,6 @@
-import { gql, useApolloClient, useLazyQuery, useMutation } from '@apollo/client';
+import { gql, useApolloClient, useLazyQuery, useMutation, useReactiveVar } from '@apollo/client';
 import { Box, Card, FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useReducer, useState } from 'react';
 import { ChromePicker } from 'react-color';
 import { userVar } from '../cache';
 import { FULL_USER_FIELDS } from '../fragments';
@@ -44,6 +44,8 @@ interface UserSettingsProps {
 
 export default function UserSettings(props: UserSettingsProps) {
   const client = useApolloClient();
+
+  const userDetail = useReactiveVar(userVar);
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [name, setName] = useState(props.user.name);
@@ -150,6 +152,8 @@ export default function UserSettings(props: UserSettingsProps) {
   const handleMouseDown = (event: React.MouseEvent) => {
     event.preventDefault();
   }
+
+  if (userDetail?.id !== props.user.id) return null;
 
   return (
     <Box>

@@ -15,6 +15,7 @@ import { Point } from 'geojson';
 import { Exclude } from 'class-transformer';
 import { Role } from 'src/roles/role.entity';
 import { Post } from 'src/posts/post.entity';
+import { Sub } from 'src/subs/sub.entity';
 
 @Entity()
 export class User {
@@ -30,6 +31,9 @@ export class User {
 
   @OneToMany(() => Role, role => role.user)
   roles: Role[];
+
+  @OneToMany(() => Sub, sub => sub.user)
+  subs: Sub[];
 
   @Column({default: 0})
   postI: number;

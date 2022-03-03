@@ -2,7 +2,7 @@ import { gql, useMutation, useReactiveVar } from '@apollo/client';
 import { Box, Card, Checkbox } from '@mui/material';
 import { useState } from 'react';
 import { ChromePicker } from 'react-color';
-import { sessionVar, snackbarVar } from '../cache';
+import { sessionVar, snackbarVar, userVar } from '../cache';
 import { ColUnit } from '../types/Col';
 import { Jam } from '../types/Jam';
 
@@ -39,6 +39,7 @@ interface JamSettingsProps {
 }
 
 export default function JamSettings(props: JamSettingsProps) {
+  const userDetail = useReactiveVar(userVar);
   const sessionDetail = useReactiveVar(sessionVar);
   
   const [color, setColor] = useState(props.jam.color);
@@ -136,6 +137,9 @@ export default function JamSettings(props: JamSettingsProps) {
     setIsPrivate(!isPrivate);
   }
 
+  if (!userDetail?.roles.some(role => role.type === 'ADMIN' && role.jamId === props.jam.id))
+    return null;
+  
   return (
     <Box>
       <Card elevation={5} sx={{

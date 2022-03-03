@@ -8,6 +8,8 @@ import { Post } from 'src/posts/post.model';
 import { PostsService } from 'src/posts/posts.service';
 import { Role } from 'src/roles/role.model';
 import { RolesService } from 'src/roles/roles.service';
+import { Sub } from 'src/subs/sub.model';
+import { SubsService } from 'src/subs/subs.service';
 import { User } from './user.model';
 import { UsersService } from './users.service';
 
@@ -18,6 +20,7 @@ export class UsersResolver {
     private readonly rolesService: RolesService,
     private readonly colsService: ColsService,
     private readonly postsService: PostsService,
+    private readonly subsService: SubsService,
   ) {}
 
   @ResolveField(() => Post, {name: 'focus'})
@@ -38,6 +41,13 @@ export class UsersResolver {
     @Parent() user: User,
   ) {
     return this.colsService.getColsByUserId(user.id);
+  }
+
+  @ResolveField(() => [Sub], {name: 'subs'})
+  async getUserSubs(
+    @Parent() user: User,
+  ) {
+    return this.subsService.getSubsByUserId(user.id);
   }
 
   @UseGuards(GqlAuthGuard)

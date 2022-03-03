@@ -142,6 +142,16 @@ export const FULL_VOTE_FIELDS = gql`
   ${LINK_FIELDS}
 `;
 
+export const SUB_FIELDS = gql`
+  fragment SubFields on Sub {
+    id
+    userId
+    postId
+    deleteDate
+  }
+`;
+
+
 export const FULL_USER_FIELDS = gql`
   fragment FullUserFields on User {
     ...UserFields
@@ -159,11 +169,15 @@ export const FULL_USER_FIELDS = gql`
     focus {
       ...FullPostFields
     }
+    subs {
+      ...SubFields
+    }
   }
   ${ROLE_FIELDS}
   ${USER_FIELDS}
   ${COL_FIELDS}
   ${FULL_POST_FIELDS}
+  ${SUB_FIELDS}
 `;
 
 export const FULL_JAM_FIELDS = gql`
@@ -183,4 +197,5 @@ export const FULL_JAM_FIELDS = gql`
   ${ROLE_FIELDS}
   ${USER_FIELDS}
   ${FULL_POST_FIELDS}
-`
+`;
+

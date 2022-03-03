@@ -7,16 +7,7 @@ import { FULL_POST_FIELDS } from '../fragments';
 import { Col } from '../types/Col';
 import { Item, ItemState } from '../types/Item';
 import { ItemContext } from '../App';
-
-
-const GET_POSTS = gql`
-  mutation GetPosts($postIds: [String!]!) {
-    getPosts(postIds: $postIds) {
-      ...FullPostFields
-    }
-  }
-  ${FULL_POST_FIELDS}
-`;
+import useGetPosts from '../Post/useGetPosts';
 
 interface HitsProps {
   col: Col;
@@ -30,16 +21,10 @@ function Hits(props: HitsProps) {
 
   const [hits, setHits] = useState([] as any[]);
 
-  const [getPosts] = useMutation(GET_POSTS, {
-    onError: error => {
-      console.error(error);
-    },
-    onCompleted: data => {
-      console.log(data);
-      props.setReload(true)
-    },
+  const { getPosts } = useGetPosts(() => {
+    props.setReload(true);
   });
-  
+
   useEffect(() => {
     let isChange = props.hits.some((hit, i) => hit.id != hits[i]?.id);
     if (!isChange) return;
@@ -88,11 +73,7 @@ function Hits(props: HitsProps) {
         }
       });
       if (Object.keys(idToItem).length) {
-        getPosts({
-          variables: {
-            postIds: Object.keys(idToItem).map(id => idToItem[id].postId),
-          }
-        });
+        getPosts(Object.keys(idToItem).map(id => idToItem[id].postId));
       }
     }
     if (Object.keys(idToItem).length) {

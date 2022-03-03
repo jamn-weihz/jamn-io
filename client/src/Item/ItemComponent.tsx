@@ -35,6 +35,8 @@ import { Item } from '../types/Item';
 import { ItemContext } from '../App';
 import promoteItem from './promoteItem';
 import useChangeCol from '../Col/useChangeCol';
+import useSubPost from '../Post/useSubPost';
+import useUnsubPost from '../Post/useUnsubPost';
 
 interface ItemComponentProps {
   post?: Post;
@@ -67,6 +69,9 @@ export default function ItemComponent(props: ItemComponentProps) {
   const { replyPost } = useReplyPost(props.item.id, props.item.postId, props.jam?.id);
 
   const { changeCol } = useChangeCol(0, true);
+
+  const { subPost } = useSubPost(props.item.postId)
+  const { unsubPost } = useUnsubPost(props.item.postId);
 
   useEffect(() => {
     if (props.item.getLinks) {
@@ -236,6 +241,17 @@ export default function ItemComponent(props: ItemComponentProps) {
     });
   }
 
+  const handleSubClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    subPost();
+  }
+  
+  const handleUnsubClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    unsubPost();
+  }
+
+
   const post = client.cache.readFragment({
     id: client.cache.identify({
       id: props.item.postId,
@@ -288,6 +304,8 @@ export default function ItemComponent(props: ItemComponentProps) {
     linkDetail.targetPostId === props.item.postId
   );
 
+  const subbed = userDetail?.subs.some(sub => sub.postId === props.item.postId);
+  
   const slice = props.surveyorState.stack[props.surveyorState.index];
   return (
     <Card elevation={5} 
@@ -397,6 +415,7 @@ export default function ItemComponent(props: ItemComponentProps) {
           <Box component='span' sx={{whiteSpace: 'nowrap'}}>
             &nbsp;&nbsp;
             <IconButton
+              title='Reply to this post'
               disabled={!userDetail?.verifyEmailDate}
               size='small'
               color='inherit'
@@ -411,6 +430,7 @@ export default function ItemComponent(props: ItemComponentProps) {
             </IconButton>
             &nbsp;&nbsp;
             <IconButton
+              title='Link from this post to another'
               disabled={!userDetail?.verifyEmailDate}
               size='small'
               color='inherit'
@@ -425,6 +445,7 @@ export default function ItemComponent(props: ItemComponentProps) {
             </IconButton>
             &nbsp;&nbsp;
             <IconButton
+              title='More options...'
               onClick={handleMenuOpenClick}
               size='small'
               color='inherit'
@@ -469,6 +490,35 @@ export default function ItemComponent(props: ItemComponentProps) {
                 </Box>
                 &nbsp; Open post
               </MenuItem>
+              {
+                subbed
+                  ? <MenuItem onClick={handleUnsubClick} sx={{
+                      fontSize: 14,
+                    }}>
+                      <Box sx={{
+                        marginLeft: '-5px',
+                        marginBottom: '-5px',
+                        fontSize: 14,
+                        color: userDetail?.color, 
+                      }}>
+                        <NotificationsTwoToneIcon fontSize='inherit'/>
+                      </Box>
+                      &nbsp; Unsubscribe from post
+                    </MenuItem>
+                  : <MenuItem onClick={handleSubClick} sx={{
+                      fontSize: 14,
+                    }}>
+                      <Box sx={{
+                        marginLeft: '-5px',
+                        marginBottom: '-5px',
+                        fontSize: 14,
+                      }}>
+                        <NotificationsNoneIcon fontSize='inherit'/>
+                      </Box>
+                      &nbsp; Subscribe to post
+                    </MenuItem>
+              }
+
               {
                 props.depth !== 0 || slice.itemIds.length !== 1
                   ? <MenuItem onClick={handlePromoteClick} sx={{

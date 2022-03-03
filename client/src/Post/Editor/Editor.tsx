@@ -9,7 +9,7 @@ import {
 } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import Editor from '@draft-js-plugins/editor';
-import {  useReactiveVar } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
 import { focusVar, userVar } from '../../cache';
 import { Box } from '@mui/material';
 import useSavePost from '../useSavePost';

@@ -17,6 +17,7 @@ import { getColor } from '../utils';
 import ColBar from '../Col/ColBar';
 import useUserRoleSubscription from '../Role/useUserRoleSubscription';
 import UserRecent from './UserRecent';
+import UserSubs from './UserSubs';
 
 const GET_USER_BY_NAME = gql`
   query GetUserByName($name: String!) {
@@ -104,8 +105,8 @@ export default function UserComponent(props: UserProps) {
                 marginBottom: 0,
                 borderBottom: '1px solid dimgrey',
               }}>
-                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/j`} sx={{
-                  color: path[3] === 'j' 
+                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/jams`} sx={{
+                  color: path[3] === 'jams' 
                     ? user1.color 
                     : color,
                 }}>
@@ -120,19 +121,27 @@ export default function UserComponent(props: UserProps) {
                   Profile
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/r`} sx={{
-                  color: path[3] === 'r' 
+                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/recent`} sx={{
+                  color: path[3] === 'recent' 
                     ? user1.color 
                     : color,
                 }}>
                   Recent
                 </ColLink>
                 &nbsp;&nbsp;
-                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/s`} sx={{
+                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/subs`} sx={{
+                  color: path[3] === 'subs' 
+                    ? user1.color 
+                    : color,
+                }}>
+                  Subs
+                </ColLink>
+                &nbsp;&nbsp;
+                <ColLink col={props.colUnit.col} pathname={`/u/${user1.name}/settings`} sx={{
                   display: user1.id === userDetail?.id
                     ? 'initial'
                     : 'none',
-                  color: path[3] === 's'
+                  color: path[3] === 'settings'
                     ? user1.color 
                     : color,
                 }}>
@@ -144,16 +153,30 @@ export default function UserComponent(props: UserProps) {
                 overflow: 'scroll',
               }}>
                 {
-                  path[3] === 'j'
-                    ? <UserJams user={user1} colUnit={props.colUnit} />
-                    : path[3] === 'r'
-                      ? <UserRecent user={user1} colUnit={props.colUnit} />
-                      : path[3] === 's'
-                        ? <UserSettings colUnit={props.colUnit} user={user1} />
-                        : <UserProfile 
-                            user={user1} 
-                            colUnit={props.colUnit} 
-                          />
+                  path[3] === 'jams'
+                    ? <UserJams 
+                        user={user1}
+                        colUnit={props.colUnit}
+                      />
+                    : path[3] === 'recent'
+                      ? <UserRecent
+                          user={user1}
+                          colUnit={props.colUnit}
+                        />
+                      : path[3] === 'subs'
+                          ? <UserSubs 
+                              user={user1}
+                              colUnit={props.colUnit}
+                            />
+                          : path[3] === 'settings'
+                            ? <UserSettings
+                                user={user1}
+                                colUnit={props.colUnit}
+                              />
+                            : <UserProfile 
+                                user={user1} 
+                                colUnit={props.colUnit} 
+                              />
                 }
               </Box>
             </Box>

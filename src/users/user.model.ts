@@ -1,5 +1,7 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { Post } from 'src/posts/post.model';
+import { Role } from 'src/roles/role.model';
+import { Sub } from 'src/subs/sub.model';
 
 @ObjectType()
 export class User {
@@ -12,6 +14,12 @@ export class User {
   @Field(() => Post, {nullable: true})
   focus: Post;
 
+  @Field(() => [Role])
+  roles: Role[];
+
+  @Field(() => [Sub])
+  subs: Sub[];
+  
   @Field(() => Int)
   postI: number;
   
