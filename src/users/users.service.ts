@@ -1,6 +1,6 @@
 import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { adjectives, animals, NumberDictionary, uniqueNamesGenerator } from 'unique-names-generator';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
@@ -25,6 +25,14 @@ export class UsersService {
 
   async getUserById(id: string): Promise<User> {
     return this.usersRepository.findOne({ id });
+  }
+
+  async getUsersByIds(ids: string[]): Promise<User[]> {
+    return this.usersRepository.find({
+      where: {
+        id: In(ids),
+      },
+    });
   }
 
   async getUserByEmail(email: string): Promise<User> {
@@ -92,7 +100,7 @@ export class UsersService {
     if (!startPost) {
       startPost = await this.postsService.createStartPost(user1.id);
     }
-    this.postsService.incrementPostNextCount(startPost.id, 1);
+    await this.postsService.incrementPostNextCount(startPost.id, 1);
     
     const userPost = await this.postsService.createPost(user1.id, null, '', '');
 

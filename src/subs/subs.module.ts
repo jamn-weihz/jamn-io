@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostsModule } from 'src/posts/posts.module';
 import { Sub } from './sub.entity';
@@ -8,7 +8,7 @@ import { SubsService } from './subs.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Sub]),
-    PostsModule,
+    forwardRef(() => PostsModule),
   ],
   providers: [SubsResolver, SubsService],
   exports: [SubsService],

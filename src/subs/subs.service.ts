@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostsService } from 'src/posts/posts.service';
 import { Repository } from 'typeorm';
@@ -9,6 +9,7 @@ export class SubsService {
   constructor(
     @InjectRepository(Sub)
     private readonly subsRepository: Repository<Sub>,
+    @Inject(forwardRef(() => PostsService))
     private readonly postsService: PostsService,
   ) {}
 

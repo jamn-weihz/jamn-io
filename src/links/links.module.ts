@@ -11,6 +11,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RolesModule } from 'src/roles/roles.module';
 import { JamsModule } from 'src/jams/jams.module';
+import { SubsModule } from 'src/subs/subs.module';
+import { LeadsModule } from 'src/leads/leads.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { JamsModule } from 'src/jams/jams.module';
     RolesModule,
     VotesModule,
     PubSubModule,
+    SubsModule,
+    LeadsModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

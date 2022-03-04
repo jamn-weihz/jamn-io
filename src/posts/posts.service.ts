@@ -32,6 +32,9 @@ export class PostsService {
 
   async getPostByIdWithPrivacy(userId: string, id: string) {
     const post = await this.postsRepository.findOne({ id });
+    if (!post) {
+      throw new BadRequestException('This post does not exist');
+    }
     if (post.jamId && post.jamI !== 1) {
       const jam = await this.jamsService.getJamById(post.jamId);
       if (jam.isPrivate) {
