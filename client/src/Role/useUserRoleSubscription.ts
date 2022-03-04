@@ -1,6 +1,8 @@
 
 
 import { gql, Reference, useApolloClient, useReactiveVar, useSubscription } from '@apollo/client';
+import { useContext } from 'react';
+import { UserContext } from '../App';
 import { sessionVar } from '../cache';
 import { ROLE_FIELDS } from '../fragments';
 
@@ -24,6 +26,8 @@ const USER_ROLE = gql`
 `;
 
 export default function useUserRoleSubscription(userId: string) {
+  const { dispatch } = useContext(UserContext);
+
   const client = useApolloClient();
   const sessionDetail = useReactiveVar(sessionVar);
 
@@ -70,6 +74,11 @@ export default function useUserRoleSubscription(userId: string) {
           },
         },
       });
+
+      dispatch({
+        type: 'REFRESH_USER',
+        userId: userRole.userId,
+      })
     }
   })
 }

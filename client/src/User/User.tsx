@@ -2,7 +2,7 @@ import { gql, useApolloClient, useLazyQuery, useReactiveVar } from '@apollo/clie
 import { Box, Card } from '@mui/material';
 import { paletteVar, userVar } from '../cache'
 import { FULL_USER_FIELDS } from '../fragments';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import NotFound from '../NotFound';
 import Logout from '../Auth/Logout';
 import Verify from '../Auth/Verify';
@@ -21,6 +21,7 @@ import UserSubs from './UserSubs';
 import UserLeaders from './UserLeaders';
 import UserFollowers from './UserFollowers';
 import useLeadSubscription from './useLeadSubscription';
+import { UserContext } from '../App';
 
 const GET_USER_BY_NAME = gql`
   query GetUserByName($name: String!) {
@@ -35,6 +36,8 @@ interface UserProps {
   name: string;
 }
 export default function UserComponent(props: UserProps) {
+  const { state, dispatch } = useContext(UserContext);
+
   const client = useApolloClient();
 
   const userDetail = useReactiveVar(userVar);
@@ -45,6 +48,24 @@ export default function UserComponent(props: UserProps) {
   useUserRoleSubscription(user?.id || '');
   useLeadSubscription(user?.id || '')
   
+  useEffect(() => {
+    if (user?.id) {
+      dispatch({
+        type: 'ADD_USER',
+        userId: user.id
+      })
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user?.id && state[user.id]) {
+      dispatch({
+        type: 'REFRESH_COMPLETE',
+        userId: user.id
+      })
+    }
+  }, [state])
+
   const [getUserByName] = useLazyQuery(GET_USER_BY_NAME, {
     onError: error => {
       console.error(error);
@@ -80,6 +101,8 @@ export default function UserComponent(props: UserProps) {
     fragment: FULL_USER_FIELDS,
     fragmentName: 'FullUserFields'
   }) as User;
+
+  console.log(user1);
 
   return (
     <Box sx={{
@@ -175,35 +198,42 @@ export default function UserComponent(props: UserProps) {
                 {
                   path[3] === 'jams'
                     ? <UserJams 
+                        key={`user-jams-${user1.id}-${props.colUnit.col.id}`}
                         user={user1}
                         colUnit={props.colUnit}
                       />
                     : path[3] === 'recent'
                       ? <UserRecent
+                          key={`user-recent-${user1.id}-${props.colUnit.col.id}`}
                           user={user1}
                           colUnit={props.colUnit}
                         />
                       : path[3] === 'subscriptions'
                           ? <UserSubs 
+                              key={`user-subs-${user1.id}-${props.colUnit.col.id}`}
                               user={user1}
                               colUnit={props.colUnit}
                             />
                           : path[3] === 'leaders'
                             ? <UserLeaders
+                                key={`user-leaders-${user1.id}-${props.colUnit.col.id}`}
                                 user={user1}
                                 colUnit={props.colUnit}
                               />
                             : path[3] === 'followers'
                               ? <UserFollowers
+                                  key={`user-followers-${user1.id}-${props.colUnit.col.id}`}
                                   user={user1}
                                   colUnit={props.colUnit}
                                 />
                               : path[3] === 'settings'
                                 ? <UserSettings
+                                    key={`user-settings-${user1.id}-${props.colUnit.col.id}`}
                                     user={user1}
                                     colUnit={props.colUnit}
                                   />
                                 : <UserProfile 
+                                    key={`user-profile-${user1.id}-${props.colUnit.col.id}`}
                                     user={user1} 
                                     colUnit={props.colUnit} 
                                   />

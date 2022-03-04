@@ -32,3 +32,25 @@ export type User = {
   deleteDate: Date | null;
   __typename: string;
 }
+
+export type UserState = {
+  [id: string]: boolean;
+}
+
+export type AddUserAction = {
+  type: 'ADD_USER',
+  userId: string;
+}
+export type RefreshUserAction = {
+  type: 'REFRESH_USER',
+  userId: string;
+}
+export type RefreshCompleteAction = {
+  type: 'REFRESH_COMPLETE',
+  userId: string;
+}
+
+export type UserAction = 
+  AddUserAction |
+  RefreshUserAction |
+  RefreshCompleteAction;

@@ -40,7 +40,7 @@ export default function UserLeaders(props: UserLeadersProps) {
       overflow: 'scroll',
     }}>
       {
-        (userDetail?.leaders || []).map(lead => {
+        (props.user.leaders || []).map(lead => {
           return (
             <Card elevation={5} key={`leader-${lead.id}-${props.colUnit.col.id}`} sx={{
               margin:1,

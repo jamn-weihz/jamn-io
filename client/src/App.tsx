@@ -28,6 +28,7 @@ import useChangeCol from './Col/useChangeCol';
 import { v4 as uuidv4 } from 'uuid';
 import useColStore from './Col/useColStore';
 import { RestartableClient } from '.';
+import { UserAction, UserState } from './types/User';
 
 const GET_USER = gql`
   query GetUser {
@@ -55,6 +56,12 @@ export type PostContextType = {
   dispatch: Dispatch<PostAction>;
 }
 export const PostContext = React.createContext({} as PostContextType);
+
+export type UserContextType = {
+  state: UserState;
+  dispatch: Dispatch<UserAction>;
+}
+export const UserContext = React.createContext({} as UserContextType);
 
 interface AppProps {
   wsClient: RestartableClient;
@@ -348,7 +355,6 @@ function App(props: AppProps) {
   const postIds = useMemo(() => Object.keys(postState), [postState]);
 
   const cardReducer = (state: CardState, action: CardAction) => {
-    console.log(action);
     switch (action.type) {
       case 'MERGE_ITEMS':
         return {
@@ -375,8 +381,29 @@ function App(props: AppProps) {
 
   const [cardState, cardDispatch] = useReducer(cardReducer, {});
 
-
-  //const [userState, userDisptach] = useReducer(userReducer, {})
+  const userReducer = (state: UserState, action: UserAction) => {
+    console.log(action);
+    switch (action.type) {
+      case 'ADD_USER':
+        return {
+          ...state,
+          [action.userId]: false,
+        };
+      case 'REFRESH_USER':
+        return {
+          ...state,
+          [action.userId]: true,
+        };
+      case 'REFRESH_COMPLETE':
+        return {
+          ...state,
+          [action.userId]: false,
+        }
+      default:
+        throw new Error('Invalid action type')
+    }
+  }
+  const [userState, userDisptach] = useReducer(userReducer, {})
 
   useSavePostSubcription(postIds, {
     state: postState,
@@ -390,6 +417,7 @@ function App(props: AppProps) {
   if (!theme) return null;
 
   return (
+    <UserContext.Provider value={{state: userState, dispatch: userDisptach}}>
     <ColContext.Provider value={{state: colState, dispatch: colDispatch}}>
     <PostContext.Provider value={{state: postState, dispatch: postDispatch}}>
     <CardContext.Provider value={{state: cardState, dispatch: cardDispatch}}>
@@ -435,6 +463,7 @@ function App(props: AppProps) {
     </CardContext.Provider>
     </PostContext.Provider>
     </ColContext.Provider>
+    </UserContext.Provider>
   );
 }
 

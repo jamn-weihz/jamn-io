@@ -1,4 +1,6 @@
 import { gql, Reference, useApolloClient, useSubscription } from '@apollo/client';
+import { useContext } from 'react';
+import { UserContext } from '../App';
 import { LEAD_FIELDS } from '../fragments';
 
 const LEAD = gql`
@@ -21,6 +23,7 @@ const LEAD = gql`
 `;
 
 export default function useLeadSubscription(userId: string) {
+  const { state, dispatch } = useContext(UserContext);
   const client = useApolloClient();
 
   useSubscription(LEAD, {
@@ -86,7 +89,16 @@ export default function useLeadSubscription(userId: string) {
           }
         }
       });
-    }
-  })
+
+      dispatch({
+        type: 'REFRESH_USER',
+        userId: lead.leaderUserId,
+      });
+      dispatch({
+        type: 'REFRESH_USER',
+        userId: lead.followerUserId,
+      });
+    },
+  });
 
 }

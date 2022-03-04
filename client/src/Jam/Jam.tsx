@@ -141,12 +141,25 @@ export default function JamComponent(props: JamComponentProps) {
               }}>
                 {
                   path[3] === 'users'
-                    ? <JamUsers jam={jam1} colUnit={props.colUnit}/>
+                    ? <JamUsers 
+                        key={`jam-users-${jam1.id}-${props.colUnit.col.id}`}
+                        jam={jam1}
+                        colUnit={props.colUnit}
+                      />
                     : path[3] === 'recent'
-                      ? <JamRecent jam={jam1} colUnit={props.colUnit} />
+                      ? <JamRecent
+                          key={`jam-recent-${jam1.id}-${props.colUnit.col.id}`}
+                          jam={jam1} 
+                          colUnit={props.colUnit}
+                        />
                       : path[3] === 'settings'
-                        ? <JamSettings jam={jam1} colUnit={props.colUnit}/>
+                        ? <JamSettings 
+                            key={`jam-settings-${jam1.id}-${props.colUnit.col.id}`}
+                            jam={jam1} 
+                            colUnit={props.colUnit}
+                          />
                         : <JamProfile 
+                            key={`jam-profile-${jam1.id}-${props.colUnit.col.id}`}
                             jam={jam1} 
                             colUnit={props.colUnit} 
                           />

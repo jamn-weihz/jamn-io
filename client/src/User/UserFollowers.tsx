@@ -39,7 +39,7 @@ export default function UserFollowers(props: UserFollowersProps) {
       overflow: 'scroll',
     }}>
       {
-        (userDetail?.followers || []).map(lead => {
+        (props.user.followers || []).map(lead => {
           return (
             <Card elevation={5} key={`follower-${lead.id}-${props.colUnit.col.id}`} sx={{
               margin:1,
