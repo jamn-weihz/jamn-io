@@ -173,7 +173,7 @@ export class VotesService {
       const subject = userIdToReasons[userId].lead
         ? `New vote by u/${user.name}`
         : userIdToReasons[userId].sourcePostSub && userIdToReasons[userId].targetPostSub
-          ? `New vote between posts "${sourcePostName}" and "${targetPostNam}"`
+          ? `New vote between posts "${sourcePostName}" and "${targetPostName}"`
           : userIdToReasons[userId].sourcePostSub
             ? `New vote on post "${sourcePostName}"`
             : userIdToReasons.targetPostSub
