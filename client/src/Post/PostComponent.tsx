@@ -11,8 +11,8 @@ import React, { useContext, useEffect } from 'react';
 import { ColUnit } from '../types/Col';
 import ColLink from '../Col/ColLink';
 import { PostContext } from '../App';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleTwoToneIcon from '@mui/icons-material/CheckCircleTwoTone';
+import CheckIcon from '@mui/icons-material/Check';
 import useFollowUser from '../User/useFollowUser';
 import useUnfollowUser from '../User/useUnfollowUser';
 
@@ -132,7 +132,7 @@ export default function PostComponent(props: PostComponentProps) {
                           fontSize: 12,
                         }}
                       >
-                        <RadioButtonUncheckedIcon fontSize='inherit' sx={{
+                        <CheckIcon fontSize='inherit' sx={{
                           color: getColor(paletteDetail.mode)
                         }}/>
                       </IconButton>

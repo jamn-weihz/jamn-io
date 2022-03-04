@@ -102,8 +102,6 @@ export default function UserComponent(props: UserProps) {
     fragmentName: 'FullUserFields'
   }) as User;
 
-  console.log(user1);
-
   return (
     <Box sx={{
       height: '100%'

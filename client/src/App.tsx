@@ -382,7 +382,6 @@ function App(props: AppProps) {
   const [cardState, cardDispatch] = useReducer(cardReducer, {});
 
   const userReducer = (state: UserState, action: UserAction) => {
-    console.log(action);
     switch (action.type) {
       case 'ADD_USER':
         return {

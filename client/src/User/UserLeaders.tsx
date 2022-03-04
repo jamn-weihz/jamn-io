@@ -4,13 +4,12 @@ import { paletteVar, userVar } from '../cache';
 import ColLink from '../Col/ColLink';
 import { ColUnit } from '../types/Col';
 import { User } from '../types/User';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleTwoToneIcon from '@mui/icons-material/CheckCircleTwoTone';
+import CheckIcon from '@mui/icons-material/Check';
 import React from 'react';
 import { getColor } from '../utils';
 import useFollowUser from './useFollowUser';
 import useUnfollowUser from './useUnfollowUser';
-import useLeadSubscription from './useLeadSubscription';
 
 interface UserLeadersProps {
   user: User;
@@ -90,7 +89,7 @@ export default function UserLeaders(props: UserLeadersProps) {
                                     fontSize: 12,
                                   }}
                                 >
-                                  <RadioButtonUncheckedIcon fontSize='inherit' sx={{
+                                  <CheckIcon fontSize='inherit' sx={{
                                     color: getColor(paletteDetail.mode)
                                   }}/>
                                 </IconButton>

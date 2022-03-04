@@ -77,7 +77,7 @@ export default function useLeadSubscription(userId: string) {
       client.cache.modify({
         id: client.cache.identify(lead.followerUser),
         fields: {
-          followers: (cachedRefs, {readField}) => {
+          leaders: (cachedRefs, {readField}) => {
             if (lead.deleteDate) {
               return cachedRefs.filter((ref: Reference) => readField('id', ref) !== lead.id);
             }
