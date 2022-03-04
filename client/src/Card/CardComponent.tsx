@@ -451,7 +451,9 @@ export default function CardComponent(props: CardComponentProps) {
               color='inherit'
               sx={{
                 fontSize: 14,
-                color,
+                color: subbed
+                  ? userDetail?.color
+                  : color,
                 padding: 0,
               }}
             >
