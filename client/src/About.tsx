@@ -13,7 +13,7 @@ export default function About(props: AboutProps) {
     }}>
       <ColBar colUnit={props.colUnit} />
       <Box sx={{
-        height: 'calc(100% - 70px)',
+        height: 'calc(100% - 50px)',
         overflow: 'scroll',
       }}>
         <Card elevation={5} sx={{
@@ -97,8 +97,14 @@ export default function About(props: AboutProps) {
             marginTop: 1,
             marginLeft: 2,
           }}>
-            A person is incentivized to link two posts, because it makes it easier 
-            for themselves to travel that link in the future.
+            People are incentivized to link posts together, because it 
+            organizes the posts for themselves, 
+            making it easier to find the post in the future.
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+            marginLeft: 4,
+          }}>
             Index posts for personal reference.
             Aggregate these personal indices to form the collective index.  
           </Box>
