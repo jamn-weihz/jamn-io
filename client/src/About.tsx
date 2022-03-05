@@ -45,6 +45,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
             textAlign: 'center',
+            marginBottom: 1,
           }}>
             Find people with skills and interests that complement your own.
             <Box sx={{
