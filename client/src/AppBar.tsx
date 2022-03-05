@@ -16,18 +16,22 @@ import { Col, ColUnit } from './types/Col';
 import { DEFAULT_COLOR, MOBILE_WIDTH } from './constants';
 import { getAppbarWidth, getColor } from './utils';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
+import InfoIcon from '@mui/icons-material/Info';
 import { ColContext } from './App';
+import { useNavigate } from 'react-router-dom';
 
 interface AppbarProps {
 }
 export default function AppBar(props: AppbarProps) {
   const { state, dispatch } = useContext(ColContext);
 
+  const navigate = useNavigate();
+
   const userDetail = useReactiveVar(userVar);
   const sizeDetail = useReactiveVar(sizeVar);
   const paletteDetail = useReactiveVar(paletteVar);
 
-  const handleCardClick = (col: Col) => (event: React.MouseEvent) => {
+  const handleItemClick = (col: Col) => (event: React.MouseEvent) => {
     console.log(col);
     event.stopPropagation();
 
@@ -44,7 +48,10 @@ export default function AppBar(props: AppbarProps) {
 
   const mapPathnameToIcon = (pathname: string) => {
     const path = pathname.split('/');
-    if (path[1] === 'register' || path[1] === 'login') {
+    if (path[1] === 'about') {
+      return <InfoIcon fontSize='inherit' />
+    }
+    else if (path[1] === 'register' || path[1] === 'login') {
       return <AccountCircleIcon fontSize='inherit'/>;
     }
     else if (path[1] === 'u') {
@@ -75,7 +82,7 @@ export default function AppBar(props: AppbarProps) {
       <Box key={'appbar-col-'+colUnit.col.id} sx={{
         padding: '5px',
       }}>
-        <IconButton size='small' onClick={handleCardClick(colUnit.col)} sx={{
+        <IconButton size='small' onClick={handleItemClick(colUnit.col)} sx={{
           fontSize: sizeDetail.width < MOBILE_WIDTH ? 16 : 32,
           color: colUnit.col.i === state.i
             ? userDetail?.color || DEFAULT_COLOR
@@ -95,20 +102,26 @@ export default function AppBar(props: AppbarProps) {
     dispatch({
       type: 'SHOW_ADDER',
     });
-  }
+  };
   
   const handleClick = (event: React.MouseEvent) => {
     dispatch({
       type: 'HIDE_ADDER'
     });
-  }
-  const handlePaletteClick = (event:React.MouseEvent) => {
+  };
+
+  const handlePaletteClick = (event: React.MouseEvent) => {
     paletteVar({
       mode: paletteDetail.mode === 'dark'
         ? 'light'
         : 'dark',
     })
-  }
+  };
+
+  const handleAboutClick = (event: React.MouseEvent) => {
+    navigate('/about')
+  };
+
   return (
     <Box onClick={handleClick} sx={{
       display: 'flex',
@@ -126,7 +139,7 @@ export default function AppBar(props: AppbarProps) {
           padding: '5px',
           paddingTop: '10px',
         }}>
-          <IconButton size='small'>
+          <IconButton size='small' onClick={handleAboutClick}>
             <img src={sizeDetail.width < MOBILE_WIDTH ? icon16 : icon32}/>
           </IconButton>
         </Box>

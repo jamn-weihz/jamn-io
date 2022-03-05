@@ -6,10 +6,24 @@ export default function reduceResetCols(state: ColState, action: ResetColsAction
     ...state,
     colUnits: [
       {
+        col: {
+          id: uuidv4(),
+          pathname: '/about',
+          i: 0,
+          __typename: 'Col',
+        },
+        stack: [{
+          pathname: '/about',
+          id: uuidv4(),
+        }],
+        index: 0,
+        showOptions: false,
+      },
+      {
         col: { 
           id: uuidv4(),
           pathname: '/register',
-          i: 0,
+          i: 1,
           __typename: 'Col',
         },
         stack: [{
@@ -23,7 +37,7 @@ export default function reduceResetCols(state: ColState, action: ResetColsAction
         col: { 
           id: uuidv4(),
           pathname: '/map',
-          i: 1,
+          i: 2,
           __typename: 'Col',
         },
         stack: [{
@@ -37,7 +51,7 @@ export default function reduceResetCols(state: ColState, action: ResetColsAction
         col: {
           id: uuidv4(),
           pathname: '/search',
-          i: 2,
+          i: 3,
           __typename: 'Col',
         },
         stack: [{
@@ -46,7 +60,7 @@ export default function reduceResetCols(state: ColState, action: ResetColsAction
         }],
         index: 0,
         showOptions: false,
-      }
+      },
     ],
     showAdder: false,
     i: 0,

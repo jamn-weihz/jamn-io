@@ -14,6 +14,7 @@ import ColBar from './ColBar';
 import NotFound from '../NotFound';
 import PostCol from '../Post/PostCol';
 import { ColContext } from '../App';
+import About from '../About';
 
 interface ColComponentProps {
   colUnit: ColUnit;
@@ -38,7 +39,10 @@ export default function ColComponent(props: ColComponentProps) {
 
   const mapColUnitToComponent = (colUnit: ColUnit) => {
     const path = colUnit.col.pathname.split('/');
-    if (path[1] === 'register') {
+    if (path[1] === 'about') {
+      return <About colUnit={colUnit} />
+    }
+    else if (path[1] === 'register') {
       return <Register colUnit={colUnit}/>;
     }
     else if (path[1] === 'login') {

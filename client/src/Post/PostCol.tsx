@@ -83,7 +83,7 @@ export default function PostCol(props: PostColProps) {
       if (isLoading) {
         console.log(data);
         setIsLoading(false)
-        setPost(data.getPost)
+        setPost(data?.getPost)
       }
     }
   });
