@@ -58,7 +58,7 @@ export default function About(props: AboutProps) {
           margin:1,
           padding:1,
         }}>
-          1) JAMN is a social medium that allows you to link between posts.
+          (1) JAMN is a social medium that allows you to link between posts.
           <Box sx={{
             marginTop: 1,
             marginLeft: 2,
@@ -104,7 +104,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop:1
           }}>
-            2) The ability to vote on links yields a demographically weighted directed graph.
+            (2) The ability to vote on links yields a demographically weighted directed graph.
           </Box>
           <Box sx={{
             marginTop: 1,
@@ -149,7 +149,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            3) Filter the voting on links by demographic
+            (3) Filter the voting on links by demographic
             to see the opinons of a specific groups of people.
           </Box>
           <Box sx={{
@@ -172,7 +172,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            4) Weight votes not just with clicks, but with money.
+            (4) Weight votes not just with clicks, but with money.
             <Box sx={{
               marginTop: 1,
               marginLeft: 2,
@@ -228,7 +228,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            5) Allow users to withdraw money invested in a link.
+            (5) Allow users to withdraw money invested in a link.
           </Box>
           <Box sx={{
             marginTop: 1,
@@ -247,7 +247,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            6) Pay the owner of a post when people use that post as platform for paid advertising.
+            (6) Pay the owner of a post when people use that post as platform for paid advertising.
           </Box>
           <Box sx={{
             marginTop: 1,
@@ -298,7 +298,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            7) Allow shareable ownership of a post.
+            (7) Allow shareable ownership of a post.
           </Box>
           <Box sx={{
             marginTop: 1,
@@ -327,7 +327,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            8) Allow shareable ownership of user accounts.
+            (8) Allow shareable ownership of user accounts.
           </Box>
           <Box sx={{
             marginTop: 1,
@@ -349,7 +349,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            9) Fix the token supply of posts and users at 1 token per post
+            (9) Fix the token supply of posts and users at 1 token per post
             and 1 token per user. Sell shares as fractions of the total supply, 
             e.g. milli-tokens and nano-tokens
           </Box>
@@ -378,7 +378,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            10) Write the ownership and transaction records to a distributed ledger.
+            (10) Write the ownership and transaction records to a distributed ledger.
             So that these assets are truly owned by the creators and not a 
             centralized corporation.
           </Box>
@@ -391,7 +391,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            11) Maintain a hybrid web2/web3 app so that people can still post 
+            (11) Maintain a hybrid web2/web3 app so that people can still post 
             and link for free.
           </Box>
           <Box sx={{
@@ -406,12 +406,12 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            12) Use maps as a jumping off point for AR integration.
+            (12) Use maps as a jumping off point for AR integration.
           </Box>
           <Box sx={{
             marginTop: 1,
           }}>
-            13) Implement a flowchart view in 3D AR/VR to see
+            (13) Implement a flowchart view in 3D AR/VR to see
             subgraphs of posts and links.
           </Box>
           <Box sx={{
@@ -431,18 +431,18 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            14) Build browser extensions to integrate linkage and web3 with
+            (14) Build browser extensions to integrate linkage and web3 with
             existing web2 posts
           </Box>
           <Box sx={{
             marginTop: 1,
           }}>
-            15) ???
+            (15) ???
           </Box>
           <Box sx={{
             marginTop: 1,
           }}>
-            16) Profit
+            (16) Profit
           </Box>
           <Box sx={{
             marginTop: 1,
