@@ -97,9 +97,9 @@ export default function PostCol(props: PostColProps) {
     })
   }, [props.id]);
 
+  console.log(isLoading)
   if (isLoading) return <Loading />
 
-  if (!surveyorState) return null;
 
   return (
     <Box sx={{
@@ -111,7 +111,7 @@ export default function PostCol(props: PostColProps) {
         overflow: 'scroll',
       }}>
       {
-        post?.id
+        post?.id && surveyorState
           ? <Box>
               <Surveyor 
                 post={post}
