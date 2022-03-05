@@ -68,12 +68,20 @@ export default function About(props: AboutProps) {
           </Box>
           <Box sx={{
             marginTop: 1,
+            marginLeft: 4,
+          }}>
+            (Hyperlinks are unidirectional in the sense that, if I post the URL of post B into
+            the content of post A (yielding a hyperlink A-&gt;B), then although I can travel directly 
+            from A to B, but not necesarily from B to A.)
+          </Box>
+          <Box sx={{
+            marginTop: 1,
             marginLeft: 2,
           }}>
-            This means that the directionality of a link is not reserved for expressing 
-            the limitation in the direction of travel.
-
-            Instead, it can be used to express more meaningful orderings, i.e.         
+            This means that, while the directionality of a hyperlink is
+            reserved for expressing 
+            the limitation in the direction of travel,
+            the directionality of a link can be used to express more meaningful orderings, i.e.         
           </Box>
           <Box sx={{
             marginTop: 1,
@@ -97,16 +105,30 @@ export default function About(props: AboutProps) {
             marginTop: 1,
             marginLeft: 2,
           }}>
-            People are incentivized to link posts together, because it 
+            People are incentivized to link posts together, because this 
             organizes the posts for themselves, 
-            making it easier to find the post in the future.
+            making it easier to find those posts in the future.
           </Box>
           <Box sx={{
             marginTop: 1,
             marginLeft: 4,
           }}>
-            Index posts for personal reference.
-            Aggregate these personal indices to form the collective index.  
+            Enable the indexing of posts for personal reference.
+            Then aggregate these personal indices to form the collective index.  
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+            marginLeft: 2,
+          }}>
+            Instead of crawling the Web to create a map of it, to detect backlinks,
+            let's make the structure of the Web directly accessible.
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+            marginLeft: 4,
+          }}>
+            So we can see the citations of a post directly.
+            And the Web becomes a space you can really walk through.
           </Box>
           <Box sx={{
             marginTop:1
@@ -125,7 +147,7 @@ export default function About(props: AboutProps) {
             marginTop: 1,
             marginLeft: 4,
           }}>
-            Imagine a presidential debate were formatted in this manner.
+            Imagine if a presidential debate were formatted in this manner.
             Where people could post questions and
             validate the logical transitions made between posts,
             voting on links to direct the flow of the conversation.
@@ -134,8 +156,8 @@ export default function About(props: AboutProps) {
             marginTop:1,
             marginLeft: 2,
           }}>
-            The weighting of the links helps you prioritize which links to follow when
-            there are many options available, thus facilitating search.
+            The weighting of the links helps you prioritize which links to follow, when
+            there are many options available. Thus, it facilitates search.
           </Box>
           <Box sx={{
             marginTop: 1,
@@ -143,15 +165,7 @@ export default function About(props: AboutProps) {
           }}>
             Imagine that each post is a search query, and the 
             neighboring posts are search results. Ranked by the vote of
-            the people. No blackbox. Just raw demographic data.
-          </Box>
-          <Box sx={{
-            marginTop: 1,
-            marginLeft: 4,
-          }}>
-            Instead of having to crawling the Web to create a map of it, let's
-            make the structure of the Web directly accessible.
-            See the citations of a post directly, thanks to bidirectional links.
+            the people. No blackbox ranking algorithm. Just raw demographic data.
           </Box>
           <Box sx={{
             marginTop: 1,
@@ -172,8 +186,8 @@ export default function About(props: AboutProps) {
             marginLeft: 2,
           }}>
             Or, view the subgraph where the weight of each person's vote is
-            determined by the people who follow them, where the weight of a follower
-            is determined by the number of people who follow them, and so on--
+            determined by the weight of their followers, whose weights are determined
+            is determined by the weight of <i>their</i> followers, and so on--
             a sort of PageRank for users.
           </Box>
           <Box sx={{
