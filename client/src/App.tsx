@@ -100,6 +100,7 @@ function App(props: AppProps) {
         mode: paletteDetail.mode,
       },
     }));
+
   }, [userDetail?.color, paletteDetail.mode])
 
   useEffect(() => {
@@ -412,8 +413,9 @@ function App(props: AppProps) {
     dispatch: cardDispatch,
   });
   useLinkPostsSubcription(postIds, cardDispatch);
-  
+
   if (!theme) return null;
+
 
   return (
     <UserContext.Provider value={{state: userState, dispatch: userDisptach}}>

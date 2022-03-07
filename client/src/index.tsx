@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-
+import { CssBaseline } from '@mui/material';
 import {
   ApolloClient,
   InMemoryCache,
@@ -114,6 +114,7 @@ const client = new ApolloClient({
 
 ReactDOM.render(
   <React.StrictMode>
+    <CssBaseline enableColorScheme />
     <ApolloProvider client={client}>
       <BrowserRouter>
         <App wsClient={wsClient} />
