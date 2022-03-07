@@ -30,7 +30,6 @@ export default function Surveyor(props: SurveyorProps) {
   const slice = props.surveyorState.stack[props.surveyorState.index];
   return (
     <Box ref={contentEl} sx={{
-      overflow: 'scroll', 
       width: '100%',
     }}>
       { 

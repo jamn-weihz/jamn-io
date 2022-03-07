@@ -60,7 +60,7 @@ export default function JamProfile(props: JamProfileProps) {
   return(
     <Box sx={{
       height: 'calc(100% - 90px)',
-      overflow: 'scroll',
+      overflowY: 'scroll',
     }}>
       <Surveyor 
         key={`surveyor-${props.colUnit.col.id}`}

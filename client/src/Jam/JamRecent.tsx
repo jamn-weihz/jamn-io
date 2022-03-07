@@ -298,7 +298,7 @@ export default function JamRecent(props: JamRecentProps) {
   return (
     <Box ref={containerEl} sx={{
       height: 'calc(100% - 90px)',
-      overflow: 'scroll',
+      overflowY: 'scroll',
     }}>
       <Box sx={{
         margin: 1,

@@ -67,7 +67,7 @@ export default function UserProfile(props: UserProfileProps) {
       height: userDetail?.id === props.user.id
         ? 'calc(100% - 150px)'
         : 'calc(100% - 110px)',
-      overflow: 'scroll',
+      overflowY: 'scroll',
     }}>
       <Surveyor 
         key={`surveyor-${props.colUnit.col.id}`}

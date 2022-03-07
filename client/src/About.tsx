@@ -14,7 +14,7 @@ export default function About(props: AboutProps) {
       <ColBar colUnit={props.colUnit} />
       <Box sx={{
         height: 'calc(100% - 50px)',
-        overflow: 'scroll',
+        overflowY: 'scroll',
       }}>
         <Card elevation={5} sx={{
           margin: 1,

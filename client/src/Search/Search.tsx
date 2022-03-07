@@ -35,7 +35,6 @@ export default function Search(props: SearchProps) {
   useEffect(() => {
     setSearchClient(algoliasearch(ALGOLIA_APP_ID, ALGOLIA_APP_KEY));
   }, []);
-
   
   const [surveyorState, setSurveyorState] = useState(() => {
     const surveyorSlice: SurveyorSlice = {
@@ -152,7 +151,7 @@ export default function Search(props: SearchProps) {
               </Card>
               <Box ref={containerEl} sx={{
                 height: '100%',
-                overflow: 'scroll',
+                overflowY: 'scroll',
               }}>
                 <Surveyor 
                   key={`surveyor-${props.colUnit.col.id}`} 
