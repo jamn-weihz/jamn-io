@@ -36,7 +36,7 @@ export default function UserLeaders(props: UserLeadersProps) {
       height: userDetail?.id === props.user.id
         ? 'calc(100% - 150px)'
         : 'calc(100% - 110px)',
-      overflow: 'scroll',
+      overflowY: 'scroll',
     }}>
       {
         (props.user.leaders || []).map(lead => {

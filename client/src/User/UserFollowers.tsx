@@ -35,7 +35,7 @@ export default function UserFollowers(props: UserFollowersProps) {
       height: userDetail?.id === props.user.id
         ? 'calc(100% - 150px)'
         : 'calc(100% - 110px)',
-      overflow: 'scroll',
+      overflowY: 'scroll',
     }}>
       {
         (props.user.followers || []).map(lead => {
