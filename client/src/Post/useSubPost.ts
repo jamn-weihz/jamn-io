@@ -12,7 +12,7 @@ const SUB_POST = gql`
   ${SUB_FIELDS}
 `
 
-export default function useSubPost(postId: string) {
+export default function useSubPost() {
   const client = useApolloClient();
 
   const userDetail = useReactiveVar(userVar);
@@ -45,7 +45,7 @@ export default function useSubPost(postId: string) {
     },
   });
 
-  const subPost = () => {
+  const subPost = (postId: string) => {
     sub({
       variables: {
         postId, 

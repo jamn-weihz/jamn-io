@@ -70,7 +70,7 @@ export default function CardComponent(props: CardComponentProps) {
 
   const { changeCol } = useChangeCol(0, true);
 
-  const { subPost } = useSubPost(props.card.postId)
+  const { subPost } = useSubPost()
   const { unsubPost } = useUnsubPost(props.card.postId);
 
   useEffect(() => {
@@ -243,7 +243,7 @@ export default function CardComponent(props: CardComponentProps) {
 
   const handleSubClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    subPost();
+    subPost(props.card.postId);
   }
   
   const handleUnsubClick = (event: React.MouseEvent) => {

@@ -2,6 +2,7 @@ import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/com
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostsService } from 'src/posts/posts.service';
 import { RolesService } from 'src/roles/roles.service';
+import { SubsService } from 'src/subs/subs.service';
 import { findDefaultWeight } from 'src/utils';
 import { VotesService } from 'src/votes/votes.service';
 import { Repository } from 'typeorm';

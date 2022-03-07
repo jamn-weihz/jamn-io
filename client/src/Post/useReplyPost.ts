@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useContext } from 'react';
 import { CardContext } from '../App';
 import { Card } from '../types/Card';
+import useSubPost from './useSubPost';
 
 const REPLY_POST = gql`
   mutation ReplyPost($sessionId: String!, $sourcePostId: String!, $jamId: String) {
@@ -30,6 +31,9 @@ const REPLY_POST = gql`
 export default function useReplyPost(cardId: string, sourcePostId: string, jamId?: string) {
   const { state, dispatch } = useContext(CardContext);
   const sessionDetail = useReactiveVar(sessionVar);
+
+  const { subPost } = useSubPost();
+
   const [reply] = useMutation(REPLY_POST, {
     onError: error => {
       console.error(error);
@@ -42,6 +46,7 @@ export default function useReplyPost(cardId: string, sourcePostId: string, jamId
     },
     onCompleted: data => {
       console.log(data);
+      subPost(data.replyPost.targetPost.id);
       focusVar({
         postId: data.replyPost.targetPost.id,
       });
@@ -74,7 +79,7 @@ export default function useReplyPost(cardId: string, sourcePostId: string, jamId
           showNext: true,
           nextIds: [newCard.id, ...state[cardId].nextIds],
         }
-      })
+      });
     },
   });
 
