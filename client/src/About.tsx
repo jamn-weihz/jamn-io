@@ -71,7 +71,7 @@ export default function About(props: AboutProps) {
             marginLeft: 4,
           }}>
             (Hyperlinks are unidirectional in the sense that, if I post the URL of post B into
-            the content of post A (yielding a hyperlink A-&gt;B), then although I can travel directly 
+            the content of post A (yielding a hyperlink A-&gt;B), then I can travel directly 
             from A to B, but not necesarily from B to A.)
           </Box>
           <Box sx={{
