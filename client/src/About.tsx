@@ -424,7 +424,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            (14) Display a users avatar next to their currently selected post.
+            (14) Display each user's avatar next to their currently selected post.
           </Box>
           <Box sx={{
             marginTop: 1,
