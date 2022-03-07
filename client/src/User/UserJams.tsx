@@ -30,7 +30,7 @@ export default function UserJams(props: UserJamsProps) {
       height: userDetail?.id === props.user.id
         ? 'calc(100% - 150px)'
         : 'calc(100% - 110px)',
-      overflow: 'scroll',
+      overflowY: 'scroll',
     }}>
       {
         props.user.roles.filter(role => !role.deleteDate).map(role => {

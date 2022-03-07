@@ -83,7 +83,7 @@ export default function JamUsers(props: JamUsersProps) {
       </Card>
       <Box sx={{
         height: 'calc(100% - 120px)',
-        overflow: 'scroll',
+        overflowY: 'scroll',
       }}>
         {
           (props.jam.roles || []).filter(role_i => !role_i.deleteDate).map(role_i => {

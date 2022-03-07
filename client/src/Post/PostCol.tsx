@@ -108,7 +108,7 @@ export default function PostCol(props: PostColProps) {
       <ColBar colUnit={props.colUnit} />
       <Box sx={{
         height: 'calc(100% - 70px)',
-        overflow: 'scroll',
+        overflowY: 'scroll',
       }}>
       {
         post?.id && surveyorState
