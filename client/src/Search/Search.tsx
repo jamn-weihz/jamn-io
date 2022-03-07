@@ -150,7 +150,7 @@ export default function Search(props: SearchProps) {
                 </Box>
               </Card>
               <Box ref={containerEl} sx={{
-                height: '100%',
+                height: 'calc(100% - 105px)',
                 overflowY: 'scroll',
               }}>
                 <Surveyor 
