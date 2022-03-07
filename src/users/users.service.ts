@@ -157,12 +157,16 @@ export class UsersService {
     return this.usersRepository.save(user0);
   }
 
-  incrementUserPostI(userId: string) {
-    this.usersRepository.increment({id: userId}, 'postI', 1);
+  async incrementUserPostI(userId: string) {
+    await this.usersRepository.increment({id: userId}, 'postI', 1);
   }
 
-  incrementUserVoteI(userId: string) {
-    this.usersRepository.increment({id: userId}, 'voteI', 1);
+  async incrementUserVoteI(userId: string) {
+    await this.usersRepository.increment({id: userId}, 'voteI', 1);
+  }
+
+  async incrementUserDeleteVoteI(userId: string) {
+    await this.usersRepository.increment({id: userId}, 'deletedVoteI', 1);
   }
 
   async setUserColor(userId: string, color: string): Promise<User> {

@@ -177,6 +177,7 @@ type User {
   cols: [Col!]!
   createDate: DateTime!
   deleteDate: DateTime
+  deletedVoteI: Int!
   description: String!
   email: String
   focus: Post!

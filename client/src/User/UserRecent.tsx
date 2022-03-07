@@ -243,7 +243,7 @@ export default function UserRecent(props: UserRecentProps) {
     if (scrollTop < 500) {
       if (!isLoading) {
         const slice = surveyorState.stack[surveyorState.index];
-        const remaining = props.user.voteI - slice.cardIds.length;
+        const remaining = props.user.voteI - props.user.deletedVoteI - slice.cardIds.length;
         if (remaining > 0) {
           setIsLoading(true);
           getRecent({
@@ -280,7 +280,7 @@ export default function UserRecent(props: UserRecentProps) {
   }
 
   const slice = surveyorState.stack[surveyorState.index];
-  const remaining = props.user.voteI - slice.cardIds.length;
+  const remaining = props.user.voteI - props.user.deletedVoteI - slice.cardIds.length;
 
   return (
     <Box ref={containerEl} sx={{

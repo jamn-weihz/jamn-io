@@ -25,6 +25,7 @@ export type User = {
   mapZoom: number | null;
   postI: number;
   voteI: number;
+  deletedVoteI: number;
   verifyEmailDate: Date;
   isRegisteredWithGoogle: boolean;
   createDate: Date;

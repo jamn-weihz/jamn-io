@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EmailService } from 'src/email/email.service';
 import { JamsService } from 'src/jams/jams.service';
@@ -92,10 +92,12 @@ export class VotesService {
   }
 
   async deleteVote(voteId: string) {
-    const vote0 = new Vote();
-    vote0.id = voteId;
-    vote0.deleteDate = new Date();
-    return this.votesRepository.save(vote0);
+    const vote = await this.votesRepository.findOne({id: voteId});
+    if (!vote) {
+      throw new BadRequestException('This vote does not exist');
+    }
+    await this.votesRepository.softDelete({id: voteId});
+    await this.usersService.incrementUserDeleteVoteI(vote.userId);
   }
 
   async notify(vote: Vote) {

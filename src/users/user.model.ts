@@ -26,6 +26,9 @@ export class User {
   @Field(() => Int)
   voteI: number;
   
+  @Field(() => Int)
+  deletedVoteI: number;
+  
   @Field()
   name: string;
 

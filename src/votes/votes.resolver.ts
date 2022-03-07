@@ -42,7 +42,6 @@ export class VotesResolver {
     @Parent() vote: Vote,
   ) {
     const link = await this.linksService.getLinkById(vote.linkId);
-    console.log('link', link)
     return link;
   }
 

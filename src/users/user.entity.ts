@@ -48,6 +48,9 @@ export class User {
   @Column({default: 0})
   voteI: number;
 
+  @Column({default: 0})
+  deletedVoteI: number;
+
   @Column()
   name: string;
 

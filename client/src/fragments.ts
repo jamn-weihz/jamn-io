@@ -6,6 +6,7 @@ export const USER_FIELDS = gql`
     focusId
     postI
     voteI
+    deletedVoteI
     name
     lowercaseName
     email
