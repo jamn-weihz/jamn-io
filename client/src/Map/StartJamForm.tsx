@@ -11,6 +11,7 @@ import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 're
 import { snackbarVar, paletteVar, startJamVar } from '../cache';
 import useChangeCol from '../Col/useChangeCol';
 import { FULL_JAM_FIELDS } from '../fragments';
+import useSubPost from '../Post/useSubPost';
 import { Col } from '../types/Col';
 import { getColor } from '../utils';
 
@@ -47,6 +48,8 @@ export default function StartJamForm(props: StartJamModalProps) {
   const [nameTimeout, setNameTimeout] = useState(null as ReturnType<typeof setTimeout> | null);
   const [desc, setDesc] = useState('');
   const jamNameEl = useRef<HTMLInputElement>();
+
+  const { subPost} = useSubPost()
   useEffect(() => {
     jamNameEl.current?.focus();
   }, [])
@@ -76,6 +79,7 @@ export default function StartJamForm(props: StartJamModalProps) {
     },
     onCompleted: data => {
       console.log(data);
+      subPost(data.startJam.focusId);
       props.setIsOpen(false);
       startJamVar({
         jam: data.startJam,
