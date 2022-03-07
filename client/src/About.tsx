@@ -113,22 +113,8 @@ export default function About(props: AboutProps) {
             marginTop: 1,
             marginLeft: 4,
           }}>
-            Enable the indexing of posts for personal reference.
-            Then aggregate these personal indices to form the collective index.  
-          </Box>
-          <Box sx={{
-            marginTop: 1,
-            marginLeft: 2,
-          }}>
-            Instead of crawling the Web to create a map of it, to detect backlinks,
-            let's make the structure of the Web directly accessible.
-          </Box>
-          <Box sx={{
-            marginTop: 1,
-            marginLeft: 4,
-          }}>
-            So we can see the citations of a post directly.
-            And the Web becomes a space you can really walk through.
+            If we enable the indexinging of posts for personal reference,
+            then we can aggregate these personal indices to form a collective index.  
           </Box>
           <Box sx={{
             marginTop:1
@@ -147,7 +133,8 @@ export default function About(props: AboutProps) {
             marginTop: 1,
             marginLeft: 4,
           }}>
-            Imagine if a presidential debate were formatted in this manner.
+            Imagine an important discussion (e.g. a presidential debate)
+            were formatted in this manner.
             Where people could post questions and
             validate the logical transitions made between posts,
             voting on links to direct the flow of the conversation.
@@ -194,57 +181,57 @@ export default function About(props: AboutProps) {
             marginTop: 1,
           }}>
             (4) Weight votes not just with clicks, but with money.
-            <Box sx={{
-              marginTop: 1,
-              marginLeft: 2,
-            }}>
-              Let's weight votes via direct democracy, via republic,
-              and also via capital.
-            </Box>
-            <Box sx={{
-              marginTop: 1,
-              marginLeft: 2,
-            }}>
-              People purchase votes and viewership anyway. Instead of forcing them to hack
-              around the system, give them an outlet to express themselves through the system.
-            </Box>
-            <Box sx={{
-              marginTop: 1,
-              marginLeft: 4,
-            }}>
-              (Like music streaming services giving people an alternative to pirating music.)
-            </Box>
-            <Box sx={{
-              marginTop: 1,
-              marginLeft: 2,
-            }}>
-              This democratises advertising so that anyone can do it.
-              It normalizes the behavior of marketing ones own material.
-            </Box>
-            <Box sx={{
-              marginTop: 1,
-              marginLeft: 4,
-            }}>
-              Choose a post as a platform, link from it to your content, 
-              invest money to boost that link in the charts.
-              Your advert is targeted directly to people who are viewing
-              a specific piece of content.
-            </Box>
-            <Box sx={{
-              marginTop: 1,
-              marginLeft: 2,
-            }}>
-              In this model, each link is an advert to some post;
-              each advert, is a link. It integrates advertisements
-              into the data structure, rather than treating it 
-              as second-class, tacked on content.
-            </Box>
-            <Box sx={{
-              marginTop: 1,
-              marginLeft: 4,
-            }}>
-              Good promotional content can become its own platform for further posts.
-            </Box>
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+            marginLeft: 2,
+          }}>
+            In (2) and (3) we weight votes via direct democracy and via republic.
+            Here we examine the weighting of votes with capital.
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+            marginLeft: 2,
+          }}>
+            People purchase votes and viewership anyway. Instead of forcing them to hack
+            around the system, give them an outlet to express themselves through the system.
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+            marginLeft: 4,
+          }}>
+            (Like music streaming services giving people an alternative to pirating music.)
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+            marginLeft: 2,
+          }}>
+            This democratises advertising so that anyone can do it.
+            It normalizes the behavior of marketing one's own material.
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+            marginLeft: 4,
+          }}>
+            Choose a post as a platform, link from it to your content, 
+            invest money to boost that link in the charts.
+            Your advert is targeted directly to people who are viewing
+            a specific piece of content.
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+            marginLeft: 2,
+          }}>
+            In this model, each link is an advert to some post;
+            each advert, is a link. It integrates advertisements
+            into the data structure, rather than treating it 
+            as a special class of content.
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+            marginLeft: 4,
+          }}>
+            Good promotional content can become its own platform for further linkage of posts.
           </Box>
           <Box sx={{
             marginTop: 1,
@@ -268,14 +255,15 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            (6) Pay the owner of a post when people use that post as platform for paid advertising.
+            (6) Pay the owner of a post when people use that post as platform for paid advertising,
+            i.e. when people invest capital in a link pointing out from that post.
           </Box>
           <Box sx={{
             marginTop: 1,
             marginLeft: 2,
           }}>
             Reconcile this with the withdrawal of investment by decaying the amount of 
-            withdrawable funds at a rate with a half-life is 100 days, compounded continually.
+            withdrawable funds at a rate with a half-life of 100 days, compounded continually.
           </Box>
           <Box sx={{
             marginTop: 1,
@@ -296,8 +284,8 @@ export default function About(props: AboutProps) {
             marginLeft: 2,
           }}>
             This helps to sunset a capital-based boosting of a link. The owners of 
-            the platform post is incentivized to withdraw the funds and apply them elsewhere
-            if they see fit.
+            the platform post is incentivized to withdraw the funds and apply them 
+            where they want interest to flow.
           </Box>
           <Box sx={{
             marginTop: 1,
@@ -334,7 +322,7 @@ export default function About(props: AboutProps) {
             marginLeft: 4,
           }}>
             This rewards people who recognize and discover quality
-            earlier, as they can buy into a post before its stock rises. 
+            earlier, as they can buy into a post before share prices rise. 
           </Box>
           <Box sx={{
             marginTop: 1,
@@ -348,30 +336,8 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            (8) Allow shareable ownership of user accounts.
-          </Box>
-          <Box sx={{
-            marginTop: 1,
-            marginLeft: 2,
-          }}>
-            While the controller of an account maintains 
-            the executive control over the links and posts 
-            generated by the account, others can share in the profits
-            generated by the controllers posts.
-          </Box>
-          <Box sx={{
-            marginTop: 1,
-            marginLeft: 2,
-          }}>
-            This incentivizes the discovery of up and coming writers,
-            and their promotion. It further aligns incentives of writers and 
-            readers.
-          </Box>
-          <Box sx={{
-            marginTop: 1,
-          }}>
-            (9) Fix the token supply of posts and users at 1 token per post
-            and 1 token per user. Sell shares as fractions of the total supply, 
+            (8) Fix the token supply of posts and users at 1 token per post.
+            Sell shares as fractions of the total supply, 
             e.g. milli-tokens and nano-tokens
           </Box>
           <Box sx={{
@@ -394,12 +360,12 @@ export default function About(props: AboutProps) {
             marginLeft: 2,
           }}>
             This prevents inflation of the supply, which dilutes the value of shares,
-            taxing the purchasers to benefit the controller.
+            taxing the purchasers to benefit the post controller.
           </Box>
           <Box sx={{
             marginTop: 1,
           }}>
-            (10) Write the ownership and transaction records to a distributed ledger.
+            (9) Write the ownership and transaction records to a distributed ledger.
             So that these assets are truly owned by the creators and not a 
             centralized corporation.
           </Box>
@@ -412,7 +378,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            (11) Maintain a hybrid web2/web3 app so that people can still post 
+            (10) Maintain a hybrid web2/web3 app so that people can still post 
             and link for free.
           </Box>
           <Box sx={{
@@ -427,12 +393,12 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            (12) Use maps as a jumping off point for AR integration.
+            (11) Use maps as a jumping off point for AR integration.
           </Box>
           <Box sx={{
             marginTop: 1,
           }}>
-            (13) Implement a flowchart view in 3D AR/VR to see
+            (12) Implement a flowchart view in 3D AR/VR to see
             subgraphs of posts and links.
           </Box>
           <Box sx={{
@@ -452,8 +418,13 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            (14) Build browser extensions to integrate linkage and web3 with
+            (13) Build browser extensions to integrate linkage and web3 with
             existing web2 posts
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+          }}>
+            (14) Display a users avatar next to their currently selected post.
           </Box>
           <Box sx={{
             marginTop: 1,
@@ -468,7 +439,7 @@ export default function About(props: AboutProps) {
           <Box sx={{
             marginTop: 1,
           }}>
-            -weihz, March 5, 2022
+            -weihz, March 7, 2022
           </Box>
         </Card>
         <Card elevation={5} sx={{
