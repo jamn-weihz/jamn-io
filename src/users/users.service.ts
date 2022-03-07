@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { PostsService } from 'src/posts/posts.service';
 import { LinksService } from 'src/links/links.service';
 import { VotesService } from 'src/votes/votes.service';
+import { SubsService } from 'src/subs/subs.service';
 
 const numbers = NumberDictionary.generate({ min: 100, max: 999 });
 
@@ -21,6 +22,7 @@ export class UsersService {
     private readonly linksService: LinksService,
     @Inject(forwardRef(() => VotesService))
     private readonly votesService: VotesService,
+    private readonly subsService: SubsService,
   ) {}
 
   async getUserById(id: string): Promise<User> {
@@ -107,6 +109,7 @@ export class UsersService {
     const link = await this.linksService.createLink(startPost.id, userPost.id, 1, 0);
     const vote = await this.votesService.createVote(user1.id, link.id, startPost.id, userPost.id, 1, 0);
 
+    const sub = await this.subsService.subPost(user1.id, userPost.id);
     user1.focusId = userPost.id;
     user1.postI = undefined;
 
