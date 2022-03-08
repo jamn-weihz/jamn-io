@@ -331,8 +331,8 @@ export default function Map(props: MapProps) {
       <Card elevation={5} sx={{
         position: 'relative',
         height: isStartingJam
-          ? 'calc(100% - 500px)'
-          : 'calc(100% - 340px)',
+          ? 'calc(100% - 400px)'
+          : 'calc(100% - 240px)',
         margin: 1,
         padding: 1,
       }}>
@@ -374,6 +374,7 @@ export default function Map(props: MapProps) {
       <Card elevation={5} sx={{
         margin: 1,
         padding: 1,
+        display: 'none',
       }}>
         <Button disabled={true}>
           Set your location
