@@ -18,7 +18,7 @@ export default function IframelyComponent(props: any) {
   });
   const paletteDetail = useReactiveVar(paletteVar);
 
-  const key = paletteDetail.mode === 'dark'
+  const key = paletteDetail.mode === 'dark' && false
     ? IFRAMELY_API_KEY_DARK
     : IFRAMELY_API_KEY_LIGHT;
 
