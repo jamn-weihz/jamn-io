@@ -9,6 +9,7 @@ import { User } from '../types/User';
 import { Jam } from '../types/Jam';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MapIcon from '@mui/icons-material/Map';
+import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import SearchIcon from '@mui/icons-material/Search';
 import useRemoveCol from './useRemoveCol';
 import CloseIcon from '@mui/icons-material/Close';
@@ -20,7 +21,6 @@ import useChangeCol from './useChangeCol';
 import useShiftCol from './useShiftCol';
 import { MOBILE_WIDTH } from '../constants';
 import { ColContext } from '../App';
-
 interface ColBarProps {
   colUnit: ColUnit;
   user?: User | null;
@@ -65,6 +65,11 @@ export default function ColBar(props: ColBarProps) {
   const handleMapClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     changeCol(props.colUnit.col, '/map');
+  }
+
+  const handleStartClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    changeCol(props.colUnit.col, '/start');
   }
 
   const handleSearchClick = (event: React.MouseEvent) => {
@@ -129,6 +134,14 @@ export default function ColBar(props: ColBarProps) {
             padding: 0,
           }}>
             <MapIcon fontSize='inherit'/>
+          </IconButton>
+          &nbsp;&nbsp;&nbsp;
+          <IconButton size='small' onClick={handleStartClick} sx={{
+            color,
+            fontSize: 20,
+            padding: 0,
+          }}>
+            <PlayCircleFilledIcon fontSize='inherit'/>
           </IconButton>
           &nbsp;&nbsp;&nbsp;
           <IconButton size='small' onClick={handleSearchClick} sx={{

@@ -95,6 +95,11 @@ export class PostsResolver {
   ) {
     return this.postsService.getPostByIdWithPrivacy(user?.id, postId);
   }
+  
+  @Query(() => Post, {name: 'getStartPost'})
+  async getStartPost() {
+    return this.postsService.getStartPost();
+  }
 
   @UseInterceptors(GqlAuthInterceptor)
   @Mutation(() => [Post], {name: 'getRecentJamPosts'})

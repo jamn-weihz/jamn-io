@@ -15,6 +15,7 @@ import NotFound from '../NotFound';
 import PostCol from '../Post/PostCol';
 import { ColContext } from '../App';
 import About from '../About';
+import Start from '../Start';
 
 interface ColComponentProps {
   colUnit: ColUnit;
@@ -27,14 +28,12 @@ export default function ColComponent(props: ColComponentProps) {
   const paletteDetail = useReactiveVar(paletteVar);
 
   const handleClick = (event: React.MouseEvent) => {
-    if (state.i !== props.colUnit.col.i) {
-      dispatch({
-        type: 'SELECT_COL',
-        i: props.colUnit.col.i,
-        scroll: false,
-        navigate: true,
-      });
-    }
+    dispatch({
+      type: 'SELECT_COL',
+      i: props.colUnit.col.i,
+      scroll: false,
+      navigate: true,
+    });
   }
 
   const mapColUnitToComponent = (colUnit: ColUnit) => {
@@ -51,12 +50,11 @@ export default function ColComponent(props: ColComponentProps) {
     else if (path[1] === 'map') {
       return <Map colUnit={colUnit}/>;
     }
+    else if (path[1] === 'start') {
+      return <Start colUnit={colUnit} />
+    }
     else if (path[1] === 'search') {
-      return (
-        <Search 
-          colUnit={colUnit} 
-        />
-      );
+      return <Search colUnit={colUnit} />;
     }
     else if (path[1] === 'u') {
       return (

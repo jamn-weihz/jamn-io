@@ -4,6 +4,7 @@ import React, { useContext } from 'react';
 import { userVar } from '../cache';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MapIcon from '@mui/icons-material/Map';
+import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import SearchIcon from '@mui/icons-material/Search';
 import useAddCol from './useAddCol';
 import { sizeVar } from '../cache';
@@ -53,6 +54,11 @@ export default function ColAdder(props: ColAdderProps) {
         fontSize: sizeDetail.width < MOBILE_WIDTH ? 16 : 32,
       }}>
         <MapIcon fontSize='inherit'/>
+      </IconButton>
+      <IconButton size='small' onClick={handleAddClick('/start')} sx={{
+        fontSize: sizeDetail.width < MOBILE_WIDTH ? 16 : 32,
+      }}>
+        <PlayCircleFilledIcon fontSize='inherit'/>
       </IconButton>
       <IconButton size='small' onClick={handleAddClick('/search')} sx={{
         fontSize: sizeDetail.width < MOBILE_WIDTH ? 16 : 32,

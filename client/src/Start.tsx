@@ -1,32 +1,31 @@
 import { gql, useLazyQuery } from '@apollo/client';
 import { Box } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
-import ColBar from '../Col/ColBar';
-import { FULL_POST_FIELDS } from '../fragments';
-import Loading from '../Loading';
-import NotFound from '../NotFound';
-import { ColUnit } from '../types/Col';
-import { Post } from '../types/Post';
+import ColBar from './Col/ColBar';
+import { FULL_POST_FIELDS } from './fragments';
+import Loading from './Loading';
+import NotFound from './NotFound';
+import { ColUnit } from './types/Col';
+import { Post } from './types/Post';
 import { v4 as uuidv4 } from 'uuid'; 
-import Surveyor from '../Card/CardSurveyor';
-import { SurveyorSlice, SurveyorState } from '../types/Surveyor';
-import { Card } from '../types/Card';
-import { CardContext } from '../App';
+import Surveyor from './Card/CardSurveyor';
+import { SurveyorSlice, SurveyorState } from './types/Surveyor';
+import { Card } from './types/Card';
+import { CardContext } from './App';
 
-const GET_POST = gql`
-  query GetPost($postId: String!) {
-    getPost(postId: $postId) {
+const GET_START_POST = gql`
+  query GetStartPost {
+    getStartPost {
       ...FullPostFields
     }
   }
   ${FULL_POST_FIELDS}
 `;
 
-interface PostColProps {
+interface StartProps {
   colUnit: ColUnit;
-  id: string;
 }
-export default function PostCol(props: PostColProps) {
+export default function Start(props: StartProps) {
   const [post, setPost] = useState(null as Post | null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -74,7 +73,7 @@ export default function PostCol(props: PostColProps) {
     }
   }, [post?.id]);
 
-  const [getPost] = useLazyQuery(GET_POST, {
+  const [getStartPost] = useLazyQuery(GET_START_POST, {
     onError: error => {
       console.error(error);
       setIsLoading(false);
@@ -83,22 +82,17 @@ export default function PostCol(props: PostColProps) {
       if (isLoading) {
         console.log(data);
         setIsLoading(false)
-        setPost(data?.getPost)
+        setPost(data?.getStartPost)
       }
     }
   });
 
   useEffect(() => {
     setIsLoading(true);
-    getPost({
-      variables: {
-        postId: props.id, 
-      }
-    })
-  }, [props.id]);
+    getStartPost()
+  }, []);
 
   if (isLoading) return <Loading />
-
 
   return (
     <Box sx={{

@@ -8,6 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MapIcon from '@mui/icons-material/Map';
 import SearchIcon from '@mui/icons-material/Search';
+import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import PersonIcon from '@mui/icons-material/Person';
 import BoltIcon from '@mui/icons-material/Bolt';
 import ChatBubbleTwoToneIcon from '@mui/icons-material/ChatBubbleTwoTone';
@@ -62,17 +63,20 @@ export default function AppBar(props: AppbarProps) {
         return <PersonIcon fontSize='inherit' />
       }
     }
+    else if (path[1] === 'map') {
+      return <MapIcon fontSize='inherit'/>;
+    }
+    else if (path[1] === 'start') {
+      return <PlayCircleFilledIcon fontSize='inherit'/>;
+    }
+    else if (path[1] === 'search') {
+      return <SearchIcon fontSize='inherit'/>;
+    }
     else if (path[1] === 'j') {
       return <BoltIcon fontSize='inherit' />
     }
     else if (path[1] === 'p') {
       return <ChatBubbleTwoToneIcon fontSize='inherit' />
-    }
-    else if (path[1] === 'map') {
-      return <MapIcon fontSize='inherit'/>;
-    }
-    else if (path[1] === 'search') {
-      return <SearchIcon fontSize='inherit'/>;
     }
     return <QuestionMarkIcon fontSize='inherit'/>;
   }

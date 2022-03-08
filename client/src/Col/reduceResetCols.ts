@@ -50,8 +50,22 @@ export default function reduceResetCols(state: ColState, action: ResetColsAction
       {
         col: {
           id: uuidv4(),
-          pathname: '/search',
+          pathname: '/start',
           i: 3,
+          __typename: 'Col',
+        },
+        stack: [{
+          pathname: '/start',
+          id: uuidv4(),
+        }],
+        index: 0,
+        showOptions: false,
+      },
+      {
+        col: {
+          id: uuidv4(),
+          pathname: '/search',
+          i: 4,
           __typename: 'Col',
         },
         stack: [{

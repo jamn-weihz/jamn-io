@@ -2,6 +2,7 @@ import { Box, Card, Link, Typography } from '@mui/material';
 import ColBar from './Col/ColBar';
 import { ColUnit } from './types/Col';
 import logo from './favicon-32x32.png';
+import MapIcon from '@mui/icons-material/Map';
 
 interface AboutProps {
   colUnit: ColUnit;
@@ -33,10 +34,10 @@ export default function About(props: AboutProps) {
               <img src={logo} />
             </Box>
             <Box sx={{
-              marginLeft: 1,
+              marginLeft: 2,
             }}>
               <Typography variant='overline' sx={{
-                fontSize: 20,
+                fontSize: 22,
               }}>
                 JAMN.IO
               </Typography>
@@ -59,7 +60,56 @@ export default function About(props: AboutProps) {
           margin:1,
           padding:1,
         }}>
-          (1) JAMN is a social medium that allows you to link between posts.
+          <Box sx={{
+            textAlign: 'center',
+          }}>
+            <Typography variant='overline' sx={{
+              fontSize: 18,
+            }}>
+              Quickstart
+            </Typography>
+          </Box>
+          <Box>
+            (1) Use the map to join conversations based on geolocation.
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+          }}>
+            (2) Browse the conversations indexed under the start post.
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+          }}>
+            (3) Use keyword search to find conversations by topic.
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+          }}>
+            (4) Follow threads using the PREV and NEXT buttons on a post.
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+          }}>
+            (5) Register to add new posts, links, and votes.
+          </Box>
+        </Card>
+        <Card elevation={5} sx={{
+          margin:1,
+          padding:1,
+        }}>
+          <Box sx={{
+            textAlign: 'center',
+          }}>
+            <Typography variant='overline' sx={{
+              fontSize: 18,
+            }}>
+              In depth
+            </Typography>
+          </Box>
+          <Box sx={{
+          }}>
+            (1) JAMN is a social medium that allows you to link between posts.
+          </Box>
           <Box sx={{
             marginTop: 1,
             marginLeft: 2,
