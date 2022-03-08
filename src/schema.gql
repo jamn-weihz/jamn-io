@@ -119,6 +119,7 @@ type Post {
   prevCount: Int!
   privacy: String!
   saveDate: DateTime!
+  startI: Int
   tokens: Int!
   updateDate: DateTime!
   user: User!

@@ -59,6 +59,9 @@ export class Post {
   @Field(() => Int)
   nextCount: number;
 
+  @Field(() => Int, {nullable: true})
+  startI: number;
+
   @Field(() => Int)
   clicks: number;
 

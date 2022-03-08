@@ -21,6 +21,7 @@ export type Post = {
   commitDate: Date | null;
   prevCount: number;
   nextCount: number;
+  startI: number | null;
   clicks: number;
   tokens: number;
   weight: number;

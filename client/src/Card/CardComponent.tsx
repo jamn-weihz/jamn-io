@@ -22,7 +22,7 @@ import { SurveyorState } from '../types/Surveyor';
 import PostComponent from '../Post/PostComponent';
 import useReplyPost from '../Post/useReplyPost';
 import { Jam } from '../types/Jam';
-import { FULL_POST_FIELDS, LINK_FIELDS, VOTE_FIELDS } from '../fragments';
+import { FULL_POST_FIELDS, LINK_FIELDS, POST_FIELDS, VOTE_FIELDS } from '../fragments';
 import useGetPrev from '../Post/useGetPrev';
 import useGetNext from '../Post/useGetNext';
 import { ColUnit } from '../types/Col';
@@ -218,7 +218,19 @@ export default function CardComponent(props: CardComponentProps) {
     event.stopPropagation();
 
     if (props.post && props.post.id !== props.card.postId) {
-      changeCol(props.colUnit.col, `/p/${props.card.postId}`)
+      const post = client.cache.readFragment({
+        id: client.cache.identify({
+          id: props.card.postId,
+          __typename: 'Post',
+        }),
+        fragment: POST_FIELDS,
+      }) as Post;
+      if (post.startI === 1) {
+        changeCol(props.colUnit.col, `/start`);
+      }
+      else {
+        changeCol(props.colUnit.col, `/p/${props.card.postId}`)
+      }
     }
     const { idToCard, rootCard } = promoteCard(state, props.card);
 

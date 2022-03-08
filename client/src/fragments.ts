@@ -73,6 +73,7 @@ export const POST_FIELDS = gql`
     draft
     privacy
     isOpaque
+    startI
     prevCount
     nextCount
     saveDate
