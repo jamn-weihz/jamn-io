@@ -70,6 +70,11 @@ export default function About(props: AboutProps) {
             </Typography>
           </Box>
           <Box>
+            (0) If you're on mobile, scroll right to see the other columns!
+          </Box>
+          <Box sx={{
+            marginTop: 1,
+          }}>
             (1) Use the map to join conversations based on geolocation.
           </Box>
           <Box sx={{
