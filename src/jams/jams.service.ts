@@ -77,7 +77,8 @@ export class JamsService {
     if (!startPost) {
       startPost = await this.postsService.createStartPost(user.id);
     }
-    this.postsService.incrementPostNextCount(startPost.id, 1);
+    await this.postsService.incrementPostNextCount(startPost.id, 1);
+    await this.postsService.incrementPostsWeights([startPost.id], 1, 0, 1);
     
     const jamPost = await this.postsService.createPost(user.id, jam1.id, jam1.name, jam1.description);
 

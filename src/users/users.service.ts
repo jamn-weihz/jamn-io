@@ -103,7 +103,7 @@ export class UsersService {
       startPost = await this.postsService.createStartPost(user1.id);
     }
     await this.postsService.incrementPostNextCount(startPost.id, 1);
-    
+    await this.postsService.incrementPostsWeights([startPost.id], 1, 0, 1);
     const userPost = await this.postsService.createPost(user1.id, null, '', '');
 
     const link = await this.linksService.createLink(startPost.id, userPost.id, 1, 0);

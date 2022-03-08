@@ -215,6 +215,8 @@ export class PostsService {
     post0.description = desc;
     post0.prevCount = 1;
     post0.nextCount = 0;
+    post0.clicks = 1;
+    post0.weight = 1;
     post0.saveDate = new Date();
     post0.commitDate = null;
     const post1 = await this.postsRepository.save(post0);
@@ -248,6 +250,7 @@ export class PostsService {
 
     const post1 = await this.postsRepository.save(post0);
     this.searchService.partialUpdatePosts([post1]);
+    this.indexPosts();
     return this.getPostById(post1.id);
   }
  
@@ -276,6 +279,7 @@ export class PostsService {
     });
     const posts1 = await this.postsRepository.save(posts0);
 
+    this.searchService.partialUpdatePosts(posts1);
     return posts1;
   }
 }
