@@ -107,28 +107,34 @@ export class VotesService {
 
     const userIdToReasons: any = {};
     leads.forEach(lead => {
-      userIdToReasons[lead.followerUserId] = {
-        lead,
-      };
+      if (lead.followerUserId !== vote.userId) {
+        userIdToReasons[lead.followerUserId] = {
+          lead,
+        };
+      }
     });
     sourcePostSubs.forEach(sub => {
-      if (userIdToReasons[sub.userId]) {
-        userIdToReasons[sub.userId].sourcePostSub = sub;
-      }
-      else {
-        userIdToReasons[sub.userId] = {
-          sourcePostSub: sub,
-        };
+      if (sub.userId !== vote.userId) {
+        if (userIdToReasons[sub.userId]) {
+          userIdToReasons[sub.userId].sourcePostSub = sub;
+        }
+        else {
+          userIdToReasons[sub.userId] = {
+            sourcePostSub: sub,
+          };
+        }
       }
     });
     targetPostSubs.forEach(sub => {
-      if (userIdToReasons[sub.userId]) {
-        userIdToReasons[sub.userId].targetPostSub = sub;
-      }
-      else {
-        userIdToReasons[sub.userId] = {
-          targetPostSub: sub
-        };
+      if (sub.userId !== vote.userId) {
+        if (userIdToReasons[sub.userId]) {
+          userIdToReasons[sub.userId].targetPostSub = sub;
+        }
+        else {
+          userIdToReasons[sub.userId] = {
+            targetPostSub: sub
+          };
+        }
       }
     });
 
