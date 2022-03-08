@@ -250,7 +250,6 @@ export class PostsService {
 
     const post1 = await this.postsRepository.save(post0);
     this.searchService.partialUpdatePosts([post1]);
-    this.indexPosts();
     return this.getPostById(post1.id);
   }
  
