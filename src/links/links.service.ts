@@ -73,6 +73,7 @@ export class LinksService {
     }
     this.postsService.incrementPostNextCount(sourcePostId, 1);
     const targetPost = await this.postsService.createPost(userId, jamId, '', '');
+    await this.postsService.incrementPostsWeights([sourcePostId, targetPost.id], 1, 0, findDefaultWeight(1,0));
     const link = await this.createLink(sourcePostId, targetPost.id, 1, 0);
     const vote = await this.votesService.createVote(userId, link.id, sourcePostId, targetPost.id, 1, 0);
     return link;
@@ -98,14 +99,17 @@ export class LinksService {
         await this.linksRepository.increment({id: link.id}, 'clicks', dClicks);
         await this.linksRepository.increment({id: link.id}, 'tokens', dTokens);
         await this.linksRepository.increment({id: link.id}, 'weight', dWeight);
+        await this.postsService.incrementPostsWeights([sourcePostId, targetPostId], dClicks, dTokens, dWeight);
       }
       const newVote = await this.votesService.createVote(userId, link.id, sourcePostId, targetPostId, clicks, tokens);
     }
     else {
       const posts = await this.postsService.getPostsByIds([sourcePostId, targetPostId]);
       if (posts.length !== 2) return null;
-      this.postsService.incrementPostNextCount(sourcePostId, 1);
-      this.postsService.incrementPostPrevCount(targetPostId, 1);
+      await this.postsService.incrementPostNextCount(sourcePostId, 1);
+      await this.postsService.incrementPostPrevCount(targetPostId, 1);
+      await this.postsService.incrementPostsWeights([sourcePostId, targetPostId], clicks, tokens, findDefaultWeight(clicks, tokens));
+
       link = await this.createLink(sourcePostId, targetPostId, clicks, tokens);
       const vote = await this.votesService.createVote(userId, link.id, sourcePostId, targetPostId, clicks, tokens);
     }
@@ -136,7 +140,8 @@ export class LinksService {
     await this.linksRepository.increment({id: linkId}, 'clicks', dClicks);
     await this.linksRepository.increment({id: linkId}, 'tokens', dTokens);
     await this.linksRepository.increment({id: linkId}, 'weight', dWeight);
-    
+    await this.postsService.incrementPostsWeights([link.sourcePostId, link.targetPostId], dClicks, dTokens, dWeight);
+
     const link1 = await this.getLinkById(linkId);
     if (link1.clicks === 0 && link1.tokens === 0 && link1.weight === 0) {
       const foreignVote = await this.votesService.getForeignVote(userId, linkId);

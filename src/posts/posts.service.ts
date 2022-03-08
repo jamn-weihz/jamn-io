@@ -250,12 +250,32 @@ export class PostsService {
     this.searchService.partialUpdatePosts([post1]);
     return this.getPostById(post1.id);
   }
-
-  incrementPostPrevCount(postId: string, value: number) {
-    this.postsRepository.increment({id: postId}, 'prevCount', value);
+ 
+  async incrementPostPrevCount(postId: string, value: number) {
+    await this.postsRepository.increment({id: postId}, 'prevCount', value);
   }
 
-  incrementPostNextCount(postId: string, value: number) {
-    this.postsRepository.increment({id: postId}, 'nextCount', value);
+  async incrementPostNextCount(postId: string, value: number) {
+    await this.postsRepository.increment({id: postId}, 'nextCount', value);
+  }
+
+  async incrementPostsWeights(postIds: string[], dClicks: number, dTokens: number, dWeight: number) {
+    const posts = await this.postsRepository.find({
+      where: {
+        id: In(postIds),
+      },
+    });
+    const posts0 = [];
+    posts.forEach(post => {
+      const post0 = new Post();
+      post0.id = post.id;
+      post0.clicks = post.clicks + dClicks;
+      post0.tokens = post.tokens + dTokens;
+      post0.weight = post.weight + dWeight;
+      posts0.push(post0);
+    });
+    const posts1 = await this.postsRepository.save(posts0);
+
+    return posts1;
   }
 }
