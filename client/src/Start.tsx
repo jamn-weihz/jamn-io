@@ -100,7 +100,7 @@ export default function Start(props: StartProps) {
     }}>
       <ColBar colUnit={props.colUnit} />
       <Box sx={{
-        height: 'calc(100% - 70px)',
+        height: 'calc(100% - 50px)',
         overflowY: 'scroll',
       }}>
       {
